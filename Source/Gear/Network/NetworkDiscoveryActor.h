@@ -5,7 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Online/LanBeacon.h"
+#include "GameFramework/GearTypes.h"
+#include "Delegates/DelegateCombinations.h"
 #include "NetworkDiscoveryActor.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFoundHostDelegate, const FGearHostInfo&, HostInfo);
 
 UCLASS()
 class GEAR_API ANetworkDiscoveryActor : public AActor
@@ -33,4 +37,7 @@ public:
 
 	void OnValidResponsePacket(uint8* Bytes, int32 Length);
 	void OnSearchTimeout();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnFoundHostDelegate OnFoundHostDelegate;
 };

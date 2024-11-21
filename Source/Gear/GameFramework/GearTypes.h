@@ -8,16 +8,26 @@
 #define DEFAULT_PLAYER_NAME "NewPlayer"
 
 USTRUCT(BlueprintType)
-struct GEAR_API FGearPersistantData
+struct GEAR_API FGearHostInfo
 {
 	GENERATED_BODY()
 
 public:
-	FGearPersistantData()
-		: PlayerName("NewPlayer")
-	{  
-	
+	FGearHostInfo(const FString& InName, const FString& InIP)
+		: Name(InName)
+		, IP(InIP)
+	{
+
 	}
 
-	FString PlayerName;
+	FGearHostInfo() : FGearHostInfo("Host", "IP")
+	{
+
+	}
+
+	UPROPERTY(BlueprintReadOnly)
+	FString Name;
+
+	UPROPERTY(BlueprintReadOnly)
+	FString IP;
 };

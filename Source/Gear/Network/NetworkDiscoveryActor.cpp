@@ -86,6 +86,9 @@ void ANetworkDiscoveryActor::OnValidResponsePacket(uint8* Bytes, int32 Length)
 	PacketReader >> IP;
 
 	UE_LOG(LogTemp, Log, TEXT("recived response from hostname: %s and ip: %s"), *HostName, *IP);
+
+	FGearHostInfo HostInfo = FGearHostInfo(HostName, IP);
+	OnFoundHostDelegate.Broadcast(HostInfo);
 }
 
 void ANetworkDiscoveryActor::OnSearchTimeout()
