@@ -3,6 +3,9 @@
 
 #include "NetworkDiscoveryActor.h"
 #include "Online/NBoSerializer.h"
+#include "SocketSubsystem.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/GearGameInstance.h"
 
 #define LAN_DISCOVERY_NONCE 1
 
@@ -55,19 +58,34 @@ void ANetworkDiscoveryActor::StopDiscovery()
 
 void ANetworkDiscoveryActor::OnValidQueryPacket(uint8* Bytes, int32 Length, uint64 Nonce)
 {
-	UE_LOG(LogTemp, Log, TEXT("recived query."));
-
  	FNboSerializeToBuffer Packet(LAN_BEACON_MAX_PACKET_SIZE);
  	LanSession.CreateHostResponsePacket(Packet, Nonce);
 
-	Packet << FString("ABC");
+	UGearGameInstance* GearGameInstance = Cast<UGearGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	FString HostName = GearGameInstance->GetPlayerName();
+
+	bool bCanBindAll;
+	TSharedPtr<class FInternetAddr> Addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, bCanBindAll);
+	FString IP = Addr->ToString(false);
+
+	Packet << HostName;
+	Packet << IP;
 
  	LanSession.BroadcastPacket(Packet, Packet.GetByteCount());
+
+	UE_LOG(LogTemp, Log, TEXT("send response with hostname: %s and ip: %s"), *HostName, *IP);
 }
 
 void ANetworkDiscoveryActor::OnValidResponsePacket(uint8* Bytes, int32 Length)
 {
-	UE_LOG(LogTemp, Log, TEXT("recived response"));
+	FString HostName;
+	FString IP;
+
+	FNboSerializeFromBuffer PacketReader(Bytes, Length);
+	PacketReader >> HostName;
+	PacketReader >> IP;
+
+	UE_LOG(LogTemp, Log, TEXT("recived response from hostname: %s and ip: %s"), *HostName, *IP);
 }
 
 void ANetworkDiscoveryActor::OnSearchTimeout()

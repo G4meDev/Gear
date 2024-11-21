@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Fill out your copyright notice in the Description page of Project Settings
 
 #include "GameFramework/GearGameInstance.h"
 #include "Kismet/GameplayStatics.h"
@@ -25,11 +24,7 @@ void UGearGameInstance::InitPersistantData()
 		GearSave = Cast<UGearSaveGame>(UGameplayStatics::CreateSaveGameObject(UGearSaveGame::StaticClass()));
 		TrySaveGame();
 	}
-
-
 }
-
-
 
 bool UGearGameInstance::TryLoadGame()
 {
@@ -111,9 +106,6 @@ FString UGearGameInstance::TryChangePlayerName(const FString& NewName)
 
 	return GetPlayerName();
 }
-
-
-
 
 #undef SAVE_SLOT_NAME
 #undef SAVE_USER_INDEX
