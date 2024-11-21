@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class Gear : ModuleRules
@@ -13,6 +14,12 @@ public class Gear : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
         PublicIncludePaths.AddRange(new string[] { "Gear", "OnlineBase/Public" });
+
+        if(Target.Platform == UnrealTargetPlatform.Android)
+        {
+            var manifestFile = Path.Combine(ModuleDirectory, "AndroidPermissions.xml");
+            AdditionalPropertiesForReceipt.Add("AndroidPlugin", manifestFile);
+        }
 
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
