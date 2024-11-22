@@ -19,13 +19,14 @@ class GEAR_API UGearGameInstance : public UGameInstance
 public:
 	void Init() override;
 
-	UFUNCTION(BlueprintCallable)
-	FString GetPlayerName() const;
+	UFUNCTION(BlueprintPure)
+	FString GetPlayerName();
 
 	UFUNCTION(BlueprintCallable)
 	FString TryChangePlayerName(const FString& NewName);
 
 private:
+	UPROPERTY()
 	UGearSaveGame* GearSave;
 
 	void InitPersistantData();

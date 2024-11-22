@@ -16,12 +16,12 @@ class GEAR_API UGearSaveGame : public USaveGame
 	GENERATED_BODY()
 	
 public:
-	UGearSaveGame()
+	UGearSaveGame() 
 		: PlayerName(DEFAULT_PLAYER_NAME)
 	{
 
 	}
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	FString PlayerName;
 };

@@ -35,7 +35,7 @@ bool UGearGameInstance::TryLoadGame()
 		return false;
 	}
 	GearSave = Cast<UGearSaveGame>(SaveGame);
-	if (!GearSave)
+	if (!IsValid(GearSave))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("save file is not compatiable"));
 		return false;
@@ -85,9 +85,9 @@ FString UGearGameInstance::ValidtePlayerNameChange(const FString& NewName, const
 	return NewName;
 }
 
-FString UGearGameInstance::GetPlayerName() const 
+FString UGearGameInstance::GetPlayerName() 
 {
-	if (GearSave)
+	if (IsValid(GearSave))
 	{
 		return GearSave->PlayerName;
 	}
@@ -97,7 +97,7 @@ FString UGearGameInstance::GetPlayerName() const
 
 FString UGearGameInstance::TryChangePlayerName(const FString& NewName)
 {
-	if (GearSave)
+	if (IsValid(GearSave))
 	{
 		FString ValidatedName = ValidtePlayerNameChange(NewName, GetPlayerName());
 		GearSave->PlayerName = ValidatedName;
