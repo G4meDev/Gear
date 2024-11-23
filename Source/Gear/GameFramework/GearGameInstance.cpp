@@ -13,6 +13,7 @@ void UGearGameInstance::Init()
 	Super::Init();
 
 	InitPersistantData();
+
 }
 
 void UGearGameInstance::InitPersistantData()
