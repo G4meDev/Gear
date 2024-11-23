@@ -2,4 +2,22 @@
 
 
 #include "GameFramework/GearGameState.h"
+#include "GameFramework/GearPlayerState.h"
 
+AGearGameState::AGearGameState()
+{
+}
+
+void AGearGameState::AddPlayerState(APlayerState* PlayerState)
+{
+	Super::AddPlayerState(PlayerState);
+
+
+}
+
+void AGearGameState::RemovePlayerState(APlayerState* PlayerState)
+{
+	Super::RemovePlayerState(PlayerState);
+
+
+}

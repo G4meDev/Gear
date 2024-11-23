@@ -6,6 +6,15 @@
 #include "GameFramework/GameMode.h"
 #include "GearGameMode.generated.h"
 
+UENUM(BlueprintType)
+enum class EGearMatchState : uint8
+{
+	WaitingForPlayerToJoin,
+	SelectingPeices,
+	Racing,
+	Ended
+};
+
 /**
  * 
  */
@@ -16,5 +25,22 @@ class GEAR_API AGearGameMode : public AGameMode
 
 public:
 	AGearGameMode();
+
+	void Tick(float DeltaSeconds) override;
 	
+
+protected:
+
+	void StartSelectingPieces();
+
+	bool ReadyToStartMatch_Implementation() override;
+	void HandleMatchHasStarted() override;
+
+	bool ReadyToEndMatch_Implementation() override;
+	void HandleMatchHasEnded() override;
+
+	bool ShouldAbort();
+	void HandleMatchAborted() override;
+
+	EGearMatchState GearMatchState;
 };

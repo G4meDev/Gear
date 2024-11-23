@@ -6,6 +6,7 @@
 #include "GameFramework/GameState.h"
 #include "GearGameState.generated.h"
 
+
 /**
  * 
  */
@@ -14,4 +15,14 @@ class GEAR_API AGearGameState : public AGameState
 {
 	GENERATED_BODY()
 	
+public:
+	AGearGameState();
+
+
+
+protected:
+	void AddPlayerState(APlayerState* PlayerState) override;
+	void RemovePlayerState(APlayerState* PlayerState) override;
+
+
 };
