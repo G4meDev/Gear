@@ -3,17 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameMode.h"
-#include "LobbyGameMode.generated.h"
+#include "GameFramework/PlayerController.h"
+#include "GearPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GEAR_API ALobbyGameMode : public AGameMode
+class GEAR_API AGearPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
-public:
-	ALobbyGameMode();
 };

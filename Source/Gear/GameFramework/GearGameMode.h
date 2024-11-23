@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
-#include "LobbyGameMode.generated.h"
+#include "GearGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GEAR_API ALobbyGameMode : public AGameMode
+class GEAR_API AGearGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
 public:
-	ALobbyGameMode();
+	AGearGameMode();
+	
 };
