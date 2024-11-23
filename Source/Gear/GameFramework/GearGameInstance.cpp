@@ -4,6 +4,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GearSaveGame.h"
 #include "GameFramework/GearTypes.h"
+#include "Blueprint/UserWidget.h"
+#include "Widgets/SWidget.h"
+#include "ShaderPipelineCache.h"
+#include "HAL/ThreadHeartBeat.h"
 
 #define SAVE_SLOT_NAME "Save"
 #define SAVE_USER_INDEX 0
@@ -12,8 +16,19 @@ void UGearGameInstance::Init()
 {
 	Super::Init();
 
-	InitPersistantData();
+	FWorldDelegates::OnSeamlessTravelStart.AddUObject(this, &UGearGameInstance::OnSeamlessTravelStart);
+	FWorldDelegates::OnSeamlessTravelTransition.AddUObject(this, &UGearGameInstance::OnSeamlessTravelTransition);
 
+	InitPersistantData();
+}
+
+void UGearGameInstance::Shutdown()
+{
+	//RemoveLoadingScreen();
+
+	LoadingScreenWidget.Reset();
+
+	Super::Shutdown();
 }
 
 void UGearGameInstance::InitPersistantData()
@@ -106,6 +121,92 @@ FString UGearGameInstance::TryChangePlayerName(const FString& NewName)
 	}
 
 	return GetPlayerName();
+}
+
+void UGearGameInstance::OnSeamlessTravelStart(UWorld* World, const FString& Str)
+{
+	ShowLoadingScreen();
+}
+
+void UGearGameInstance::OnSeamlessTravelTransition(UWorld* World)
+{
+	RemoveLoadingScreen();
+}
+
+// -----------------------------------------------------------------------------------------------
+
+void UGearGameInstance::ShowLoadingScreen()
+{
+	if (LoadingScreenWidget.IsValid())
+	{
+		return;
+	}
+
+	if (UUserWidget* UserWidget = UUserWidget::CreateWidgetInstance(*this, LoadingScreenWidgetClass, NAME_None))
+	{
+		LoadingScreenWidget = UserWidget->TakeWidget();
+	}
+
+	UGameViewportClient* GameViewportClient = GetGameViewportClient();
+	GameViewportClient->AddViewportWidgetContent(LoadingScreenWidget.ToSharedRef(), 10000);
+
+	ChangePerformanceSettings(true);
+
+	FSlateApplication::Get().Tick();
+}
+
+void UGearGameInstance::RemoveLoadingScreen()
+{
+	if (LoadingScreenWidget.IsValid())
+	{
+		if (UGameViewportClient* GameViewportClient = GetGameViewportClient())
+		{
+			GameViewportClient->RemoveViewportWidgetContent(LoadingScreenWidget.ToSharedRef());
+		}
+
+		LoadingScreenWidget.Reset();
+	}
+
+	ChangePerformanceSettings(false);
+}
+
+void UGearGameInstance::ChangePerformanceSettings(bool bEnabingLoadingScreen)
+{
+	UGameInstance* LocalGameInstance = this;
+	UGameViewportClient* GameViewportClient = LocalGameInstance->GetGameViewportClient();
+
+	FShaderPipelineCache::SetBatchMode(bEnabingLoadingScreen ? FShaderPipelineCache::BatchMode::Fast : FShaderPipelineCache::BatchMode::Background);
+
+	// Don't bother drawing the 3D world while we're loading
+	GameViewportClient->bDisableWorldRendering = bEnabingLoadingScreen;
+
+	// Make sure to prioritize streaming in levels if the loading screen is up
+	if (UWorld* ViewportWorld = GameViewportClient->GetWorld())
+	{
+		if (AWorldSettings* WorldSettings = ViewportWorld->GetWorldSettings(false, false))
+		{
+			WorldSettings->bHighPriorityLoadingLocal = bEnabingLoadingScreen;
+		}
+	}
+
+	if (bEnabingLoadingScreen)
+	{
+		// Set a new hang detector timeout multiplier when the loading screen is visible.
+		double HangDurationMultiplier = 5;
+
+		FThreadHeartBeat::Get().SetDurationMultiplier(HangDurationMultiplier);
+
+		// Do not report hitches while the loading screen is up
+		FGameThreadHitchHeartBeat::Get().SuspendHeartBeat();
+	}
+	else
+	{
+		// Restore the hang detector timeout when we hide the loading screen
+		FThreadHeartBeat::Get().SetDurationMultiplier(1.0);
+
+		// Resume reporting hitches now that the loading screen is down
+		FGameThreadHitchHeartBeat::Get().ResumeHeartBeat();
+	}
 }
 
 #undef SAVE_SLOT_NAME

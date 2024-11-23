@@ -7,6 +7,8 @@
 #include "GearGameInstance.generated.h" 
 
 class UGearSaveGame;
+class UUserWidget;
+class SWidget;
 
 /**
  * 
@@ -19,12 +21,30 @@ class GEAR_API UGearGameInstance : public UGameInstance
 public:
 	void Init() override;
 
+	virtual void Shutdown() override;
+
 	UFUNCTION(BlueprintPure)
 	FString GetPlayerName();
 
 	UFUNCTION(BlueprintCallable)
 	FString TryChangePlayerName(const FString& NewName);
 
+	void OnSeamlessTravelStart(UWorld* World, const FString& Str);
+
+	void OnSeamlessTravelTransition(UWorld* World);
+
+	UFUNCTION(BlueprintCallable)
+	void ShowLoadingScreen();
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveLoadingScreen();
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
+
+	TSharedPtr<SWidget> LoadingScreenWidget;
+	
 private:
 	UPROPERTY()
 	UGearSaveGame* GearSave;
@@ -38,4 +58,6 @@ private:
 	void TrySaveGameAsync();
 
 	FString ValidtePlayerNameChange(const FString& NewName, const FString& OldName);
+
+	void ChangePerformanceSettings(bool bEnabingLoadingScreen);
 };
