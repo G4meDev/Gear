@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "GameFramework/GearTypes.h"
 #include "LobbyPlayerState.generated.h"
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerNameChanged);
 
 /**
  * 
@@ -22,6 +21,8 @@ protected:
 	void Destroyed() override;
 
 	void OnRep_PlayerName() override;
+
+	void CopyProperties(APlayerState* PlayerState) override;
 
 public:
 	UPROPERTY(BlueprintAssignable)

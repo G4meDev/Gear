@@ -7,6 +7,8 @@
 
 #define DEFAULT_PLAYER_NAME "NewPlayer"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerNameChanged);
+
 USTRUCT(BlueprintType)
 struct GEAR_API FGearHostInfo
 {

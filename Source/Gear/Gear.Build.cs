@@ -13,7 +13,7 @@ public class Gear : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-        PublicIncludePaths.AddRange(new string[] { "Gear", "OnlineBase/Public" });
+        PublicIncludePaths.AddRange(new string[] { "Gear" });
 
         if(Target.Platform == UnrealTargetPlatform.Android)
         {

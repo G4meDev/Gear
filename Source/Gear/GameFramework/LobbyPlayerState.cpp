@@ -24,3 +24,18 @@ void ALobbyPlayerState::OnRep_PlayerName()
 
 	OnPlayerNameChanged.Broadcast();
 }
+
+void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	// after travel player name just get set locally and server wont notice the name change
+
+	ENetMode NetMode = GetNetMode();
+	if (NetMode == NM_ListenServer || NetMode == NM_Standalone)
+	{
+		PlayerState->OnRep_PlayerName();
+	}
+
+
+}

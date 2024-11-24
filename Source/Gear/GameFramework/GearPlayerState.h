@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "GameFramework/GearTypes.h"
 #include "GearPlayerState.generated.h"
 
 /**
@@ -13,5 +14,17 @@ UCLASS()
 class GEAR_API AGearPlayerState : public APlayerState
 {
 	GENERATED_BODY()
-	
+
+
+protected:
+
+	void OnRep_PlayerName() override;
+
+	void CopyProperties(APlayerState* PlayerState) override;
+
+
+public:
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerNameChanged OnPlayerNameChanged;
 };
