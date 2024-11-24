@@ -6,6 +6,12 @@
 #include "GameFramework/GearGameState.h"
 #include "GearHUD.h"
 
+AGearPlayerController::AGearPlayerController()
+{
+	GearHUD = nullptr;
+	IsReady = false;
+}
+
 void AGearPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,10 +31,36 @@ void AGearPlayerController::BeginPlay()
 		}
 	}
 
-	else
+
+}
+
+void AGearPlayerController::AllPlayersJoined_Implementation()
+{
+	if (IsValid(GearHUD))
 	{
-		GearHUD = nullptr;
+		GearHUD->AllPlayersJoined();
 	}
+}
+
+void AGearPlayerController::MatchStarted_Implementation()
+{
+	if (IsValid(GearHUD))
+	{
+		GearHUD->RemoveWaitingScreen();
+	}
+}
+
+void AGearPlayerController::PeekClientIsReady_Implementation()
+{
+	if (IsValid(GearHUD))
+	{
+		RespondClientIsReady();
+	}
+}
+
+void AGearPlayerController::RespondClientIsReady_Implementation()
+{
+	IsReady = true;
 }
 
 void AGearPlayerController::OnNewPlayer(AGearPlayerState* GearPlayer)

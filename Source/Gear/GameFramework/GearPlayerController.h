@@ -19,13 +19,32 @@ class GEAR_API AGearPlayerController : public APlayerController
 	
 protected:
 
+	AGearPlayerController();
+
 	virtual void BeginPlay() override;
+
 
 
 public:
 
+	bool IsReady;
+
+	UPROPERTY()
 	AGearHUD* GearHUD;
+
+	UFUNCTION(Client, Unreliable)
+	void PeekClientIsReady();
+
+	UFUNCTION(Server, Unreliable)
+	void RespondClientIsReady();
 
 	void OnNewPlayer(AGearPlayerState* GearPlayer);
 	void OnRemovePlayer(AGearPlayerState* GearPlayer);
+
+	UFUNCTION(Client, Reliable)
+	void AllPlayersJoined();
+
+	UFUNCTION(Client, Reliable)
+	void MatchStarted();
+
 };

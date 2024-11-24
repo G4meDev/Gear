@@ -19,14 +19,14 @@ void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 		APlayerController* const PlayerController = Iterator->Get();
 		if (PlayerController && PlayerController->IsLocalController())
 		{
-			AGearPlayerController* LobbyController = Cast<AGearPlayerController>(PlayerController);
+			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
 
-			if (IsValid(LobbyController))
+			if (IsValid(GearController))
 			{
 				AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(PlayerState);
 				if (IsValid(GearPlayer))
 				{
-					LobbyController->OnNewPlayer(GearPlayer);
+					GearController->OnNewPlayer(GearPlayer);
 				}
 			}
 		}
@@ -42,14 +42,14 @@ void AGearGameState::RemovePlayerState(APlayerState* PlayerState)
 		APlayerController* const PlayerController = Iterator->Get();
 		if (PlayerController && PlayerController->IsLocalController())
 		{
-			AGearPlayerController* LobbyController = Cast<AGearPlayerController>(PlayerController);
+			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
 
-			if (IsValid(LobbyController))
+			if (IsValid(GearController))
 			{
 				AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(PlayerState);
 				if (IsValid(GearPlayer))
 				{
-					LobbyController->OnRemovePlayer(GearPlayer);
+					GearController->OnRemovePlayer(GearPlayer);
 				}
 			}
 		}

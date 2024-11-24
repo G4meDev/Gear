@@ -31,6 +31,8 @@ public:
 
 protected:
 
+	virtual void BeginPlay() override;
+
 	void StartSelectingPieces();
 
 	bool ReadyToStartMatch_Implementation() override;
@@ -42,5 +44,9 @@ protected:
 	bool ShouldAbort();
 	void HandleMatchAborted() override;
 
+	void StartFirstPhase();
+
 	EGearMatchState GearMatchState;
+
+	float StartDelayAfterAllJoined = 2.0f;
 };

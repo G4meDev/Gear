@@ -29,7 +29,24 @@ void AGearGameMode::Tick(float DeltaSeconds)
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()
 {
-	return NumTravellingPlayers == 0 && NumPlayers > 1;
+	bool EveryClientIsReady = true;
+
+	// until all clients doesn't respond to server client don`t start game
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* const PlayerController = Iterator->Get();
+		if (PlayerController)
+		{
+			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
+			if (IsValid(GearController) && !GearController->IsReady)
+			{
+				EveryClientIsReady = false;
+				GearController->PeekClientIsReady();
+			}
+		}
+	}
+
+	return NumTravellingPlayers == 0 && NumPlayers > 1 && EveryClientIsReady;
 }
 
 void AGearGameMode::HandleMatchHasStarted()
@@ -38,9 +55,22 @@ void AGearGameMode::HandleMatchHasStarted()
 
 	UE_LOG(LogTemp, Warning, TEXT("Match Started!"));
 
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* const PlayerController = Iterator->Get();
+		if (PlayerController)
+		{
+			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
 
+			if (IsValid(GearController))
+			{
+				GearController->AllPlayersJoined();
+			}
+		}
+	}
 
-	StartSelectingPieces();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, StartDelayAfterAllJoined);
 }
 
 
@@ -63,9 +93,34 @@ void AGearGameMode::HandleMatchAborted()
 	UE_LOG(LogTemp, Error, TEXT("Match Aborted!"));
 }
 
+void AGearGameMode::StartFirstPhase()
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* const PlayerController = Iterator->Get();
+		if (PlayerController)
+		{
+			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
+
+			if (IsValid(GearController))
+			{
+				GearController->MatchStarted();
+			}
+		}
+	}
+	
+	StartSelectingPieces();
+}
+
 bool AGearGameMode::ReadyToEndMatch_Implementation()
 {
 	return false;
+}
+
+void AGearGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
 }
 
 void AGearGameMode::StartSelectingPieces()

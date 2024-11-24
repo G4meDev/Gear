@@ -25,6 +25,9 @@ public:
 	void RemoveWaitingScreen();
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void AllPlayersJoined();
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void AddPlayer(AGearPlayerState* InPlayer);
 
 	UFUNCTION(BlueprintImplementableEvent)
