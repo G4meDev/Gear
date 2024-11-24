@@ -38,6 +38,8 @@ void AGearGameMode::HandleMatchHasStarted()
 
 	UE_LOG(LogTemp, Warning, TEXT("Match Started!"));
 
+
+
 	StartSelectingPieces();
 }
 

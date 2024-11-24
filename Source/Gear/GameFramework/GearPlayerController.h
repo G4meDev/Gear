@@ -6,7 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "GearPlayerController.generated.h"
 
-class APlayerState;
+class AGearPlayerState;
+class AGearHUD;
 
 /**
  * 
@@ -18,14 +19,13 @@ class GEAR_API AGearPlayerController : public APlayerController
 	
 protected:
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnAddPlayer(AGearPlayerState* InPlayer);
+	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnRemovePlayer(AGearPlayerState* InPlayer);
 
 public:
 
-	void NotifyNewPlayer(APlayerState* InPlayer);
-	void NotifyRemovePlayer(APlayerState* InPlayer);
+	AGearHUD* GearHUD;
+
+	void OnNewPlayer(AGearPlayerState* GearPlayer);
+	void OnRemovePlayer(AGearPlayerState* GearPlayer);
 };

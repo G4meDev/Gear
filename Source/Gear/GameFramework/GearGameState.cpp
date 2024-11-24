@@ -2,7 +2,7 @@
 
 
 #include "GameFramework/GearGameState.h"
-//#include "GameFramework/GearPlayerState.h"
+#include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearPlayerController.h"
 
 AGearGameState::AGearGameState()
@@ -23,7 +23,11 @@ void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 
 			if (IsValid(LobbyController))
 			{
-				LobbyController->NotifyNewPlayer(PlayerState);
+				AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(PlayerState);
+				if (IsValid(GearPlayer))
+				{
+					LobbyController->OnNewPlayer(GearPlayer);
+				}
 			}
 		}
 	}
@@ -42,7 +46,11 @@ void AGearGameState::RemovePlayerState(APlayerState* PlayerState)
 
 			if (IsValid(LobbyController))
 			{
-				LobbyController->NotifyRemovePlayer(PlayerState);
+				AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(PlayerState);
+				if (IsValid(GearPlayer))
+				{
+					LobbyController->OnRemovePlayer(GearPlayer);
+				}
 			}
 		}
 	}

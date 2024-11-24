@@ -3,21 +3,42 @@
 
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearPlayerState.h"
+#include "GameFramework/GearGameState.h"
+#include "GearHUD.h"
 
-void AGearPlayerController::NotifyNewPlayer(APlayerState* InPlayer)
+void AGearPlayerController::BeginPlay()
 {
-	AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(InPlayer);
-	if (IsValid(GearPlayer))
+	Super::BeginPlay();
+
+	if (IsLocalController())
 	{
-		OnAddPlayer(GearPlayer);
+		GearHUD = Cast<AGearHUD>(GetHUD());
+		GearHUD->ShowWaitingScreen();
+
+		for(APlayerState* State : GetWorld()->GetGameState()->PlayerArray)
+		{
+			AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(State);
+			if (IsValid(GearPlayer))
+			{
+				OnNewPlayer(GearPlayer);
+			}
+		}
+	}
+
+	else
+	{
+		GearHUD = nullptr;
 	}
 }
 
-void AGearPlayerController::NotifyRemovePlayer(APlayerState* InPlayer)
+void AGearPlayerController::OnNewPlayer(AGearPlayerState* GearPlayer)
 {
-	AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(InPlayer);
-	if (IsValid(GearPlayer))
-	{
-		OnRemovePlayer(GearPlayer);
-	}
+	if(IsValid(GearHUD))
+		GearHUD->AddPlayer(GearPlayer);
+}
+
+void AGearPlayerController::OnRemovePlayer(AGearPlayerState* GearPlayer)
+{
+	if (IsValid(GearHUD))
+		GearHUD->RemovePlayer(GearPlayer);
 }
