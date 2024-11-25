@@ -6,6 +6,9 @@
 #include "GameFramework/GameMode.h"
 #include "GearGameMode.generated.h"
 
+struct FHazardDescription;
+class AGearHazardActor;
+
 UENUM(BlueprintType)
 enum class EGearMatchState : uint8
 {
@@ -55,9 +58,18 @@ protected:
 	bool ShouldAbort();
 
 	void SpawnNewBuilderPawns();
+	void SpawnNewHazzards();
+
+	bool LoadHazards();
 
 	
 	EGearMatchState GearMatchState;
 
 	float StartDelayAfterAllJoined = 2.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UDataTable* HazardSpawnRulesDataTable;
+
+	UPROPERTY()
+	TArray<FHazardDescription> AvaliableHazards;
 };

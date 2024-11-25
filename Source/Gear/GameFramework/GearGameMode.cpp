@@ -6,6 +6,7 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearBuilderPawn.h"
+#include "Hazard/GearHazardActor.h"
 
 AGearGameMode::AGearGameMode()
 {
@@ -16,6 +17,16 @@ AGearGameMode::AGearGameMode()
 	bUseSeamlessTravel = true;
 
 	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
+}
+
+void AGearGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!LoadHazards())
+	{
+		AbortMatch();
+	}
 }
 
 void AGearGameMode::Tick(float DeltaSeconds)
@@ -58,6 +69,43 @@ void AGearGameMode::SpawnNewBuilderPawns()
 	}
 }
 
+void AGearGameMode::SpawnNewHazzards()
+{
+	
+}
+
+bool AGearGameMode::LoadHazards()
+{
+	AvaliableHazards.Empty();
+
+	if (IsValid(HazardSpawnRulesDataTable))
+	{
+		TArray<FHazardDescription*> RawHazards; 
+		HazardSpawnRulesDataTable->GetAllRows<FHazardDescription>("Reading hazard rules", RawHazards);
+
+		for (FHazardDescription* Desc : RawHazards)
+		{
+			TSubclassOf<AGearHazardActor> HazardClass = StaticLoadClass(AGearHazardActor::StaticClass(), nullptr, *Desc->ClassPath);
+			if (IsValid(HazardClass))
+			{
+				FHazardDescription NewDesc = *Desc;
+				NewDesc.Class = HazardClass;
+				
+				AvaliableHazards.Add(NewDesc);
+			}
+		}
+
+		if (AvaliableHazards.Num() == 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 void AGearGameMode::HandleMatchAborted()
 {
 	Super::HandleMatchAborted();
@@ -87,12 +135,6 @@ void AGearGameMode::StartFirstPhase()
 bool AGearGameMode::ReadyToEndMatch_Implementation()
 {
 	return false;
-}
-
-void AGearGameMode::BeginPlay()
-{
-	Super::BeginPlay();
-
 }
 
 void AGearGameMode::StartSelectingPieces()

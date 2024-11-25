@@ -9,6 +9,39 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerNameChanged);
 
+class AGearHazardActor;
+
+USTRUCT(BlueprintType)
+struct FHazardDescription : public FTableRowBase
+{
+	GENERATED_BODY()
+
+
+public:
+
+	UPROPERTY()
+	TSubclassOf<AGearHazardActor> Class;
+	
+	UPROPERTY()
+	bool HasBeenSpawned = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString ClassPath;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool OnlySpawnOne = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpawnChance_Round_1 = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpawnChance_Round_2 = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpawnChance_Round_3 = 10.0f;
+};
+
+
 USTRUCT(BlueprintType)
 struct GEAR_API FGearHostInfo
 {
