@@ -34,20 +34,29 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	bool CheckIsEveryPlayerReady();
-	void AllPlayerJoined();
+// ---------------- AGameMode ----------------------------------------------
 
-	void StartSelectingPieces();
-
+	bool ReadyToStartMatch_Implementation() override;
+	void HandleMatchHasStarted() override;
 
 	bool ReadyToEndMatch_Implementation() override;
 	void HandleMatchHasEnded() override;
 
-	bool ShouldAbort();
 	void HandleMatchAborted() override;
 
-	void StartFirstPhase();
+// -------------------------------------------------------------------------
 
+	bool CheckIsEveryPlayerReady();
+	void AllPlayerJoined();
+
+	void StartFirstPhase();
+	void StartSelectingPieces();
+
+	bool ShouldAbort();
+
+	void SpawnNewBuilderPawns();
+
+	
 	EGearMatchState GearMatchState;
 
 	float StartDelayAfterAllJoined = 2.0f;

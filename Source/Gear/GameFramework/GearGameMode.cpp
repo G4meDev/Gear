@@ -5,6 +5,7 @@
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
+#include "GameFramework/GearBuilderPawn.h"
 
 AGearGameMode::AGearGameMode()
 {
@@ -21,17 +22,9 @@ void AGearGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (GearMatchState == EGearMatchState::WaitingForPlayerToJoin)
-	{
-		if (CheckIsEveryPlayerReady())
-		{
-			AllPlayerJoined();
-		}
-	}
-
 	if (ShouldAbort())
 	{
-		SetMatchState(MatchState::Aborted);
+		AbortMatch();
 	}
 }
 
@@ -46,6 +39,23 @@ void AGearGameMode::HandleMatchHasEnded()
 bool AGearGameMode::ShouldAbort()
 {
 	return NumTravellingPlayers == 0 && NumPlayers < 2;
+}
+
+void AGearGameMode::SpawnNewBuilderPawns()
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* const PlayerController = Iterator->Get();
+		if (PlayerController)
+		{
+			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
+			if (IsValid(GearController))
+			{
+				AGearBuilderPawn* BuilderPawn = GetWorld()->SpawnActor<AGearBuilderPawn>(DefaultPawnClass);
+				GearController->Possess(BuilderPawn);
+			}
+		}
+	}
 }
 
 void AGearGameMode::HandleMatchAborted()
@@ -90,7 +100,24 @@ void AGearGameMode::StartSelectingPieces()
 	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces!"));
 
 	GearMatchState = EGearMatchState::SelectingPeices;
+
+	SpawnNewBuilderPawns();
 }
+
+bool AGearGameMode::ReadyToStartMatch_Implementation()
+{
+	return CheckIsEveryPlayerReady();
+}
+
+void AGearGameMode::HandleMatchHasStarted()
+{
+	Super::HandleMatchIsWaitingToStart();
+
+	UE_LOG(LogTemp, Warning, TEXT("match started."));
+
+	AllPlayerJoined();
+}
+
 
 bool AGearGameMode::CheckIsEveryPlayerReady()
 {
