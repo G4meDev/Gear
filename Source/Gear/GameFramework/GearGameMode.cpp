@@ -21,56 +21,18 @@ void AGearGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (GearMatchState == EGearMatchState::WaitingForPlayerToJoin)
+	{
+		if (CheckIsEveryPlayerReady())
+		{
+			AllPlayerJoined();
+		}
+	}
+
 	if (ShouldAbort())
 	{
 		SetMatchState(MatchState::Aborted);
 	}
-}
-
-bool AGearGameMode::ReadyToStartMatch_Implementation()
-{
-	bool EveryClientIsReady = true;
-
-	// until all clients doesn't respond to server client don`t start game
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		APlayerController* const PlayerController = Iterator->Get();
-		if (PlayerController)
-		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-			if (IsValid(GearController) && !GearController->IsReady)
-			{
-				EveryClientIsReady = false;
-				GearController->PeekClientIsReady();
-			}
-		}
-	}
-
-	return NumTravellingPlayers == 0 && NumPlayers > 1 && EveryClientIsReady;
-}
-
-void AGearGameMode::HandleMatchHasStarted()
-{
-	Super::HandleMatchHasStarted();
-
-	UE_LOG(LogTemp, Warning, TEXT("Match Started!"));
-
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		APlayerController* const PlayerController = Iterator->Get();
-		if (PlayerController)
-		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-
-			if (IsValid(GearController))
-			{
-				GearController->AllPlayersJoined();
-			}
-		}
-	}
-
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, StartDelayAfterAllJoined);
 }
 
 
@@ -128,4 +90,53 @@ void AGearGameMode::StartSelectingPieces()
 	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces!"));
 
 	GearMatchState = EGearMatchState::SelectingPeices;
+}
+
+bool AGearGameMode::CheckIsEveryPlayerReady()
+{
+	bool EveryClientIsReady = true;
+	
+	// until all clients doesn't respond to server client don`t start game
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* const PlayerController = Iterator->Get();
+		if (PlayerController)
+		{
+			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
+			if (IsValid(GearController) && !GearController->IsReady)
+			{
+				EveryClientIsReady = false;
+				GearController->PeekClientIsReady();
+			}
+		}
+	}
+	
+	return NumTravellingPlayers == 0 && NumPlayers > 1 && EveryClientIsReady;
+}
+
+void AGearGameMode::AllPlayerJoined()
+{
+	if (GearMatchState == EGearMatchState::WaitingForPlayerToJoin)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("all player joined"));
+
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			APlayerController* const PlayerController = Iterator->Get();
+			if (PlayerController)
+			{
+				AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
+
+				if (IsValid(GearController))
+				{
+					GearController->AllPlayersJoined();
+				}
+			}
+		}
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, StartDelayAfterAllJoined);
+
+		GearMatchState = EGearMatchState::AllPlayersJoined;
+	}
 }

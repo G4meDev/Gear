@@ -10,6 +10,7 @@ UENUM(BlueprintType)
 enum class EGearMatchState : uint8
 {
 	WaitingForPlayerToJoin,
+	AllPlayersJoined,
 	SelectingPeices,
 	Racing,
 	Ended
@@ -33,10 +34,11 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	bool CheckIsEveryPlayerReady();
+	void AllPlayerJoined();
+
 	void StartSelectingPieces();
 
-	bool ReadyToStartMatch_Implementation() override;
-	void HandleMatchHasStarted() override;
 
 	bool ReadyToEndMatch_Implementation() override;
 	void HandleMatchHasEnded() override;
