@@ -7,6 +7,9 @@
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearBuilderPawn.h"
 #include "Hazard/GearHazardActor.h"
+#include "Hazard/HazardPreviewSpawnPoint.h"
+
+#include "kismet/GameplayStatics.h"
 
 AGearGameMode::AGearGameMode()
 {
@@ -25,6 +28,13 @@ void AGearGameMode::BeginPlay()
 
 	if (!LoadHazards())
 	{
+		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards found"));
+		AbortMatch();
+	}
+
+	if (!LoadHazardPreviewSpawnPoints())
+	{
+		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards preview spawn point found"));
 		AbortMatch();
 	}
 }
@@ -71,7 +81,15 @@ void AGearGameMode::SpawnNewBuilderPawns()
 
 void AGearGameMode::SpawnNewHazzards()
 {
-	
+	PreviewHazards.Empty(5);
+
+	for (AHazardPreviewSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
+	{
+		AGearHazardActor* HazardActor = GetWorld()->SpawnActor<AGearHazardActor>(AvaliableHazards[0].Class, SpawnPoint->GetTransform());
+		HazardActor->SetHazardState(EHazardState::Preview);
+		
+		PreviewHazards.Add(HazardActor);
+	}
 }
 
 bool AGearGameMode::LoadHazards()
@@ -104,6 +122,25 @@ bool AGearGameMode::LoadHazards()
 	}
 
 	return false;
+}
+
+bool AGearGameMode::LoadHazardPreviewSpawnPoints()
+{
+	HazardPreviewSpawnPoints.Empty(5);
+	
+	TArray<AActor*> SpawnActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHazardPreviewSpawnPoint::StaticClass(), SpawnActors);
+
+	for (AActor* Actor : SpawnActors)
+	{
+		AHazardPreviewSpawnPoint* HazardPreviewSpawnPoint = Cast<AHazardPreviewSpawnPoint>(Actor);
+		if (IsValid(HazardPreviewSpawnPoint))
+		{
+			HazardPreviewSpawnPoints.Add(HazardPreviewSpawnPoint);
+		}
+	}
+
+	return HazardPreviewSpawnPoints.Num() == 5;
 }
 
 void AGearGameMode::HandleMatchAborted()
@@ -144,6 +181,7 @@ void AGearGameMode::StartSelectingPieces()
 	GearMatchState = EGearMatchState::SelectingPeices;
 
 	SpawnNewBuilderPawns();
+	SpawnNewHazzards();
 }
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()

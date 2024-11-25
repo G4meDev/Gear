@@ -8,6 +8,7 @@
 
 struct FHazardDescription;
 class AGearHazardActor;
+class AHazardPreviewSpawnPoint;
 
 UENUM(BlueprintType)
 enum class EGearMatchState : uint8
@@ -61,15 +62,18 @@ protected:
 	void SpawnNewHazzards();
 
 	bool LoadHazards();
-
+	bool LoadHazardPreviewSpawnPoints();
 	
 	EGearMatchState GearMatchState;
+
+	TArray<AGearHazardActor*> PreviewHazards;
 
 	float StartDelayAfterAllJoined = 2.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UDataTable* HazardSpawnRulesDataTable;
-
-	UPROPERTY()
+	
 	TArray<FHazardDescription> AvaliableHazards;
+
+	TArray<AHazardPreviewSpawnPoint*> HazardPreviewSpawnPoints;	
 };
