@@ -22,9 +22,16 @@ protected:
 
 	void CopyProperties(APlayerState* PlayerState) override;
 
+	UFUNCTION()
+	virtual void OnRep_ColorCode();
 
 public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerNameChanged OnPlayerNameChanged;
+
+// 	UPROPERTY(ReplicatedUsing=OnRep_ColorCode)
+// 	EPlayerColorCode ColorCode;
+
+	FColor PlayerColor;
 };

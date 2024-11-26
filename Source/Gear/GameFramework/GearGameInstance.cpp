@@ -8,6 +8,7 @@
 #include "Widgets/SWidget.h"
 #include "ShaderPipelineCache.h"
 #include "HAL/ThreadHeartBeat.h"
+#include "Utils/DataHelperBFL.h"
 
 #define SAVE_SLOT_NAME "Save"
 #define SAVE_USER_INDEX 0

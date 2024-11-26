@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/GearTypes.h"
 #include "LobbyPlayerController.generated.h"
 
 class ALobbyPlayerState;
@@ -29,6 +30,18 @@ protected:
 	void OnRemovePlayer(ALobbyPlayerState* InPlayer);
 
 public:
+
 	void NotifyNewPlayer(APlayerState* InPlayer);
 	void NotifyRemovePlayer(APlayerState* InPlayer);
+
+	UFUNCTION(Server, Reliable)
+	void RequestColorChange(EPlayerColorCode Color);
+
+	UFUNCTION(Client, Reliable)
+	void ColorChange_RollBack(EPlayerColorCode Color);
+
+	UFUNCTION(BlueprintCallable)
+	void TryChangeColor(EPlayerColorCode Color);
+
+	ALobbyPlayerState* GetLobbyPlayerState();
 };

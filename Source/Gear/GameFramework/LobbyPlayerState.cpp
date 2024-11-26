@@ -3,6 +3,16 @@
 
 #include "GameFramework/LobbyPlayerState.h"
 #include "GameFramework/LobbyplayerController.h"
+#include "GameFramework/LobbyGameState.h"
+#include "Utils/DataHelperBFL.h"
+#include "Net/UnrealNetwork.h"
+
+void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ALobbyPlayerState, ColorCode);
+}
 
 void ALobbyPlayerState::BeginPlay()
 {
@@ -23,6 +33,13 @@ void ALobbyPlayerState::OnRep_PlayerName()
 	Super::OnRep_PlayerName();
 
 	OnPlayerNameChanged.Broadcast();
+}
+
+void ALobbyPlayerState::OnRep_ColorCode(EPlayerColorCode OldColor)
+{
+	PlayerColor = UDataHelperBFL::ResolveColorCode(ColorCode);
+	
+
 }
 
 void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)

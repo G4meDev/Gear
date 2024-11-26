@@ -16,3 +16,9 @@ void AGearPlayerState::CopyProperties(APlayerState* PlayerState)
 
 
 }
+
+void AGearPlayerState::OnRep_ColorCode()
+{
+	
+
+}

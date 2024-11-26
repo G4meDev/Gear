@@ -7,7 +7,6 @@
 
 #define DEFAULT_PLAYER_NAME "NewPlayer"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerNameChanged);
 
 class AGearHazardActor;
 
@@ -66,3 +65,28 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FString IP;
 };
+
+UENUM(BlueprintType)
+enum class EPlayerColorCode : uint8 
+{
+	Black,
+	NileBlue,
+	PansyPurple,
+	ElfGreen,
+	BrownRust,
+	Wenge,
+	Cloud,
+	Linen,
+	RedRibbon,
+	Squash,
+	BananaYellow,
+	GreenSnake,
+	PictonBlue,
+	GrayishPurple,
+	DeepBlush,
+	DeepPeach,
+	MAX_COLOR
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerNameChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerColorChanged, EPlayerColorCode, OldColor, EPlayerColorCode, NewColor);

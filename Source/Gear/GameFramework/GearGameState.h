@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
+#include "GameFramework/GearTypes.h"
 #include "GearGameState.generated.h"
 
 
@@ -17,8 +18,6 @@ class GEAR_API AGearGameState : public AGameState
 	
 public:
 	AGearGameState();
-
-
 
 protected:
 	void AddPlayerState(APlayerState* PlayerState) override;

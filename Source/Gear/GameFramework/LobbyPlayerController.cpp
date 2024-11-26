@@ -5,6 +5,7 @@
 #include "GameFramework/GearGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/LobbyPlayerState.h"
+#include "GameFramework/LobbyGameState.h"
 
 void ALobbyPlayerController::BeginPlay()
 {
@@ -39,4 +40,43 @@ void ALobbyPlayerController::NotifyRemovePlayer(APlayerState* InPlayer)
 	{
 		OnRemovePlayer(LobbyPlayer);
 	}	
+}
+
+void ALobbyPlayerController::RequestColorChange_Implementation(EPlayerColorCode Color)
+{
+	ALobbyGameState* LobbyGameState = Cast<ALobbyGameState>(GetWorld()->GetGameState());
+
+	if (IsValid(LobbyGameState))
+	{
+		LobbyGameState->RequestColorChangeForPlayer(this, Color);
+	}
+}
+
+void ALobbyPlayerController::ColorChange_RollBack_Implementation(EPlayerColorCode Color)
+{
+	ALobbyPlayerState* LobbyPlayer = GetLobbyPlayerState();
+	if (IsValid(LobbyPlayer))
+	{
+		LobbyPlayer->ColorCode = Color;
+	}
+}
+
+void ALobbyPlayerController::TryChangeColor(EPlayerColorCode Color)
+{
+	// change color locally. if color is invalid then server sends a roll back rpc
+	if (!HasAuthority())
+	{
+		ALobbyPlayerState* LobbyPlayer = GetLobbyPlayerState();
+		if (IsValid(LobbyPlayer))
+		{
+			LobbyPlayer->ColorCode = Color;
+		}
+	}
+
+	RequestColorChange(Color);
+}
+
+ALobbyPlayerState* ALobbyPlayerController::GetLobbyPlayerState()
+{
+	return Cast<ALobbyPlayerState>(PlayerState);
 }
