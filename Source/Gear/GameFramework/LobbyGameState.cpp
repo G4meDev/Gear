@@ -33,6 +33,7 @@ void ALobbyGameState::AssignNewColorToPlayer(APlayerState* Player)
 			if (!InUseColors.Contains(ColorCode))
 			{
 				LobbyPlayer->ColorCode = ColorCode;
+				LobbyPlayer->OnRep_ColorCode();
 				return;
 			}
 		}
@@ -53,6 +54,7 @@ void ALobbyGameState::RequestColorChangeForPlayer(ALobbyPlayerController* PC, EP
 	if (!InUseColors.Contains(Color))
 	{
 		Player->ColorCode = Color;
+		Player->OnRep_ColorCode();
 	}
 
 	else

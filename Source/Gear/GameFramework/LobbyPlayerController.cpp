@@ -58,6 +58,7 @@ void ALobbyPlayerController::ColorChange_RollBack_Implementation(EPlayerColorCod
 	if (IsValid(LobbyPlayer))
 	{
 		LobbyPlayer->ColorCode = Color;
+		LobbyPlayer->OnRep_ColorCode();
 	}
 }
 
@@ -70,6 +71,7 @@ void ALobbyPlayerController::TryChangeColor(EPlayerColorCode Color)
 		if (IsValid(LobbyPlayer))
 		{
 			LobbyPlayer->ColorCode = Color;
+			LobbyPlayer->OnRep_ColorCode();
 		}
 	}
 

@@ -4,6 +4,7 @@
 #include "GameFramework/LobbyPlayerState.h"
 #include "GameFramework/LobbyplayerController.h"
 #include "GameFramework/LobbyGameState.h"
+#include "GameFramework/GearPlayerState.h"
 #include "Utils/DataHelperBFL.h"
 #include "Net/UnrealNetwork.h"
 
@@ -12,6 +13,12 @@ void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ALobbyPlayerState, ColorCode);
+}
+
+ALobbyPlayerState::ALobbyPlayerState()
+{
+	ColorCode = EPlayerColorCode::Black;
+	OnRep_ColorCode();
 }
 
 void ALobbyPlayerState::BeginPlay()
@@ -32,10 +39,10 @@ void ALobbyPlayerState::OnRep_PlayerName()
 {
 	Super::OnRep_PlayerName();
 
-	OnPlayerNameChanged.Broadcast();
+	
 }
 
-void ALobbyPlayerState::OnRep_ColorCode(EPlayerColorCode OldColor)
+void ALobbyPlayerState::OnRep_ColorCode()
 {
 	PlayerColor = UDataHelperBFL::ResolveColorCode(ColorCode);
 	
@@ -46,13 +53,10 @@ void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);
 
-	// after travel player name just get set locally and server wont notice the name change
-
-	ENetMode NetMode = GetNetMode();
-	if (NetMode == NM_ListenServer || NetMode == NM_Standalone)
+	AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(PlayerState);
+	if (IsValid(GearPlayerState))
 	{
-		PlayerState->OnRep_PlayerName();
+		GearPlayerState->ColorCode = ColorCode;
+		GearPlayerState->OnRep_ColorCode();
 	}
-
-
 }

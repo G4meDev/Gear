@@ -16,27 +16,27 @@ class GEAR_API ALobbyPlayerState : public APlayerState
 	GENERATED_BODY()
 
 protected:
+	
+	ALobbyPlayerState();
+
 	void BeginPlay();
 
 	void Destroyed() override;
 
 	void OnRep_PlayerName() override;
 
-	UFUNCTION()
-	virtual void OnRep_ColorCode(EPlayerColorCode OldColor);
-
 	void CopyProperties(APlayerState* PlayerState) override;
 
 public:
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerNameChanged OnPlayerNameChanged;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerColorChanged OnPlayerColorChanged;
 
 	UPROPERTY(ReplicatedUsing=OnRep_ColorCode, BlueprintReadWrite, EditAnywhere)
 	EPlayerColorCode ColorCode;
 
+	UFUNCTION()
+	virtual void OnRep_ColorCode();
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
 
 };

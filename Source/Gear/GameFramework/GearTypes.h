@@ -87,6 +87,3 @@ enum class EPlayerColorCode : uint8
 	DeepPeach,
 	MAX_COLOR
 };
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerNameChanged);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerColorChanged, EPlayerColorCode, OldColor, EPlayerColorCode, NewColor);

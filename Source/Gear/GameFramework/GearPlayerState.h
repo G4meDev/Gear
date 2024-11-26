@@ -16,22 +16,25 @@ class GEAR_API AGearPlayerState : public APlayerState
 	GENERATED_BODY()
 
 
+public:
+
+	AGearPlayerState();
+
+	UPROPERTY(ReplicatedUsing=OnRep_ColorCode, BlueprintReadWrite, EditAnywhere)
+	EPlayerColorCode ColorCode;
+
+	UFUNCTION()
+	virtual void OnRep_ColorCode();
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FColor PlayerColor;
+
+
 protected:
 
 	void OnRep_PlayerName() override;
 
 	void CopyProperties(APlayerState* PlayerState) override;
 
-	UFUNCTION()
-	virtual void OnRep_ColorCode();
-
-public:
-
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerNameChanged OnPlayerNameChanged;
-
-// 	UPROPERTY(ReplicatedUsing=OnRep_ColorCode)
-// 	EPlayerColorCode ColorCode;
-
-	FColor PlayerColor;
 };
