@@ -60,3 +60,8 @@ void AGearPlayerState::SetSelectedHazard(AGearHazardActor* Hazard)
 		SelectedHazard = Hazard;
 	}
 }
+
+bool AGearPlayerState::HasSelectedHazard() const
+{
+	return SelectedHazard != nullptr;
+}

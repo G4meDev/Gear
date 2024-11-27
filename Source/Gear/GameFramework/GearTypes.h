@@ -10,6 +10,17 @@
 
 class AGearHazardActor;
 
+UENUM(BlueprintType)
+enum class EGearMatchState : uint8
+{
+	WaitingForPlayerToJoin,
+	AllPlayersJoined,
+	SelectingPeices,
+	PlacingPieces,
+	Racing,
+	Ended
+};
+
 USTRUCT(BlueprintType)
 struct FHazardDescription : public FTableRowBase
 {

@@ -19,6 +19,15 @@ class GEAR_API AGearGameState : public AGameState
 public:
 	AGearGameState();
 
+	UFUNCTION()
+	void OnRep_GearMatchState();
+
+	UPROPERTY(Replicated)
+	double LastStateChangeTime;
+
+	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
+	EGearMatchState GearMatchState;
+
 protected:
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;

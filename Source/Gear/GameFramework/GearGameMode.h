@@ -4,22 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "GameFramework/GearTypes.h"
 #include "GearGameMode.generated.h"
 
 struct FHazardDescription;
 class AGearPlayerState;
 class AGearHazardActor;
 class AHazardPreviewSpawnPoint;
-
-UENUM(BlueprintType)
-enum class EGearMatchState : uint8
-{
-	WaitingForPlayerToJoin,
-	AllPlayersJoined,
-	SelectingPeices,
-	Racing,
-	Ended
-};
 
 /**
  * 
@@ -37,6 +28,8 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void RequestSelectingHazardForPlayer(AGearHazardActor* Hazard, AGearPlayerState* Player);
+
+	void SetGearMatchState(EGearMatchState State);
 
 protected:
 
@@ -58,7 +51,12 @@ protected:
 	void AllPlayerJoined();
 
 	void StartFirstPhase();
+	void AssignPiecesToUnowningPlayers();
 	void StartSelectingPieces();
+	FTimerHandle SelectingPiecesTimerHandle;
+
+	bool IsEveryPlayerSelectedPieces();
+	void StartPlaceingPieces(bool bEveryPlayerIsReady);
 
 	bool ShouldAbort();
 
@@ -67,14 +65,10 @@ protected:
 
 	bool LoadHazards();
 	bool LoadHazardPreviewSpawnPoints();
-
-
 	
 	EGearMatchState GearMatchState;
 
 	TArray<AGearHazardActor*> PreviewHazards;
-
-	float StartDelayAfterAllJoined = 2.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UDataTable* HazardSpawnRulesDataTable;

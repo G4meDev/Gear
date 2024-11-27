@@ -4,17 +4,29 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearPlayerController.h"
+#include "Net/UnrealNetwork.h"
 
 AGearGameState::AGearGameState()
 {
+	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
+}
 
+void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(AGearGameState, GearMatchState);
+	DOREPLIFETIME(AGearGameState, LastStateChangeTime);
+}
+
+void AGearGameState::OnRep_GearMatchState()
+{
+	
 }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
-
-
 
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{

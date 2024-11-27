@@ -119,6 +119,11 @@ void AGearHazardActor::OnRep_OwningPlayer()
 	}
 }
 
+bool AGearHazardActor::HasOwningPlayer() const
+{
+	return OwningPlayer != nullptr;
+}
+
 void AGearHazardActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

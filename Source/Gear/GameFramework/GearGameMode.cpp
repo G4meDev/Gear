@@ -8,6 +8,7 @@
 #include "GameFramework/GearBuilderPawn.h"
 #include "Hazard/GearHazardActor.h"
 #include "Hazard/HazardPreviewSpawnPoint.h"
+#include "Utils/GameVariablesBFL.h"
 
 #include "kismet/GameplayStatics.h"
 
@@ -43,6 +44,14 @@ void AGearGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (GearMatchState == EGearMatchState::SelectingPeices)
+	{
+		if (IsEveryPlayerSelectedPieces())
+		{
+			StartPlaceingPieces(true);
+		}
+	}
+
 	if (ShouldAbort())
 	{
 		AbortMatch();
@@ -54,7 +63,7 @@ void AGearGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 
-	GearMatchState = EGearMatchState::Ended;
+	SetGearMatchState(EGearMatchState::Ended);
 }
 
 bool AGearGameMode::ShouldAbort()
@@ -85,7 +94,10 @@ void AGearGameMode::SpawnNewHazzards()
 
 	for (AHazardPreviewSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
 	{
-		AGearHazardActor* HazardActor = GetWorld()->SpawnActor<AGearHazardActor>(AvaliableHazards[0].Class, SpawnPoint->GetTransform());
+		// TODO: implement hazard spawning logic, for now spawn randomly
+		TSubclassOf<AGearHazardActor>& SpawnClass = AvaliableHazards[ FMath::RandRange(0, AvaliableHazards.Num()-1) ].Class;
+
+		AGearHazardActor* HazardActor = GetWorld()->SpawnActor<AGearHazardActor>(SpawnClass, SpawnPoint->GetTransform());
 		HazardActor->SetPreview();
 		
 		PreviewHazards.Add(HazardActor);
@@ -145,9 +157,21 @@ bool AGearGameMode::LoadHazardPreviewSpawnPoints()
 
 void AGearGameMode::RequestSelectingHazardForPlayer_Implementation(AGearHazardActor* Hazard, AGearPlayerState* Player)
 {
-	if (IsValid(Hazard) && IsValid(Player) && Hazard->OwningPlayer == nullptr)
+	if (GearMatchState == EGearMatchState::SelectingPeices && IsValid(Hazard) && IsValid(Player) && !Hazard->HasOwningPlayer())
 	{
 		Player->SetSelectedHazard(Hazard);
+	}
+}
+
+void AGearGameMode::SetGearMatchState(EGearMatchState State)
+{
+	GearMatchState = State;
+
+	AGearGameState* GearGameState = GetGameState<AGearGameState>();
+	if (GearGameState)
+	{
+		GearGameState->LastStateChangeTime = GearGameState->GetServerWorldTimeSeconds();
+		GearGameState->GearMatchState = State;
 	}
 }
 
@@ -177,6 +201,36 @@ void AGearGameMode::StartFirstPhase()
 	StartSelectingPieces();
 }
 
+void AGearGameMode::AssignPiecesToUnowningPlayers()
+{
+	TArray<AGearPlayerState*> UnowningPlayers;
+	TArray<AGearHazardActor*> UnownedHazards;
+
+	for (APlayerState* Player : GameState->PlayerArray)
+	{
+		AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(Player);
+		if (IsValid(GearPlayer) && !GearPlayer->HasSelectedHazard())
+		{
+			UnowningPlayers.Add(GearPlayer);
+		}
+	}
+
+	for (AGearHazardActor* Hazard : PreviewHazards)
+	{
+		if (!Hazard->HasOwningPlayer())
+		{
+			UnownedHazards.Add(Hazard);
+		}
+	}
+
+	for (int i = 0; i < UnowningPlayers.Num(); i++)
+	{
+		check(i < UnownedHazards.Num());
+
+		UnowningPlayers[i]->SetSelectedHazard(UnownedHazards[i]);
+	}
+}
+
 bool AGearGameMode::ReadyToEndMatch_Implementation()
 {
 	return false;
@@ -186,10 +240,36 @@ void AGearGameMode::StartSelectingPieces()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces!"));
 
-	GearMatchState = EGearMatchState::SelectingPeices;
+	SetGearMatchState(EGearMatchState::SelectingPeices);
 
 	SpawnNewBuilderPawns();
 	SpawnNewHazzards();
+
+	GetWorld()->GetTimerManager().SetTimer(SelectingPiecesTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartPlaceingPieces, false), UGameVariablesBFL::GV_PieceSelectionTimeLimit(), false);
+}
+
+bool AGearGameMode::IsEveryPlayerSelectedPieces()
+{
+	for (APlayerState* Player : GameState->PlayerArray)
+	{
+		AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(Player);
+		if (IsValid(GearPlayer) && !GearPlayer->HasSelectedHazard())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void AGearGameMode::StartPlaceingPieces(bool bEveryPlayerIsReady)
+{
+	if (!bEveryPlayerIsReady)
+	{
+		AssignPiecesToUnowningPlayers();
+	}
+
+	SetGearMatchState(EGearMatchState::PlacingPieces);
 }
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()
@@ -250,8 +330,8 @@ void AGearGameMode::AllPlayerJoined()
 		}
 
 		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, StartDelayAfterAllJoined);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay());
 
-		GearMatchState = EGearMatchState::AllPlayersJoined;
+		SetGearMatchState(EGearMatchState::AllPlayersJoined);
 	}
 }

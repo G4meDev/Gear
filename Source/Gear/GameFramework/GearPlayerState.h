@@ -36,6 +36,9 @@ public:
 	UPROPERTY(Replicated)
 	AGearHazardActor* SelectedHazard;
 
+
+	bool HasSelectedHazard() const;
+
 protected:
 
 	void OnRep_PlayerName() override;

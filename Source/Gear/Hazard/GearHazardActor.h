@@ -51,6 +51,8 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_OwningPlayer)
 	AGearPlayerState* OwningPlayer;
 
+	bool HasOwningPlayer() const;
+
 protected:
 	virtual void BeginPlay() override;
 
