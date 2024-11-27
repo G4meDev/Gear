@@ -86,7 +86,7 @@ void AGearGameMode::SpawnNewHazzards()
 	for (AHazardPreviewSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
 	{
 		AGearHazardActor* HazardActor = GetWorld()->SpawnActor<AGearHazardActor>(AvaliableHazards[0].Class, SpawnPoint->GetTransform());
-		HazardActor->SetHazardState(EHazardState::Preview);
+		HazardActor->SetPreview();
 		
 		PreviewHazards.Add(HazardActor);
 	}
@@ -141,6 +141,14 @@ bool AGearGameMode::LoadHazardPreviewSpawnPoints()
 	}
 
 	return HazardPreviewSpawnPoints.Num() == 5;
+}
+
+void AGearGameMode::RequestSelectingHazardForPlayer_Implementation(AGearHazardActor* Hazard, AGearPlayerState* Player)
+{
+	if (IsValid(Hazard) && IsValid(Player) && Hazard->OwningPlayer == nullptr)
+	{
+		Player->SetSelectedHazard(Hazard);
+	}
 }
 
 void AGearGameMode::HandleMatchAborted()

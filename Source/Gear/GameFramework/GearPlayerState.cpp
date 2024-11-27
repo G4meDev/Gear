@@ -2,6 +2,7 @@
 
 
 #include "GameFramework/GearPlayerState.h"
+#include "Hazard/GearHazardActor.h"
 #include "Utils/DataHelperBFL.h"
 #include "Net/UnrealNetwork.h"
 
@@ -16,6 +17,7 @@ void AGearPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGearPlayerState, ColorCode);
+	DOREPLIFETIME(AGearPlayerState, SelectedHazard);
 }
 
 void AGearPlayerState::OnRep_PlayerName()
@@ -37,4 +39,24 @@ void AGearPlayerState::OnRep_ColorCode()
 {
 	PlayerColor = UDataHelperBFL::ResolveColorCode(ColorCode);
 
+}
+
+void AGearPlayerState::SetSelectedHazard(AGearHazardActor* Hazard)
+{
+	if (HasAuthority())
+	{
+		if (IsValid(SelectedHazard))
+		{
+			SelectedHazard->OwningPlayer = nullptr;
+			SelectedHazard->OnRep_OwningPlayer();
+		}
+
+		if (IsValid(Hazard))
+		{
+			Hazard->OwningPlayer = this;
+			Hazard->OnRep_OwningPlayer();
+		}
+
+		SelectedHazard = Hazard;
+	}
 }

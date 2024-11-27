@@ -4,7 +4,9 @@
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
+#include "GameFramework/GearGameMode.h"
 #include "GearHUD.h"
+#include "Hazard/GearHazardActor.h"
 
 AGearPlayerController::AGearPlayerController()
 {
@@ -47,6 +49,21 @@ void AGearPlayerController::MatchStarted_Implementation()
 	if (IsValid(GearHUD))
 	{
 		GearHUD->RemoveWaitingScreen();
+	}
+}
+
+void AGearPlayerController::SelectHazard_Implementation(AGearHazardActor* Hazard)
+{
+	AGearPlayerState* GearPlayer = GetPlayerState<AGearPlayerState>();
+
+	if (IsValid(GearPlayer))
+	{
+		AGearGameMode* GearGameMode = Cast<AGearGameMode>(GetWorld()->GetAuthGameMode());
+
+		if (IsValid(GearGameMode))
+		{
+			GearGameMode->RequestSelectingHazardForPlayer(Hazard, GearPlayer);
+		}
 	}
 }
 

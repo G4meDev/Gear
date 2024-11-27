@@ -8,6 +8,7 @@
 
 class AGearPlayerState;
 class AGearHUD;
+class AGearHazardActor;
 
 /**
  * 
@@ -22,8 +23,6 @@ protected:
 	AGearPlayerController();
 
 	virtual void BeginPlay() override;
-
-
 
 public:
 
@@ -47,4 +46,6 @@ public:
 	UFUNCTION(Client, Reliable)
 	void MatchStarted();
 
+	UFUNCTION(Server, Reliable)
+	void SelectHazard(AGearHazardActor* Hazard);
 };

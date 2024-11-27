@@ -6,10 +6,15 @@
 #include "GameFramework/Actor.h"
 #include "GearHazardActor.generated.h"
 
+class UBoxComponent;
+class UStaticMeshComponent;
+class AGearPlayerState;
+
 UENUM(BlueprintType)
 enum class EHazardState : uint8
 {
 	Preview,
+	Selected,
 	Idle,
 	Enabled
 };
@@ -22,14 +27,29 @@ class GEAR_API AGearHazardActor : public AActor
 public:
 	AGearHazardActor();
 
-	virtual void SetHazardState(EHazardState State);
-
-	UFUNCTION()
-	virtual void OnRep_HazardState(EHazardState OldValue);
-
-	void GoPreview();
+	void PostInitializeComponents() override;
 
 	virtual void Tick(float DeltaTime) override;
+	
+	void SetPreview();
+	void SetSelectedBy(AGearPlayerState* Player);
+
+	UFUNCTION()
+	void OnRep_OwningPlayer();
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* Root;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UBoxComponent* SelectionHitbox;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UStaticMeshComponent* SelectionIndicator;
+
+	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
+
+	UPROPERTY(ReplicatedUsing=OnRep_OwningPlayer)
+	AGearPlayerState* OwningPlayer;
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,6 +59,13 @@ protected:
 
 	float PreviewRotaionOffset;
 
-	UPROPERTY(ReplicatedUsing=OnRep_HazardState, BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
 	EHazardState HazardState;
+
+	void SelectionBoxClicked();
+
+	UFUNCTION()
+	void OnSelectionBoxClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
+	UFUNCTION()
+	void OnSelectionBoxTouched(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
 };

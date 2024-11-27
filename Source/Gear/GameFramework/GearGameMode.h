@@ -7,6 +7,7 @@
 #include "GearGameMode.generated.h"
 
 struct FHazardDescription;
+class AGearPlayerState;
 class AGearHazardActor;
 class AHazardPreviewSpawnPoint;
 
@@ -33,6 +34,9 @@ public:
 
 	void Tick(float DeltaSeconds) override;
 	
+
+	UFUNCTION(Server, Reliable)
+	void RequestSelectingHazardForPlayer(AGearHazardActor* Hazard, AGearPlayerState* Player);
 
 protected:
 
@@ -63,6 +67,8 @@ protected:
 
 	bool LoadHazards();
 	bool LoadHazardPreviewSpawnPoints();
+
+
 	
 	EGearMatchState GearMatchState;
 

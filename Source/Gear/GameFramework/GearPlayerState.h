@@ -7,6 +7,8 @@
 #include "GameFramework/GearTypes.h"
 #include "GearPlayerState.generated.h"
 
+class AGearHazardActor;
+
 /**
  * 
  */
@@ -26,15 +28,20 @@ public:
 	UFUNCTION()
 	virtual void OnRep_ColorCode();
 
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
 
+	void SetSelectedHazard(AGearHazardActor* Hazard);
+
+	UPROPERTY(Replicated)
+	AGearHazardActor* SelectedHazard;
 
 protected:
 
 	void OnRep_PlayerName() override;
 
 	void CopyProperties(APlayerState* PlayerState) override;
+
+
 
 };
