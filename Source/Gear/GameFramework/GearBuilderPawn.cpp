@@ -26,7 +26,7 @@ AGearBuilderPawn::AGearBuilderPawn()
 	Camera->SetupAttachment(CameraBoom);
 
 	bCanMove = false;
-	MovementSpeed = 1.0f;
+	MovementSpeed = 100.0f;
 }
 
 void AGearBuilderPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -79,6 +79,7 @@ void AGearBuilderPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 }
 
 void AGearBuilderPawn::StartPlacing()

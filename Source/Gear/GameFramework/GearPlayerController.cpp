@@ -11,10 +11,14 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "InputAction.h"
 
 AGearPlayerController::AGearPlayerController()
 {
 	IsReady = false;
+
+	bDraging = false;
+	LastDragPosition = FVector2D::Zero();
 }
 
 void AGearPlayerController::PostInitializeComponents()
@@ -54,6 +58,85 @@ void AGearPlayerController::BeginPlay()
 		}
 	}
 
+
+}
+
+void AGearPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (IsLocalController())
+	{
+		UpdateScreenDragValueAndInjectInput();
+
+		
+	}
+}
+
+void AGearPlayerController::UpdateScreenDragValueAndInjectInput()
+{
+	bool bMouseDown = IsInputKeyDown(EKeys::LeftMouseButton);
+	FVector2D MousePosition;
+	GetMousePosition(MousePosition.X, MousePosition.Y);
+	
+	bool bTouchDown;
+	FVector2D TouchPosition;
+	GetInputTouchState(ETouchIndex::Touch1, TouchPosition.X, TouchPosition.Y, bTouchDown);
+
+	bool HoldingScreen = bMouseDown || bTouchDown;
+
+	FVector2D CurrentPosition = FVector2D::Zero();
+
+	if (bMouseDown)
+	{
+		CurrentPosition = MousePosition;
+	}
+	
+	else if (bTouchDown)
+	{
+		CurrentPosition = TouchPosition;
+	}
+
+	FVector2D ScreenDragValue;
+
+	if (!HoldingScreen)
+	{
+		ScreenDragValue = FVector2D::Zero();
+		LastDragPosition = FVector2D::Zero();
+		bDraging = false;
+	}
+
+	// just started draging
+	else if (HoldingScreen && !bDraging)
+	{
+		ScreenDragValue = FVector2D::Zero();
+		LastDragPosition = CurrentPosition;
+		bDraging = true;
+	}
+
+	else
+	{
+		ScreenDragValue = CurrentPosition - LastDragPosition;
+		LastDragPosition = CurrentPosition;
+		bDraging = true;
+	}
+
+	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+	{
+		if (IsValid(MoveScreenAction))
+		{
+// 			int32 SizeX;
+// 			int32 SizeY;
+// 			GetViewportSize(SizeX, SizeY);
+// 
+// 			ScreenDragValue /= FVector2D(SizeX, SizeY);
+			
+			TArray<UInputModifier*> Modifiers;
+			TArray<UInputTrigger*> Triggers;
+
+			InputSystem->InjectInputForAction(MoveScreenAction, FInputActionValue(FInputActionValue::Axis2D(ScreenDragValue)), Modifiers, Triggers);
+		}
+	}
 
 }
 

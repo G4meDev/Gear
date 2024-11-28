@@ -10,6 +10,7 @@ class AGearPlayerState;
 class AGearHUD;
 class AGearHazardActor;
 class UInputMappingContext;
+class UInputAction;
 
 /**
  * 
@@ -30,7 +31,17 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputMappingContext* InputMappingContext;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInputAction* MoveScreenAction;
+
+	FVector2D LastDragPosition;
+	bool bDraging;
+
+	void UpdateScreenDragValueAndInjectInput();
+
 public:
+
+	void Tick( float DeltaSeconds ) override;
 
 	bool IsReady;
 
@@ -58,4 +69,5 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientStatePlacingPieces(float StateStartTime);
+
 };
