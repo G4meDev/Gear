@@ -73,17 +73,13 @@ bool AGearGameMode::ShouldAbort()
 
 void AGearGameMode::SpawnNewBuilderPawns()
 {
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
-		APlayerController* const PlayerController = Iterator->Get();
-		if (PlayerController)
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController))
 		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-			if (IsValid(GearController))
-			{
-				AGearBuilderPawn* BuilderPawn = GetWorld()->SpawnActor<AGearBuilderPawn>(DefaultPawnClass);
-				GearController->Possess(BuilderPawn);
-			}
+			AGearBuilderPawn* BuilderPawn = GetWorld()->SpawnActor<AGearBuilderPawn>(DefaultPawnClass);
+			PlayerController->Possess(BuilderPawn);
 		}
 	}
 }
@@ -175,7 +171,7 @@ void AGearGameMode::StartFirstPhase()
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (PlayerController)
+		if (IsValid(PlayerController))
 		{
 			PlayerController->ClientStateMatchStarted();
 		}
@@ -233,7 +229,7 @@ void AGearGameMode::StartSelectingPieces()
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (PlayerController)
+		if (IsValid(PlayerController))
 		{
 			PlayerController->ClientStateSelectingPieces(GetWorld()->GetTimeSeconds());
 		}
@@ -264,7 +260,7 @@ void AGearGameMode::StartPlaceingPieces(bool bEveryPlayerIsReady)
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (PlayerController)
+		if (IsValid(PlayerController))
 		{
 			PlayerController->ClientStatePlacingPieces(GetWorld()->GetTimeSeconds());
 		}
@@ -295,15 +291,11 @@ bool AGearGameMode::CheckIsEveryPlayerReady()
 	// until all clients doesn't respond to server client don`t start game
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		APlayerController* const PlayerController = Iterator->Get();
-		if (PlayerController)
+		AGearPlayerController* GearController = Cast<AGearPlayerController>(*Iterator);	
+		if (IsValid(GearController) && !GearController->IsReady)
 		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-			if (IsValid(GearController) && !GearController->IsReady)
-			{
-				EveryClientIsReady = false;
-				GearController->PeekClientIsReady();
-			}
+			EveryClientIsReady = false;
+			GearController->PeekClientIsReady();
 		}
 	}
 	
@@ -318,15 +310,10 @@ void AGearGameMode::AllPlayerJoined()
 
 		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
-			APlayerController* const PlayerController = Iterator->Get();
-			if (PlayerController)
+			AGearPlayerController* GearController = Cast<AGearPlayerController>(*Iterator);	
+			if (IsValid(GearController))
 			{
-				AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-
-				if (IsValid(GearController))
-				{
-					GearController->ClientStateAllPlayersJoined();
-				}
+				GearController->ClientStateAllPlayersJoined();
 			}
 		}
 
