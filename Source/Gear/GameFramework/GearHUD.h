@@ -28,6 +28,12 @@ public:
 	void AllPlayersJoined();
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void StartSelectingPieces(float Time);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartPlacingPieces(float Time);
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void AddPlayer(AGearPlayerState* InPlayer);
 
 	UFUNCTION(BlueprintImplementableEvent)

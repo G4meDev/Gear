@@ -10,7 +10,6 @@
 
 AGearPlayerController::AGearPlayerController()
 {
-	GearHUD = nullptr;
 	IsReady = false;
 }
 
@@ -20,8 +19,11 @@ void AGearPlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
-		GearHUD = Cast<AGearHUD>(GetHUD());
-		GearHUD->ShowWaitingScreen();
+		AGearHUD* GearHUD = GetHUD<AGearHUD>();
+		if (IsValid(GearHUD))
+		{
+			GearHUD->ShowWaitingScreen();
+		}
 
 		for(APlayerState* State : GetWorld()->GetGameState()->PlayerArray)
 		{
@@ -36,16 +38,18 @@ void AGearPlayerController::BeginPlay()
 
 }
 
-void AGearPlayerController::AllPlayersJoined_Implementation()
+void AGearPlayerController::ClientStateAllPlayersJoined_Implementation()
 {
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
 		GearHUD->AllPlayersJoined();
 	}
 }
 
-void AGearPlayerController::MatchStarted_Implementation()
+void AGearPlayerController::ClientStateMatchStarted_Implementation()
 {
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
 		GearHUD->RemoveWaitingScreen();
@@ -67,8 +71,27 @@ void AGearPlayerController::SelectHazard_Implementation(AGearHazardActor* Hazard
 	}
 }
 
+void AGearPlayerController::ClientStateSelectingPieces_Implementation(float StateStartTime)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->StartSelectingPieces(StateStartTime);
+	}
+}
+
+void AGearPlayerController::ClientStatePlacingPieces_Implementation(float StateStartTime)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->StartPlacingPieces(StateStartTime);
+	}
+}
+
 void AGearPlayerController::PeekClientIsReady_Implementation()
 {
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
 		RespondClientIsReady();
@@ -82,12 +105,18 @@ void AGearPlayerController::RespondClientIsReady_Implementation()
 
 void AGearPlayerController::OnNewPlayer(AGearPlayerState* GearPlayer)
 {
-	if(IsValid(GearHUD))
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
 		GearHUD->AddPlayer(GearPlayer);
+	}
 }
 
 void AGearPlayerController::OnRemovePlayer(AGearPlayerState* GearPlayer)
 {
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
+	{
 		GearHUD->RemovePlayer(GearPlayer);
+	}
 }

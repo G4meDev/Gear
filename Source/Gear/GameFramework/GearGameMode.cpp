@@ -63,7 +63,7 @@ void AGearGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 
-	SetGearMatchState(EGearMatchState::Ended);
+	GearMatchState = EGearMatchState::Ended;
 }
 
 bool AGearGameMode::ShouldAbort()
@@ -155,23 +155,11 @@ bool AGearGameMode::LoadHazardPreviewSpawnPoints()
 	return HazardPreviewSpawnPoints.Num() == 5;
 }
 
-void AGearGameMode::RequestSelectingHazardForPlayer_Implementation(AGearHazardActor* Hazard, AGearPlayerState* Player)
+void AGearGameMode::RequestSelectingHazardForPlayer(AGearHazardActor* Hazard, AGearPlayerState* Player)
 {
 	if (GearMatchState == EGearMatchState::SelectingPeices && IsValid(Hazard) && IsValid(Player) && !Hazard->HasOwningPlayer())
 	{
 		Player->SetSelectedHazard(Hazard);
-	}
-}
-
-void AGearGameMode::SetGearMatchState(EGearMatchState State)
-{
-	GearMatchState = State;
-
-	AGearGameState* GearGameState = GetGameState<AGearGameState>();
-	if (GearGameState)
-	{
-		GearGameState->LastStateChangeTime = GearGameState->GetServerWorldTimeSeconds();
-		GearGameState->GearMatchState = State;
 	}
 }
 
@@ -184,17 +172,12 @@ void AGearGameMode::HandleMatchAborted()
 
 void AGearGameMode::StartFirstPhase()
 {
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
-		APlayerController* const PlayerController = Iterator->Get();
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
 		if (PlayerController)
 		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-
-			if (IsValid(GearController))
-			{
-				GearController->MatchStarted();
-			}
+			PlayerController->ClientStateMatchStarted();
 		}
 	}
 	
@@ -240,12 +223,21 @@ void AGearGameMode::StartSelectingPieces()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces!"));
 
-	SetGearMatchState(EGearMatchState::SelectingPeices);
+	GearMatchState = EGearMatchState::SelectingPeices;
 
 	SpawnNewBuilderPawns();
 	SpawnNewHazzards();
 
 	GetWorld()->GetTimerManager().SetTimer(SelectingPiecesTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartPlaceingPieces, false), UGameVariablesBFL::GV_PieceSelectionTimeLimit(), false);
+
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (PlayerController)
+		{
+			PlayerController->ClientStateSelectingPieces(GetWorld()->GetTimeSeconds());
+		}
+	}
 }
 
 bool AGearGameMode::IsEveryPlayerSelectedPieces()
@@ -269,7 +261,16 @@ void AGearGameMode::StartPlaceingPieces(bool bEveryPlayerIsReady)
 		AssignPiecesToUnowningPlayers();
 	}
 
-	SetGearMatchState(EGearMatchState::PlacingPieces);
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (PlayerController)
+		{
+			PlayerController->ClientStatePlacingPieces(GetWorld()->GetTimeSeconds());
+		}
+	}
+
+	GearMatchState = EGearMatchState::PlacingPieces;
 }
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()
@@ -324,7 +325,7 @@ void AGearGameMode::AllPlayerJoined()
 
 				if (IsValid(GearController))
 				{
-					GearController->AllPlayersJoined();
+					GearController->ClientStateAllPlayersJoined();
 				}
 			}
 		}
@@ -332,6 +333,6 @@ void AGearGameMode::AllPlayerJoined()
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay());
 
-		SetGearMatchState(EGearMatchState::AllPlayersJoined);
+		GearMatchState = EGearMatchState::AllPlayersJoined;
 	}
 }

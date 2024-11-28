@@ -8,21 +8,14 @@
 
 AGearGameState::AGearGameState()
 {
-	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
+
 }
 
-void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
-	DOREPLIFETIME(AGearGameState, GearMatchState);
-	DOREPLIFETIME(AGearGameState, LastStateChangeTime);
-}
-
-void AGearGameState::OnRep_GearMatchState()
-{
-	
-}
+// void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+// {
+// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+// 	
+// }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 {

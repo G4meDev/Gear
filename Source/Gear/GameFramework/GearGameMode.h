@@ -25,11 +25,7 @@ public:
 
 	void Tick(float DeltaSeconds) override;
 	
-
-	UFUNCTION(Server, Reliable)
 	void RequestSelectingHazardForPlayer(AGearHazardActor* Hazard, AGearPlayerState* Player);
-
-	void SetGearMatchState(EGearMatchState State);
 
 protected:
 

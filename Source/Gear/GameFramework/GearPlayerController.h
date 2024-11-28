@@ -28,9 +28,6 @@ public:
 
 	bool IsReady;
 
-	UPROPERTY()
-	AGearHUD* GearHUD;
-
 	UFUNCTION(Client, Unreliable)
 	void PeekClientIsReady();
 
@@ -41,11 +38,18 @@ public:
 	void OnRemovePlayer(AGearPlayerState* GearPlayer);
 
 	UFUNCTION(Client, Reliable)
-	void AllPlayersJoined();
+	void ClientStateAllPlayersJoined();
 
 	UFUNCTION(Client, Reliable)
-	void MatchStarted();
+	void ClientStateMatchStarted();
 
 	UFUNCTION(Server, Reliable)
 	void SelectHazard(AGearHazardActor* Hazard);
+
+
+	UFUNCTION(Client, Reliable)
+	void ClientStateSelectingPieces(float StateStartTime);
+
+	UFUNCTION(Client, Reliable)
+	void ClientStatePlacingPieces(float StateStartTime);
 };
