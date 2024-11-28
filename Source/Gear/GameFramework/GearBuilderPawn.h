@@ -9,6 +9,8 @@
 class UStaticMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
+class UInputAction;
+struct FInputActionInstance;
 
 UCLASS()
 class GEAR_API AGearBuilderPawn : public APawn
@@ -31,10 +33,23 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UCameraComponent* Camera;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInputAction* MoveScreenAction;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float MovementSpeed;
+
+	bool bCanMove;
+
+	void FindStartPlacingTarget(FVector& Location, FRotator& Rotation);
+
+	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void MoveScreen(const FInputActionInstance& Instance);
+
 public:	
 	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	void StartPlacing();
 };

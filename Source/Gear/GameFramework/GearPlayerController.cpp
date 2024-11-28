@@ -5,12 +5,22 @@
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearGameMode.h"
+#include "GameFramework/GearBuilderPawn.h"
 #include "GearHUD.h"
 #include "Hazard/GearHazardActor.h"
+
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 
 AGearPlayerController::AGearPlayerController()
 {
 	IsReady = false;
+}
+
+void AGearPlayerController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
 }
 
 void AGearPlayerController::BeginPlay()
@@ -19,6 +29,15 @@ void AGearPlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (IsValid(InputMappingContext))
+			{
+				InputSystem->AddMappingContext(InputMappingContext, 0);
+			}
+		}
+
+
 		AGearHUD* GearHUD = GetHUD<AGearHUD>();
 		if (IsValid(GearHUD))
 		{
@@ -86,6 +105,12 @@ void AGearPlayerController::ClientStatePlacingPieces_Implementation(float StateS
 	if (IsValid(GearHUD))
 	{
 		GearHUD->StartPlacingPieces(StateStartTime);
+	}
+
+	AGearBuilderPawn* BuilderPawn = GetPawn<AGearBuilderPawn>();
+	if (BuilderPawn)
+	{
+		BuilderPawn->StartPlacing();
 	}
 }
 

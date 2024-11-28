@@ -9,6 +9,7 @@
 class AGearPlayerState;
 class AGearHUD;
 class AGearHazardActor;
+class UInputMappingContext;
 
 /**
  * 
@@ -22,7 +23,12 @@ protected:
 
 	AGearPlayerController();
 
+	void PostInitializeComponents() override;
+
 	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInputMappingContext* InputMappingContext;
 
 public:
 
