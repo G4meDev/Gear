@@ -26,35 +26,43 @@ AGearBuilderPawn::AGearBuilderPawn()
 	Camera->SetupAttachment(CameraBoom);
 
 	bCanMove = false;
-	MovementSpeed = 100.0f;
+	MovementSpeed = 40.0f;
+	Damping = 0.0f;
+	Drag = 0.0f;
+	ScreenDragValue = FVector2D::Zero();
+	Velocity = FVector2D::Zero();
 }
 
 void AGearBuilderPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	Input->BindAction(MoveScreenAction, ETriggerEvent::Triggered, this, &AGearBuilderPawn::MoveScreen);
+	Input->BindAction(MoveScreenAction, ETriggerEvent::Triggered, this, &AGearBuilderPawn::MoveScreenInputTrigger);
+	Input->BindAction(MoveScreenAction, ETriggerEvent::Completed, this, &AGearBuilderPawn::MoveScreenInputCompleted);
 }
 
+void AGearBuilderPawn::MoveScreenInputTrigger(const FInputActionInstance& Instance)
+{
+	ScreenDragValue = Instance.GetValue().Get<FVector2D>();
+}
+
+
+void AGearBuilderPawn::MoveScreenInputCompleted(const FInputActionInstance& Instance)
+{
+	ScreenDragValue = FVector2D::Zero();
+}
 
 void AGearBuilderPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
 
+void AGearBuilderPawn::Destroyed()
+{
+	Super::Destroyed();
 	
 }
 
-void AGearBuilderPawn::MoveScreen(const FInputActionInstance& Instance)
-{
-	if (bCanMove)
-	{
-		FVector2D MovementInput = Instance.GetValue().Get<FVector2D>();
-		FVector MovementInput3D = FVector(MovementInput.X, MovementInput.Y, 0);
-
-		FVector DeltaLocation = GetTransform().InverseTransformVectorNoScale(MovementInput3D * MovementSpeed * GetWorld()->GetDeltaSeconds());
-		SetActorLocation(GetActorLocation() + DeltaLocation);
-	}
-}
 
 void AGearBuilderPawn::FindStartPlacingTarget(FVector& Location, FRotator& Rotation)
 {
@@ -79,7 +87,31 @@ void AGearBuilderPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+	if (bCanMove)
+	{
+		Velocity += -ScreenDragValue * MovementSpeed * DeltaTime;
+
+		if (Velocity.IsNearlyZero(KINDA_SMALL_NUMBER))
+		{
+			Velocity = FVector2D::Zero();
+		}
+
+		else
+		{
+			float VelocityMagnitude = Velocity.Length();
+			Velocity.Normalize();
+			
+			VelocityMagnitude = FMath::FInterpTo(VelocityMagnitude, 0.0f, DeltaTime, Drag);
+			VelocityMagnitude = FMath::FInterpConstantTo(VelocityMagnitude, 0.0f, DeltaTime, Damping);
+
+			Velocity *= VelocityMagnitude;
+
+			FVector Velocity3D = FVector(Velocity.X, Velocity.Y, 0);
+			FVector DeltaLocation = GetTransform().InverseTransformVectorNoScale(Velocity3D);
+
+			SetActorLocation(GetActorLocation() + DeltaLocation);
+		}
+	}
 }
 
 void AGearBuilderPawn::StartPlacing()

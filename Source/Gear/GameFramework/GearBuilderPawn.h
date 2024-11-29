@@ -24,6 +24,16 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	virtual void Destroyed() override;
+
+	void FindStartPlacingTarget(FVector& Location, FRotator& Rotation);
+
+	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void MoveScreenInputTrigger(const FInputActionInstance& Instance);
+
+	void MoveScreenInputCompleted(const FInputActionInstance& Instance);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* ViewTarget;
 
@@ -38,14 +48,18 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float MovementSpeed;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float Damping;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float Drag;
+
+	FVector2D ScreenDragValue;
+	FVector2D Velocity;
 
 	bool bCanMove;
 
-	void FindStartPlacingTarget(FVector& Location, FRotator& Rotation);
-
-	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	void MoveScreen(const FInputActionInstance& Instance);
 
 public:	
 	
