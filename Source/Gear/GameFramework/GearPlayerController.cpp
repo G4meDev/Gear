@@ -7,7 +7,7 @@
 #include "GameFramework/GearGameMode.h"
 #include "GameFramework/GearBuilderPawn.h"
 #include "GearHUD.h"
-#include "Placeable/GearHazard.h"
+#include "Placeable/GearPlaceable.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -158,7 +158,7 @@ void AGearPlayerController::ClientStateMatchStarted_Implementation()
 	}
 }
 
-void AGearPlayerController::SelectHazard_Implementation(AGearHazard* Hazard)
+void AGearPlayerController::SelectPlaceable_Implementation(AGearPlaceable* Placeable)
 {
 	AGearPlayerState* GearPlayer = GetPlayerState<AGearPlayerState>();
 
@@ -168,7 +168,7 @@ void AGearPlayerController::SelectHazard_Implementation(AGearHazard* Hazard)
 
 		if (IsValid(GearGameMode))
 		{
-			GearGameMode->RequestSelectingHazardForPlayer(Hazard, GearPlayer);
+			GearGameMode->RequestSelectingPlaceableForPlayer(Placeable, GearPlayer);
 		}
 	}
 }

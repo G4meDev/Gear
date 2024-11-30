@@ -2,11 +2,21 @@
 
 
 #include "Placeable/GearPlaceable.h"
+#include "Net/UnrealNetwork.h"
 
 AGearPlaceable::AGearPlaceable()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	bReplicates = true;
+	SetReplicateMovement(true);
+}
+
+void AGearPlaceable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGearPlaceable, OwningPlayer);
 }
 
 void AGearPlaceable::BeginPlay()
@@ -26,3 +36,19 @@ void AGearPlaceable::RoundReset()
 	RoundRestBlueprintEvent();
 }
 
+bool AGearPlaceable::HasOwningPlayer() const
+{
+	return OwningPlayer != nullptr;
+}
+
+void AGearPlaceable::OnRep_OwningPlayer()
+{
+	if (OwningPlayer == nullptr)
+	{
+		SetPreview();
+	}
+	else
+	{
+		SetSelectedBy(OwningPlayer);
+	}
+}

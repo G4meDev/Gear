@@ -8,7 +8,9 @@
 #include "GameFramework/GearTypes.h"
 #include "GearPlaceable.generated.h"
 
-UCLASS(Blueprintable , abstract)
+class AGearPlayerState;
+
+UCLASS(Blueprintable)
 class GEAR_API AGearPlaceable : public AActor, public IRoundResetable
 {
 	GENERATED_BODY()
@@ -16,14 +18,14 @@ class GEAR_API AGearPlaceable : public AActor, public IRoundResetable
 public:	
 	AGearPlaceable();
 
-protected:
-	virtual void BeginPlay() override;
-
-public:	
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RoundReset() override;
+
+	virtual void SetPreview() {};
+
+	virtual void SetSelectedBy(AGearPlayerState* Player) {};
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void RoundRestBlueprintEvent();
@@ -31,4 +33,16 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EPlaceableType Type;
+
+
+	UPROPERTY(ReplicatedUsing=OnRep_OwningPlayer)
+	AGearPlayerState* OwningPlayer;
+
+	bool HasOwningPlayer() const;
+
+	UFUNCTION()
+	void OnRep_OwningPlayer();
+
+protected:
+	virtual void BeginPlay() override;
 };

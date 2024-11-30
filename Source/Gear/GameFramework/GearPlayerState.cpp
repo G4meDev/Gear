@@ -2,7 +2,7 @@
 
 
 #include "GameFramework/GearPlayerState.h"
-#include "Placeable/GearHazard.h"
+#include "Placeable/GearPlaceable.h"
 #include "Utils/DataHelperBFL.h"
 #include "Net/UnrealNetwork.h"
 
@@ -17,7 +17,7 @@ void AGearPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGearPlayerState, ColorCode);
-	DOREPLIFETIME(AGearPlayerState, SelectedHazard);
+	DOREPLIFETIME(AGearPlayerState, SelectedPlaceable);
 }
 
 void AGearPlayerState::OnRep_PlayerName()
@@ -41,27 +41,27 @@ void AGearPlayerState::OnRep_ColorCode()
 
 }
 
-void AGearPlayerState::SetSelectedHazard(AGearHazard* Hazard)
+void AGearPlayerState::SetSelectedHazard(AGearPlaceable* Placeable)
 {
 	if (HasAuthority())
 	{
-		if (IsValid(SelectedHazard))
+		if (IsValid(SelectedPlaceable))
 		{
-			SelectedHazard->OwningPlayer = nullptr;
-			SelectedHazard->OnRep_OwningPlayer();
+			SelectedPlaceable->OwningPlayer = nullptr;
+			SelectedPlaceable->OnRep_OwningPlayer();
 		}
 
-		if (IsValid(Hazard))
+		if (IsValid(Placeable))
 		{
-			Hazard->OwningPlayer = this;
-			Hazard->OnRep_OwningPlayer();
+			Placeable->OwningPlayer = this;
+			Placeable->OnRep_OwningPlayer();
 		}
 
-		SelectedHazard = Hazard;
+		SelectedPlaceable = Placeable;
 	}
 }
 
 bool AGearPlayerState::HasSelectedHazard() const
 {
-	return SelectedHazard != nullptr;
+	return SelectedPlaceable != nullptr;
 }

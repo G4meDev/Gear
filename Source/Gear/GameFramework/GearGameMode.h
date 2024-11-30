@@ -9,7 +9,7 @@
 
 struct FHazardDescription;
 class AGearPlayerState;
-class AGearHazard;
+class AGearPlaceable;
 class AHazardPreviewSpawnPoint;
 
 /**
@@ -25,7 +25,7 @@ public:
 
 	void Tick(float DeltaSeconds) override;
 	
-	void RequestSelectingHazardForPlayer(AGearHazard* Hazard, AGearPlayerState* Player);
+	void RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearPlayerState* Player);
 
 protected:
 
@@ -47,24 +47,24 @@ protected:
 	void AllPlayerJoined();
 
 	void StartFirstPhase();
-	void AssignPiecesToUnowningPlayers();
-	void StartSelectingPieces();
+	void StartSelectingPlaceables();
+	void AssignPlaceablesToUnowningPlayers();
 	FTimerHandle SelectingPiecesTimerHandle;
 
-	bool IsEveryPlayerSelectedPieces();
-	void StartPlaceingPieces(bool bEveryPlayerIsReady);
+	bool IsEveryPlayerSelectedPlaceables();
+	void StartPlaceing(bool bEveryPlayerIsReady);
 
 	bool ShouldAbort();
 
 	void SpawnNewBuilderPawns();
-	void SpawnNewHazzards();
+	void SpawnNewPlaceables();
 
-	bool LoadHazards();
+	bool LoadPlaceables();
 	bool LoadHazardPreviewSpawnPoints();
 	
 	EGearMatchState GearMatchState;
 
-	TArray<AGearHazard*> PreviewHazards;
+	TArray<AGearPlaceable*> PreviewPlaceables;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UDataTable* HazardSpawnRulesDataTable;

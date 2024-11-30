@@ -6,7 +6,7 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearBuilderPawn.h"
-#include "Placeable/GearHazard.h"
+#include "Placeable/GearPlaceable.h"
 #include "Placeable/HazardPreviewSpawnPoint.h"
 #include "Utils/GameVariablesBFL.h"
 
@@ -27,7 +27,7 @@ void AGearGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!LoadHazards())
+	if (!LoadPlaceables())
 	{
 		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards found"));
 		AbortMatch();
@@ -44,11 +44,11 @@ void AGearGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (GearMatchState == EGearMatchState::SelectingPeices)
+	if (GearMatchState == EGearMatchState::SelectingPlaceables)
 	{
-		if (IsEveryPlayerSelectedPieces())
+		if (IsEveryPlayerSelectedPlaceables())
 		{
-			StartPlaceingPieces(true);
+			StartPlaceing(true);
 		}
 	}
 
@@ -84,23 +84,23 @@ void AGearGameMode::SpawnNewBuilderPawns()
 	}
 }
 
-void AGearGameMode::SpawnNewHazzards()
+void AGearGameMode::SpawnNewPlaceables()
 {
-	PreviewHazards.Empty(5);
+	PreviewPlaceables.Empty(5);
 
 	for (AHazardPreviewSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
 	{
 		// TODO: implement hazard spawning logic, for now spawn randomly
-		TSubclassOf<AGearHazard>& SpawnClass = AvaliableHazards[ FMath::RandRange(0, AvaliableHazards.Num()-1) ].Class;
+		TSubclassOf<AGearPlaceable>& SpawnClass = AvaliableHazards[ FMath::RandRange(0, AvaliableHazards.Num()-1) ].Class;
 
-		AGearHazard* HazardActor = GetWorld()->SpawnActor<AGearHazard>(SpawnClass, SpawnPoint->GetTransform());
+		AGearPlaceable* HazardActor = GetWorld()->SpawnActor<AGearPlaceable>(SpawnClass, SpawnPoint->GetTransform());
 		HazardActor->SetPreview();
 		
-		PreviewHazards.Add(HazardActor);
+		PreviewPlaceables.Add(HazardActor);
 	}
 }
 
-bool AGearGameMode::LoadHazards()
+bool AGearGameMode::LoadPlaceables()
 {
 	AvaliableHazards.Empty();
 
@@ -111,7 +111,7 @@ bool AGearGameMode::LoadHazards()
 
 		for (FHazardDescription* Desc : RawHazards)
 		{
-			TSubclassOf<AGearHazard> HazardClass = StaticLoadClass(AGearHazard::StaticClass(), nullptr, *Desc->ClassPath);
+			TSubclassOf<AGearPlaceable> HazardClass = StaticLoadClass(AGearPlaceable::StaticClass(), nullptr, *Desc->ClassPath);
 			if (IsValid(HazardClass))
 			{
 				FHazardDescription NewDesc = *Desc;
@@ -151,11 +151,11 @@ bool AGearGameMode::LoadHazardPreviewSpawnPoints()
 	return HazardPreviewSpawnPoints.Num() == 5;
 }
 
-void AGearGameMode::RequestSelectingHazardForPlayer(AGearHazard* Hazard, AGearPlayerState* Player)
+void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearPlayerState* Player)
 {
-	if (GearMatchState == EGearMatchState::SelectingPeices && IsValid(Hazard) && IsValid(Player) && !Hazard->HasOwningPlayer())
+	if (GearMatchState == EGearMatchState::SelectingPlaceables && IsValid(Placeable) && IsValid(Player) && !Placeable->HasOwningPlayer())
 	{
-		Player->SetSelectedHazard(Hazard);
+		Player->SetSelectedHazard(Placeable);
 	}
 }
 
@@ -177,13 +177,13 @@ void AGearGameMode::StartFirstPhase()
 		}
 	}
 	
-	StartSelectingPieces();
+	StartSelectingPlaceables();
 }
 
-void AGearGameMode::AssignPiecesToUnowningPlayers()
+void AGearGameMode::AssignPlaceablesToUnowningPlayers()
 {
 	TArray<AGearPlayerState*> UnowningPlayers;
-	TArray<AGearHazard*> UnownedHazards;
+	TArray<AGearPlaceable*> UnownedHazards;
 
 	for (APlayerState* Player : GameState->PlayerArray)
 	{
@@ -194,7 +194,7 @@ void AGearGameMode::AssignPiecesToUnowningPlayers()
 		}
 	}
 
-	for (AGearHazard* Hazard : PreviewHazards)
+	for (AGearPlaceable* Hazard : PreviewPlaceables)
 	{
 		if (!Hazard->HasOwningPlayer())
 		{
@@ -215,16 +215,16 @@ bool AGearGameMode::ReadyToEndMatch_Implementation()
 	return false;
 }
 
-void AGearGameMode::StartSelectingPieces()
+void AGearGameMode::StartSelectingPlaceables()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces!"));
 
-	GearMatchState = EGearMatchState::SelectingPeices;
+	GearMatchState = EGearMatchState::SelectingPlaceables;
 
 	SpawnNewBuilderPawns();
-	SpawnNewHazzards();
+	SpawnNewPlaceables();
 
-	GetWorld()->GetTimerManager().SetTimer(SelectingPiecesTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartPlaceingPieces, false), UGameVariablesBFL::GV_PieceSelectionTimeLimit(), false);
+	GetWorld()->GetTimerManager().SetTimer(SelectingPiecesTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartPlaceing, false), UGameVariablesBFL::GV_PieceSelectionTimeLimit(), false);
 
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
@@ -236,7 +236,7 @@ void AGearGameMode::StartSelectingPieces()
 	}
 }
 
-bool AGearGameMode::IsEveryPlayerSelectedPieces()
+bool AGearGameMode::IsEveryPlayerSelectedPlaceables()
 {
 	for (APlayerState* Player : GameState->PlayerArray)
 	{
@@ -250,7 +250,7 @@ bool AGearGameMode::IsEveryPlayerSelectedPieces()
 	return true;
 }
 
-void AGearGameMode::StartPlaceingPieces(bool bEveryPlayerIsReady)
+void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 {
 	UE_LOG(LogTemp, Warning, TEXT("start placing pieces"));
 
@@ -259,7 +259,7 @@ void AGearGameMode::StartPlaceingPieces(bool bEveryPlayerIsReady)
 
 	if (!bEveryPlayerIsReady)
 	{
-		AssignPiecesToUnowningPlayers();
+		AssignPlaceablesToUnowningPlayers();
 	}
 
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
@@ -271,7 +271,7 @@ void AGearGameMode::StartPlaceingPieces(bool bEveryPlayerIsReady)
 		}
 	}
 
-	GearMatchState = EGearMatchState::PlacingPieces;
+	GearMatchState = EGearMatchState::Placing;
 }
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()

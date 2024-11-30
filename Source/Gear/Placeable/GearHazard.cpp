@@ -25,9 +25,6 @@ AGearHazard::AGearHazard()
 
 	PrimaryActorTick.bCanEverTick = true;
 
-	bReplicates = true;
-	SetReplicateMovement(true);
-
 	PreviewRotaionOffset = FMath::FRandRange(0.0f, 360.0f);
 	HazardState = EHazardState::Idle;
 }
@@ -47,7 +44,7 @@ void AGearHazard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGearHazard, HazardState);
-	DOREPLIFETIME(AGearHazard, OwningPlayer);
+	
 }
 
 void AGearHazard::BeginPlay()
@@ -71,7 +68,7 @@ void AGearHazard::SelectionBoxClicked()
 
 			if (IsValid(GearController))
 			{
-				GearController->SelectHazard(this);
+				GearController->SelectPlaceable(this);
 			}
 		}
 	}
@@ -105,23 +102,6 @@ void AGearHazard::SetSelectedBy(AGearPlayerState* Player)
 
 	SelectionIndicatorMaterial->SetVectorParameterValue(TEXT("Color"), Player->PlayerColor);
 	SelectionIndicator->SetVisibility(true);
-}
-
-void AGearHazard::OnRep_OwningPlayer()
-{
-	if (OwningPlayer == nullptr)
-	{
-		SetPreview();
-	}
-	else
-	{
-		SetSelectedBy(OwningPlayer);
-	}
-}
-
-bool AGearHazard::HasOwningPlayer() const
-{
-	return OwningPlayer != nullptr;
 }
 
 void AGearHazard::Tick(float DeltaTime)

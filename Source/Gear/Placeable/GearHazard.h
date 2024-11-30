@@ -31,11 +31,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 	
-	void SetPreview();
-	void SetSelectedBy(AGearPlayerState* Player);
-
-	UFUNCTION()
-	void OnRep_OwningPlayer();
+	void SetPreview() override;
+	void SetSelectedBy(AGearPlayerState* Player) override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* Root;
@@ -47,11 +44,6 @@ public:
 	UStaticMeshComponent* SelectionIndicator;
 
 	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
-
-	UPROPERTY(ReplicatedUsing=OnRep_OwningPlayer)
-	AGearPlayerState* OwningPlayer;
-
-	bool HasOwningPlayer() const;
 
 protected:
 	virtual void BeginPlay() override;

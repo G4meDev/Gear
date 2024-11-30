@@ -8,15 +8,15 @@
 #define DEFAULT_PLAYER_NAME "NewPlayer"
 
 
-class AGearHazard;
+class AGearPlaceable;
 
 UENUM(BlueprintType)
 enum class EGearMatchState : uint8
 {
 	WaitingForPlayerToJoin,
 	AllPlayersJoined,
-	SelectingPeices,
-	PlacingPieces,
+	SelectingPlaceables,
+	Placing,
 	Racing,
 	Ended
 };
@@ -37,7 +37,7 @@ struct FHazardDescription : public FTableRowBase
 public:
 
 	UPROPERTY()
-	TSubclassOf<AGearHazard> Class;
+	TSubclassOf<AGearPlaceable> Class;
 	
 	UPROPERTY()
 	bool HasBeenSpawned = false;
