@@ -18,19 +18,17 @@ AGearPlaceable::AGearPlaceable()
 	SetRootComponent(Root);
 
 	SelectionHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("SelectionHitbox"));
-
+	SelectionHitbox->SetCollisionProfileName("Selectable");
 	SelectionHitbox->SetupAttachment(Root);
-
-	SelectionIndicator = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectionIndicator"));
-	SelectionIndicator->SetVisibility(false);
-	SelectionIndicator->SetupAttachment(Root);
-	SelectionIndicator->SetIsReplicated(true);
-
-	PlaceableState = EPlaceableState::Idle;
 
 	PreviewRotationPivot = CreateDefaultSubobject<USceneComponent>(TEXT("PreviewRotationPivot"));
 	PreviewRotationPivot->SetupAttachment(Root);
 
+	SelectionIndicator = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectionIndicator"));
+	SelectionIndicator->SetupAttachment(PreviewRotationPivot);
+	SelectionIndicator->SetIsReplicated(true);
+
+	PlaceableState = EPlaceableState::Idle;
 	PreviewScale = 1.0f;
 
 	bReplicates = true;
@@ -46,6 +44,8 @@ void AGearPlaceable::PostInitializeComponents()
 	SelectionHitbox->OnInputTouchBegin.AddDynamic(this, &AGearPlaceable::OnSelectionBoxTouched);
 
 	SelectionIndicatorMaterial = SelectionIndicator->CreateDynamicMaterialInstance(0, nullptr);
+
+	SelectionIndicator->SetVisibility(false);
 }
 
 void AGearPlaceable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
