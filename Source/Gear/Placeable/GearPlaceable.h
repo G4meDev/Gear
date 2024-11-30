@@ -9,6 +9,9 @@
 #include "GearPlaceable.generated.h"
 
 class AGearPlayerState;
+class UBoxComponent;
+class UStaticMeshComponent;
+class AGearPlayerState;
 
 UCLASS(Blueprintable)
 class GEAR_API AGearPlaceable : public AActor, public IRoundResetable
@@ -18,14 +21,16 @@ class GEAR_API AGearPlaceable : public AActor, public IRoundResetable
 public:	
 	AGearPlaceable();
 
+	void PostInitializeComponents() override;
+
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RoundReset() override;
 
-	virtual void SetPreview() {};
+	virtual void SetPreview();
 
-	virtual void SetSelectedBy(AGearPlayerState* Player) {};
+	virtual void SetSelectedBy(AGearPlayerState* Player);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void RoundRestBlueprintEvent();
@@ -43,6 +48,35 @@ public:
 	UFUNCTION()
 	void OnRep_OwningPlayer();
 
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* Root;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UBoxComponent* SelectionHitbox;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UStaticMeshComponent* SelectionIndicator;
+
+	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
+
+
+
 protected:
 	virtual void BeginPlay() override;
+
+		UPROPERTY()
+	float PreviewRotationSpeed = 30.0f;
+
+	float PreviewRotaionOffset;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	EPlaceableState HazardState;
+
+	void SelectionBoxClicked();
+
+	UFUNCTION()
+	void OnSelectionBoxClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
+	UFUNCTION()
+	void OnSelectionBoxTouched(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
 };

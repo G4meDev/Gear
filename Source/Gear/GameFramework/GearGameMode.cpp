@@ -91,37 +91,37 @@ void AGearGameMode::SpawnNewPlaceables()
 	for (AHazardPreviewSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
 	{
 		// TODO: implement hazard spawning logic, for now spawn randomly
-		TSubclassOf<AGearPlaceable>& SpawnClass = AvaliableHazards[ FMath::RandRange(0, AvaliableHazards.Num()-1) ].Class;
+		TSubclassOf<AGearPlaceable>& SpawnClass = AvaliablePlaceables[ FMath::RandRange(0, AvaliablePlaceables.Num()-1) ].Class;
 
-		AGearPlaceable* HazardActor = GetWorld()->SpawnActor<AGearPlaceable>(SpawnClass, SpawnPoint->GetTransform());
-		HazardActor->SetPreview();
+		AGearPlaceable* PlaceableActor = GetWorld()->SpawnActor<AGearPlaceable>(SpawnClass, SpawnPoint->GetTransform());
+		PlaceableActor->SetPreview();
 		
-		PreviewPlaceables.Add(HazardActor);
+		PreviewPlaceables.Add(PlaceableActor);
 	}
 }
 
 bool AGearGameMode::LoadPlaceables()
 {
-	AvaliableHazards.Empty();
+	AvaliablePlaceables.Empty();
 
-	if (IsValid(HazardSpawnRulesDataTable))
+	if (IsValid(PlaceableSpawnRulesDataTable))
 	{
-		TArray<FHazardDescription*> RawHazards; 
-		HazardSpawnRulesDataTable->GetAllRows<FHazardDescription>("Reading hazard rules", RawHazards);
+		TArray<FPlaceableDescription*> RawHazards;
+		PlaceableSpawnRulesDataTable->GetAllRows<FPlaceableDescription>("Reading hazard rules", RawHazards);
 
-		for (FHazardDescription* Desc : RawHazards)
+		for (FPlaceableDescription* Desc : RawHazards)
 		{
 			TSubclassOf<AGearPlaceable> HazardClass = StaticLoadClass(AGearPlaceable::StaticClass(), nullptr, *Desc->ClassPath);
 			if (IsValid(HazardClass))
 			{
-				FHazardDescription NewDesc = *Desc;
+				FPlaceableDescription NewDesc = *Desc;
 				NewDesc.Class = HazardClass;
 				
-				AvaliableHazards.Add(NewDesc);
+				AvaliablePlaceables.Add(NewDesc);
 			}
 		}
 
-		if (AvaliableHazards.Num() == 0)
+		if (AvaliablePlaceables.Num() == 0)
 		{
 			return false;
 		}

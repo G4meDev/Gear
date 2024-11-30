@@ -28,8 +28,17 @@ enum class EPlaceableType : uint8
 	RoadModule
 };
 
+UENUM(BlueprintType)
+enum class EPlaceableState : uint8
+{
+	Preview,
+	Selected,
+	Idle,
+	Enabled
+};
+
 USTRUCT(BlueprintType)
-struct FHazardDescription : public FTableRowBase
+struct FPlaceableDescription : public FTableRowBase
 {
 	GENERATED_BODY()
 

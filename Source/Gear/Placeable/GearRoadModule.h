@@ -4,21 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Placeable/GearPlaceable.h"
-#include "GearHazard.generated.h"
+#include "GearRoadModule.generated.h"
 
-
-UCLASS(Blueprintable)
-class GEAR_API AGearHazard : public AGearPlaceable
+/**
+ * 
+ */
+UCLASS()
+class GEAR_API AGearRoadModule : public AGearPlaceable
 {
 	GENERATED_BODY()
 	
 public:
-	AGearHazard();
+	AGearRoadModule();
 
 	void PostInitializeComponents() override;
 
 	virtual void Tick(float DeltaTime) override;
-	
+
 	void SetPreview() override;
 	void SetSelectedBy(AGearPlayerState* Player) override;
 
@@ -26,6 +28,5 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
 
 };

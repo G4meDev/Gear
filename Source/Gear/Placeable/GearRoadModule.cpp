@@ -1,18 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Placeable/GearHazard.h"
-#include "Net/UnrealNetwork.h"
+#include "Placeable/GearRoadModule.h"
 
-
-AGearHazard::AGearHazard()
+AGearRoadModule::AGearRoadModule()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 
 }
 
-void AGearHazard::PostInitializeComponents()
+void AGearRoadModule::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
@@ -26,24 +24,24 @@ void AGearHazard::PostInitializeComponents()
 // 	
 // }
 
-void AGearHazard::BeginPlay()
+void AGearRoadModule::BeginPlay()
 {
 	Super::BeginPlay();
 
 
 }
 
-void AGearHazard::SetPreview()
+void AGearRoadModule::SetPreview()
 {
 	Super::SetPreview();
 }
 
-void AGearHazard::SetSelectedBy(AGearPlayerState* Player)
+void AGearRoadModule::SetSelectedBy(AGearPlayerState* Player)
 {
 	Super::SetSelectedBy(Player);
 }
 
-void AGearHazard::Tick(float DeltaTime)
+void AGearRoadModule::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

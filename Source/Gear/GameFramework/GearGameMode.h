@@ -67,9 +67,9 @@ protected:
 	TArray<AGearPlaceable*> PreviewPlaceables;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UDataTable* HazardSpawnRulesDataTable;
+	UDataTable* PlaceableSpawnRulesDataTable;
 	
-	TArray<FHazardDescription> AvaliableHazards;
+	TArray<FPlaceableDescription> AvaliablePlaceables;
 
-	TArray<AHazardPreviewSpawnPoint*> HazardPreviewSpawnPoints;	
+	TArray<AHazardPreviewSpawnPoint*> HazardPreviewSpawnPoints;
 };
