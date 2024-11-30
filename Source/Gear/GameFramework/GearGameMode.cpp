@@ -7,7 +7,7 @@
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearBuilderPawn.h"
 #include "Placeable/GearPlaceable.h"
-#include "Placeable/HazardPreviewSpawnPoint.h"
+#include "Placeable/PlaceableSpawnPoint.h"
 #include "Utils/GameVariablesBFL.h"
 
 #include "kismet/GameplayStatics.h"
@@ -33,7 +33,7 @@ void AGearGameMode::BeginPlay()
 		AbortMatch();
 	}
 
-	if (!LoadHazardPreviewSpawnPoints())
+	if (!LoadPlaceableSpawnPoints())
 	{
 		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards preview spawn point found"));
 		AbortMatch();
@@ -88,14 +88,15 @@ void AGearGameMode::SpawnNewPlaceables()
 {
 	PreviewPlaceables.Empty(5);
 
-	for (AHazardPreviewSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
+	for (APlaceableSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
 	{
 		// TODO: implement hazard spawning logic, for now spawn randomly
 		TSubclassOf<AGearPlaceable>& SpawnClass = AvaliablePlaceables[ FMath::RandRange(0, AvaliablePlaceables.Num()-1) ].Class;
 
 		AGearPlaceable* PlaceableActor = GetWorld()->SpawnActor<AGearPlaceable>(SpawnClass, SpawnPoint->GetTransform());
 		PlaceableActor->SetPreview();
-		
+		PlaceableActor->AttachToSpawnPoint(SpawnPoint);
+
 		PreviewPlaceables.Add(PlaceableActor);
 	}
 }
@@ -132,19 +133,19 @@ bool AGearGameMode::LoadPlaceables()
 	return false;
 }
 
-bool AGearGameMode::LoadHazardPreviewSpawnPoints()
+bool AGearGameMode::LoadPlaceableSpawnPoints()
 {
 	HazardPreviewSpawnPoints.Empty(5);
 	
 	TArray<AActor*> SpawnActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHazardPreviewSpawnPoint::StaticClass(), SpawnActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlaceableSpawnPoint::StaticClass(), SpawnActors);
 
 	for (AActor* Actor : SpawnActors)
 	{
-		AHazardPreviewSpawnPoint* HazardPreviewSpawnPoint = Cast<AHazardPreviewSpawnPoint>(Actor);
-		if (IsValid(HazardPreviewSpawnPoint))
+		APlaceableSpawnPoint* SpawnPoint = Cast<APlaceableSpawnPoint>(Actor);
+		if (IsValid(SpawnPoint))
 		{
-			HazardPreviewSpawnPoints.Add(HazardPreviewSpawnPoint);
+			HazardPreviewSpawnPoints.Add(SpawnPoint);
 		}
 	}
 

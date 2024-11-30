@@ -12,6 +12,7 @@ class AGearPlayerState;
 class UBoxComponent;
 class UStaticMeshComponent;
 class AGearPlayerState;
+class APlaceableSpawnPoint;
 
 UCLASS(Blueprintable)
 class GEAR_API AGearPlaceable : public AActor, public IRoundResetable
@@ -58,20 +59,21 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* SelectionIndicator;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* PreviewRotationPivot;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float PreviewScale;
+
 	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
 
-
+	void AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint);
 
 protected:
 	virtual void BeginPlay() override;
 
-		UPROPERTY()
-	float PreviewRotationSpeed = 30.0f;
-
-	float PreviewRotaionOffset;
-
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
-	EPlaceableState HazardState;
+	EPlaceableState PlaceableState;
 
 	void SelectionBoxClicked();
 

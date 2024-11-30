@@ -8,6 +8,7 @@
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
+#include "Placeable/PlaceableSpawnPoint.h"
 
 AGearPlaceable::AGearPlaceable()
 {
@@ -25,12 +26,16 @@ AGearPlaceable::AGearPlaceable()
 	SelectionIndicator->SetupAttachment(Root);
 	SelectionIndicator->SetIsReplicated(true);
 
-	PreviewRotaionOffset = FMath::FRandRange(0.0f, 360.0f);
-	HazardState = EPlaceableState::Idle;
+	PlaceableState = EPlaceableState::Idle;
 
+	PreviewRotationPivot = CreateDefaultSubobject<USceneComponent>(TEXT("PreviewRotationPivot"));
+	PreviewRotationPivot->SetupAttachment(Root);
+
+	PreviewScale = 1.0f;
 
 	bReplicates = true;
 	SetReplicateMovement(true);
+
 }
 
 void AGearPlaceable::PostInitializeComponents()
@@ -48,14 +53,14 @@ void AGearPlaceable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGearPlaceable, OwningPlayer);
-	DOREPLIFETIME(AGearPlaceable, HazardState);
+	DOREPLIFETIME(AGearPlaceable, PlaceableState);
 }
 
 void AGearPlaceable::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (HazardState == EPlaceableState::Preview)
+	if (PlaceableState == EPlaceableState::Preview)
 	{
 		SetPreview();
 	}
@@ -92,14 +97,7 @@ void AGearPlaceable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// in preview mode rotate locally
-	if (HazardState == EPlaceableState::Preview || HazardState == EPlaceableState::Selected)
-	{
-		FRotator Rotator = Rotator.ZeroRotator;
-		Rotator.Yaw = GetWorld()->GetTimeSeconds() * PreviewRotationSpeed + PreviewRotaionOffset;
 
-		SetActorRotation(Rotator);
-	}
 }
 
 void AGearPlaceable::RoundReset()
@@ -111,7 +109,7 @@ void AGearPlaceable::SetPreview()
 {
 	if (HasAuthority())
 	{
-		HazardState = EPlaceableState::Preview;
+		PlaceableState = EPlaceableState::Preview;
 		SelectionIndicator->SetVisibility(false);
 	}
 }
@@ -120,7 +118,7 @@ void AGearPlaceable::SetSelectedBy(AGearPlayerState* Player)
 {
 	if (HasAuthority())
 	{
-		HazardState = EPlaceableState::Selected;
+		PlaceableState = EPlaceableState::Selected;
 	}
 
 	SelectionIndicatorMaterial->SetVectorParameterValue(TEXT("Color"), Player->PlayerColor);
@@ -142,4 +140,11 @@ void AGearPlaceable::OnRep_OwningPlayer()
 	{
 		SetSelectedBy(OwningPlayer);
 	}
+}
+
+void AGearPlaceable::AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint)
+{
+	AttachToActor(SpawnPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	SetActorScale3D(FVector(PreviewScale));
+	SetActorRelativeLocation(-PreviewRotationPivot->GetRelativeLocation() * PreviewScale);
 }

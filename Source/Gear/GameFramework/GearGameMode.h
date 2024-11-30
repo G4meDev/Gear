@@ -10,7 +10,7 @@
 struct FHazardDescription;
 class AGearPlayerState;
 class AGearPlaceable;
-class AHazardPreviewSpawnPoint;
+class APlaceableSpawnPoint;
 
 /**
  * 
@@ -60,7 +60,7 @@ protected:
 	void SpawnNewPlaceables();
 
 	bool LoadPlaceables();
-	bool LoadHazardPreviewSpawnPoints();
+	bool LoadPlaceableSpawnPoints();
 	
 	EGearMatchState GearMatchState;
 
@@ -71,5 +71,5 @@ protected:
 	
 	TArray<FPlaceableDescription> AvaliablePlaceables;
 
-	TArray<AHazardPreviewSpawnPoint*> HazardPreviewSpawnPoints;
+	TArray<APlaceableSpawnPoint*> HazardPreviewSpawnPoints;
 };

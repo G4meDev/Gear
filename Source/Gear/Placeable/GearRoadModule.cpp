@@ -7,7 +7,7 @@ AGearRoadModule::AGearRoadModule()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-
+	PreviewScale = 0.1f;
 }
 
 void AGearRoadModule::PostInitializeComponents()
