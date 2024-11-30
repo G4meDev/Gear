@@ -6,8 +6,8 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearBuilderPawn.h"
-#include "Hazard/GearHazardActor.h"
-#include "Hazard/HazardPreviewSpawnPoint.h"
+#include "Placeable/GearHazard.h"
+#include "Placeable/HazardPreviewSpawnPoint.h"
 #include "Utils/GameVariablesBFL.h"
 
 #include "kismet/GameplayStatics.h"
@@ -91,9 +91,9 @@ void AGearGameMode::SpawnNewHazzards()
 	for (AHazardPreviewSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
 	{
 		// TODO: implement hazard spawning logic, for now spawn randomly
-		TSubclassOf<AGearHazardActor>& SpawnClass = AvaliableHazards[ FMath::RandRange(0, AvaliableHazards.Num()-1) ].Class;
+		TSubclassOf<AGearHazard>& SpawnClass = AvaliableHazards[ FMath::RandRange(0, AvaliableHazards.Num()-1) ].Class;
 
-		AGearHazardActor* HazardActor = GetWorld()->SpawnActor<AGearHazardActor>(SpawnClass, SpawnPoint->GetTransform());
+		AGearHazard* HazardActor = GetWorld()->SpawnActor<AGearHazard>(SpawnClass, SpawnPoint->GetTransform());
 		HazardActor->SetPreview();
 		
 		PreviewHazards.Add(HazardActor);
@@ -111,7 +111,7 @@ bool AGearGameMode::LoadHazards()
 
 		for (FHazardDescription* Desc : RawHazards)
 		{
-			TSubclassOf<AGearHazardActor> HazardClass = StaticLoadClass(AGearHazardActor::StaticClass(), nullptr, *Desc->ClassPath);
+			TSubclassOf<AGearHazard> HazardClass = StaticLoadClass(AGearHazard::StaticClass(), nullptr, *Desc->ClassPath);
 			if (IsValid(HazardClass))
 			{
 				FHazardDescription NewDesc = *Desc;
@@ -151,7 +151,7 @@ bool AGearGameMode::LoadHazardPreviewSpawnPoints()
 	return HazardPreviewSpawnPoints.Num() == 5;
 }
 
-void AGearGameMode::RequestSelectingHazardForPlayer(AGearHazardActor* Hazard, AGearPlayerState* Player)
+void AGearGameMode::RequestSelectingHazardForPlayer(AGearHazard* Hazard, AGearPlayerState* Player)
 {
 	if (GearMatchState == EGearMatchState::SelectingPeices && IsValid(Hazard) && IsValid(Player) && !Hazard->HasOwningPlayer())
 	{
@@ -183,7 +183,7 @@ void AGearGameMode::StartFirstPhase()
 void AGearGameMode::AssignPiecesToUnowningPlayers()
 {
 	TArray<AGearPlayerState*> UnowningPlayers;
-	TArray<AGearHazardActor*> UnownedHazards;
+	TArray<AGearHazard*> UnownedHazards;
 
 	for (APlayerState* Player : GameState->PlayerArray)
 	{
@@ -194,7 +194,7 @@ void AGearGameMode::AssignPiecesToUnowningPlayers()
 		}
 	}
 
-	for (AGearHazardActor* Hazard : PreviewHazards)
+	for (AGearHazard* Hazard : PreviewHazards)
 	{
 		if (!Hazard->HasOwningPlayer())
 		{
@@ -252,6 +252,11 @@ bool AGearGameMode::IsEveryPlayerSelectedPieces()
 
 void AGearGameMode::StartPlaceingPieces(bool bEveryPlayerIsReady)
 {
+	UE_LOG(LogTemp, Warning, TEXT("start placing pieces"));
+
+	GetWorld()->GetTimerManager().ClearTimer(SelectingPiecesTimerHandle);
+
+
 	if (!bEveryPlayerIsReady)
 	{
 		AssignPiecesToUnowningPlayers();

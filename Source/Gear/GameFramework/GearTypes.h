@@ -8,7 +8,7 @@
 #define DEFAULT_PLAYER_NAME "NewPlayer"
 
 
-class AGearHazardActor;
+class AGearHazard;
 
 UENUM(BlueprintType)
 enum class EGearMatchState : uint8
@@ -21,6 +21,13 @@ enum class EGearMatchState : uint8
 	Ended
 };
 
+UENUM(BlueprintType)
+enum class EPlaceableType : uint8
+{
+	Hazard,
+	RoadModule
+};
+
 USTRUCT(BlueprintType)
 struct FHazardDescription : public FTableRowBase
 {
@@ -30,7 +37,7 @@ struct FHazardDescription : public FTableRowBase
 public:
 
 	UPROPERTY()
-	TSubclassOf<AGearHazardActor> Class;
+	TSubclassOf<AGearHazard> Class;
 	
 	UPROPERTY()
 	bool HasBeenSpawned = false;

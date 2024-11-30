@@ -2,7 +2,7 @@
 
 
 #include "GameFramework/GearPlayerState.h"
-#include "Hazard/GearHazardActor.h"
+#include "Placeable/GearHazard.h"
 #include "Utils/DataHelperBFL.h"
 #include "Net/UnrealNetwork.h"
 
@@ -41,7 +41,7 @@ void AGearPlayerState::OnRep_ColorCode()
 
 }
 
-void AGearPlayerState::SetSelectedHazard(AGearHazardActor* Hazard)
+void AGearPlayerState::SetSelectedHazard(AGearHazard* Hazard)
 {
 	if (HasAuthority())
 	{

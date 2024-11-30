@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "GearHazardActor.generated.h"
+#include "Placeable/GearPlaceable.h"
+#include "GearHazard.generated.h"
 
 class UBoxComponent;
 class UStaticMeshComponent;
@@ -20,12 +20,12 @@ enum class EHazardState : uint8
 };
 
 UCLASS(Blueprintable)
-class GEAR_API AGearHazardActor : public AActor
+class GEAR_API AGearHazard : public AGearPlaceable
 {
 	GENERATED_BODY()
 	
 public:
-	AGearHazardActor();
+	AGearHazard();
 
 	void PostInitializeComponents() override;
 

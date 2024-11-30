@@ -8,7 +8,7 @@
 
 class AGearPlayerState;
 class AGearHUD;
-class AGearHazardActor;
+class AGearHazard;
 class UInputMappingContext;
 class UInputAction;
 
@@ -61,7 +61,7 @@ public:
 	void ClientStateMatchStarted();
 
 	UFUNCTION(Server, Reliable)
-	void SelectHazard(AGearHazardActor* Hazard);
+	void SelectHazard(AGearHazard* Hazard);
 
 
 	UFUNCTION(Client, Reliable)

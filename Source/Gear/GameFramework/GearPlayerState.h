@@ -7,7 +7,7 @@
 #include "GameFramework/GearTypes.h"
 #include "GearPlayerState.generated.h"
 
-class AGearHazardActor;
+class AGearHazard;
 
 /**
  * 
@@ -31,10 +31,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
 
-	void SetSelectedHazard(AGearHazardActor* Hazard);
+	void SetSelectedHazard(AGearHazard* Hazard);
 
 	UPROPERTY(Replicated)
-	AGearHazardActor* SelectedHazard;
+	AGearHazard* SelectedHazard;
 
 
 	bool HasSelectedHazard() const;

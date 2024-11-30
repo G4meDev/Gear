@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Hazard/HazardPreviewSpawnPoint.h"
+#include "Placeable/HazardPreviewSpawnPoint.h"
 
 AHazardPreviewSpawnPoint::AHazardPreviewSpawnPoint()
 {

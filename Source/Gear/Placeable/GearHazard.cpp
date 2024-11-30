@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Hazard/GearHazardActor.h"
+#include "Placeable/GearHazard.h"
 #include "Net/UnrealNetwork.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -9,7 +9,7 @@
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
 
-AGearHazardActor::AGearHazardActor()
+AGearHazard::AGearHazard()
 {
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
@@ -32,25 +32,25 @@ AGearHazardActor::AGearHazardActor()
 	HazardState = EHazardState::Idle;
 }
 
-void AGearHazardActor::PostInitializeComponents()
+void AGearHazard::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	SelectionHitbox->OnClicked.AddDynamic(this, &AGearHazardActor::OnSelectionBoxClicked);
-	SelectionHitbox->OnInputTouchBegin.AddDynamic(this, &AGearHazardActor::OnSelectionBoxTouched);
+	SelectionHitbox->OnClicked.AddDynamic(this, &AGearHazard::OnSelectionBoxClicked);
+	SelectionHitbox->OnInputTouchBegin.AddDynamic(this, &AGearHazard::OnSelectionBoxTouched);
 
 	SelectionIndicatorMaterial = SelectionIndicator->CreateDynamicMaterialInstance(0, nullptr);	
 }
 
-void AGearHazardActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AGearHazard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AGearHazardActor, HazardState);
-	DOREPLIFETIME(AGearHazardActor, OwningPlayer);
+	DOREPLIFETIME(AGearHazard, HazardState);
+	DOREPLIFETIME(AGearHazard, OwningPlayer);
 }
 
-void AGearHazardActor::BeginPlay()
+void AGearHazard::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -60,7 +60,7 @@ void AGearHazardActor::BeginPlay()
 	}
 }
 
-void AGearHazardActor::SelectionBoxClicked()
+void AGearHazard::SelectionBoxClicked()
 {
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -77,17 +77,17 @@ void AGearHazardActor::SelectionBoxClicked()
 	}
 }
 
-void AGearHazardActor::OnSelectionBoxClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
+void AGearHazard::OnSelectionBoxClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
 {
 	SelectionBoxClicked();
 }
 
-void AGearHazardActor::OnSelectionBoxTouched(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent)
+void AGearHazard::OnSelectionBoxTouched(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent)
 {
 	SelectionBoxClicked();
 }
 
-void AGearHazardActor::SetPreview()
+void AGearHazard::SetPreview()
 {
 	if (HasAuthority())
 	{
@@ -96,7 +96,7 @@ void AGearHazardActor::SetPreview()
 	}
 }
 
-void AGearHazardActor::SetSelectedBy(AGearPlayerState* Player)
+void AGearHazard::SetSelectedBy(AGearPlayerState* Player)
 {
 	if (HasAuthority())
 	{
@@ -107,7 +107,7 @@ void AGearHazardActor::SetSelectedBy(AGearPlayerState* Player)
 	SelectionIndicator->SetVisibility(true);
 }
 
-void AGearHazardActor::OnRep_OwningPlayer()
+void AGearHazard::OnRep_OwningPlayer()
 {
 	if (OwningPlayer == nullptr)
 	{
@@ -119,12 +119,12 @@ void AGearHazardActor::OnRep_OwningPlayer()
 	}
 }
 
-bool AGearHazardActor::HasOwningPlayer() const
+bool AGearHazard::HasOwningPlayer() const
 {
 	return OwningPlayer != nullptr;
 }
 
-void AGearHazardActor::Tick(float DeltaTime)
+void AGearHazard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

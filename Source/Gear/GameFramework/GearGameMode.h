@@ -9,7 +9,7 @@
 
 struct FHazardDescription;
 class AGearPlayerState;
-class AGearHazardActor;
+class AGearHazard;
 class AHazardPreviewSpawnPoint;
 
 /**
@@ -25,7 +25,7 @@ public:
 
 	void Tick(float DeltaSeconds) override;
 	
-	void RequestSelectingHazardForPlayer(AGearHazardActor* Hazard, AGearPlayerState* Player);
+	void RequestSelectingHazardForPlayer(AGearHazard* Hazard, AGearPlayerState* Player);
 
 protected:
 
@@ -64,7 +64,7 @@ protected:
 	
 	EGearMatchState GearMatchState;
 
-	TArray<AGearHazardActor*> PreviewHazards;
+	TArray<AGearHazard*> PreviewHazards;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UDataTable* HazardSpawnRulesDataTable;
