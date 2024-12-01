@@ -7,6 +7,7 @@
 UPlaceableSocket::UPlaceableSocket()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 
 	Occupied = false;
 }

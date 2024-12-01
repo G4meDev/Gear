@@ -33,7 +33,6 @@ AGearPlaceable::AGearPlaceable()
 
 	bReplicates = true;
 	SetReplicateMovement(true);
-
 }
 
 void AGearPlaceable::PostInitializeComponents()
