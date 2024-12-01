@@ -8,6 +8,7 @@
 #include "GearGameMode.generated.h"
 
 struct FHazardDescription;
+class AGearGameState;
 class AGearPlayerState;
 class AGearPlaceable;
 class APlaceableSpawnPoint;
@@ -70,6 +71,5 @@ protected:
 	UDataTable* PlaceableSpawnRulesDataTable;
 	
 	TArray<FPlaceableDescription> AvaliablePlaceables;
-
 	TArray<APlaceableSpawnPoint*> HazardPreviewSpawnPoints;
 };

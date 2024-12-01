@@ -36,10 +36,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void RoundRestBlueprintEvent();
 
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPlaceableType Type;
-
+	EPlaceableSocketType SocketType;
 
 	UPROPERTY(ReplicatedUsing=OnRep_OwningPlayer)
 	AGearPlayerState* OwningPlayer;

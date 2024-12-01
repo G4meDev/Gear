@@ -7,6 +7,8 @@
 #include "GameFramework/GearTypes.h"
 #include "GearGameState.generated.h"
 
+class AGearRoadModule;
+class AGearHazard;
 
 /**
  * 
@@ -17,11 +19,21 @@ class GEAR_API AGearGameState : public AGameState
 	GENERATED_BODY()
 	
 public:
+	
 	AGearGameState();
 
+	UFUNCTION()
+	void OnRep_RoadModuleStack();
+
+	bool FindStartRoadModuleAndAddToStack();
+
 protected:
+	
+	virtual void BeginPlay() override;
+
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;
 
-
+	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack)
+	TArray<AGearRoadModule*> RoadModuleStack;
 };

@@ -38,6 +38,14 @@ void AGearGameMode::BeginPlay()
 		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards preview spawn point found"));
 		AbortMatch();
 	}
+
+	AGearGameState* GearGameState = GetGameState<AGearGameState>();
+	if (!GearGameState || !GearGameState->FindStartRoadModuleAndAddToStack())
+	{
+		UE_LOG(LogGameMode, Error, TEXT("finding first raod module failed"));
+		AbortMatch();
+	}
+
 }
 
 void AGearGameMode::Tick(float DeltaSeconds)
@@ -218,7 +226,7 @@ bool AGearGameMode::ReadyToEndMatch_Implementation()
 
 void AGearGameMode::StartSelectingPlaceables()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces!"));
+	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces"));
 
 	GearMatchState = EGearMatchState::SelectingPlaceables;
 

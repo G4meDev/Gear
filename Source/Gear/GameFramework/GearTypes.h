@@ -22,10 +22,9 @@ enum class EGearMatchState : uint8
 };
 
 UENUM(BlueprintType)
-enum class EPlaceableType : uint8
+enum class EPlaceableSocketType : uint8
 {
-	Hazard,
-	RoadModule
+	Road
 };
 
 UENUM(BlueprintType)

@@ -4,6 +4,11 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearPlayerController.h"
+
+#include "Placeable/GearRoadModule.h"
+#include "Placeable/GearHazard.h"
+
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 AGearGameState::AGearGameState()
@@ -11,11 +16,40 @@ AGearGameState::AGearGameState()
 
 }
 
-// void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
-// {
-// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-// 	
-// }
+void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(AGearGameState, RoadModuleStack);
+}
+
+void AGearGameState::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+}
+
+void AGearGameState::OnRep_RoadModuleStack()
+{
+
+}
+
+bool AGearGameState::FindStartRoadModuleAndAddToStack()
+{
+	TArray<AActor*> AlreadyPlacedRoadModules;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGearRoadModule::StaticClass(), AlreadyPlacedRoadModules);
+
+	if (AlreadyPlacedRoadModules.Num() != 1)
+	{
+		UE_LOG(LogTemp, Error, TEXT("only one road module should be placed in level but found %i"), AlreadyPlacedRoadModules.Num());
+		return false;
+	}
+
+	AGearRoadModule* Module = Cast<AGearRoadModule>(AlreadyPlacedRoadModules[0]);
+	RoadModuleStack.Add(Module);
+	return true;
+}
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 {
