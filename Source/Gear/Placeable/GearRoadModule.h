@@ -6,6 +6,8 @@
 #include "Placeable/GearPlaceable.h"
 #include "GearRoadModule.generated.h"
 
+class UPlaceableSocket;
+
 /**
  * 
  */
@@ -24,7 +26,8 @@ public:
 	void SetPreview() override;
 	void SetSelectedBy(AGearPlayerState* Player) override;
 
-
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPlaceableSocket* RoadEndSocket;
 
 protected:
 	virtual void BeginPlay() override;

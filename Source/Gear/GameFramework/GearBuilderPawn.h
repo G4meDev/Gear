@@ -18,15 +18,21 @@ class GEAR_API AGearBuilderPawn : public APawn
 	GENERATED_BODY()
 
 public:
+	
 	AGearBuilderPawn();
+
+	virtual void Tick(float DeltaTime) override;
+
+	void StartPlacing();
+
+	UFUNCTION(BlueprintCallable)
+	void TeleportToRoadEnd();
 
 protected:
 	
 	virtual void BeginPlay() override;
 
 	virtual void Destroyed() override;
-
-	void FindStartPlacingTarget(FVector& Location, FRotator& Rotation);
 
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -60,10 +66,7 @@ protected:
 
 	bool bCanMove;
 
-
-public:	
+private:
 	
-	virtual void Tick(float DeltaTime) override;
 
-	void StartPlacing();
 };

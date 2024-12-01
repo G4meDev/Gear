@@ -27,6 +27,8 @@ public:
 
 	bool FindStartRoadModuleAndAddToStack();
 
+	void GetRoadEndSocket(FVector& Location, FRotator& Rotation);
+
 protected:
 	
 	virtual void BeginPlay() override;

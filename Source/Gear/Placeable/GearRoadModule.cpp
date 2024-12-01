@@ -2,10 +2,14 @@
 
 
 #include "Placeable/GearRoadModule.h"
+#include "Placeable/PlaceableSocket.h"
 
 AGearRoadModule::AGearRoadModule()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	RoadEndSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("EndSocket"));
+	RoadEndSocket->SetupAttachment(Root);
 
 	PreviewScale = 0.1f;
 }

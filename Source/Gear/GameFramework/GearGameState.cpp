@@ -7,6 +7,7 @@
 
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
+#include "Placeable/PlaceableSocket.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -49,6 +50,15 @@ bool AGearGameState::FindStartRoadModuleAndAddToStack()
 	AGearRoadModule* Module = Cast<AGearRoadModule>(AlreadyPlacedRoadModules[0]);
 	RoadModuleStack.Add(Module);
 	return true;
+}
+
+void AGearGameState::GetRoadEndSocket(FVector& Location, FRotator& Rotation)
+{
+	if (!RoadModuleStack.IsEmpty())
+	{
+		Location = RoadModuleStack.Top()->RoadEndSocket->GetComponentLocation();
+		Rotation = RoadModuleStack.Top()->RoadEndSocket->GetComponentRotation();
+	}
 }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)
