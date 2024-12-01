@@ -21,13 +21,20 @@ public:
 
 	void PostInitializeComponents() override;
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void Tick(float DeltaTime) override;
 
 	void SetPreview() override;
 	void SetSelectedBy(AGearPlayerState* Player) override;
 
+	void Flip();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UPlaceableSocket* RoadEndSocket;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
+	bool bFliped;
 
 protected:
 	virtual void BeginPlay() override;

@@ -68,6 +68,6 @@ public:
 	void ClientStateSelectingPieces(float StateStartTime);
 
 	UFUNCTION(Client, Reliable)
-	void ClientStatePlacingPieces(float StateStartTime);
+	void ClientStatePlacing(float StateStartTime);
 
 };

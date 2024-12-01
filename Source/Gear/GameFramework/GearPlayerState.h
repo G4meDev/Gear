@@ -33,7 +33,7 @@ public:
 
 	void SetSelectedHazard(AGearPlaceable* Placeable);
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadWrite)
 	AGearPlaceable* SelectedPlaceable;
 
 
@@ -44,7 +44,6 @@ protected:
 	void OnRep_PlayerName() override;
 
 	void CopyProperties(APlayerState* PlayerState) override;
-
 
 
 };

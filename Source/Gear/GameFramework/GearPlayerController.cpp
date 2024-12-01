@@ -182,7 +182,7 @@ void AGearPlayerController::ClientStateSelectingPieces_Implementation(float Stat
 	}
 }
 
-void AGearPlayerController::ClientStatePlacingPieces_Implementation(float StateStartTime)
+void AGearPlayerController::ClientStatePlacing_Implementation(float StateStartTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
@@ -191,7 +191,7 @@ void AGearPlayerController::ClientStatePlacingPieces_Implementation(float StateS
 	}
 
 	AGearBuilderPawn* BuilderPawn = GetPawn<AGearBuilderPawn>();
-	if (BuilderPawn)
+	if (IsValid(BuilderPawn))
 	{
 		BuilderPawn->StartPlacing();
 	}

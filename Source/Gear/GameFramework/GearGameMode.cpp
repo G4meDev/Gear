@@ -263,12 +263,27 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 {
 	UE_LOG(LogTemp, Warning, TEXT("start placing pieces"));
 
-	GetWorld()->GetTimerManager().ClearTimer(SelectingPiecesTimerHandle);
+	GearMatchState = EGearMatchState::Placing;
 
+	GetWorld()->GetTimerManager().ClearTimer(SelectingPiecesTimerHandle);
 
 	if (!bEveryPlayerIsReady)
 	{
 		AssignPlaceablesToUnowningPlayers();
+	}
+
+	for (AGearPlaceable* PreviewPlaceable : PreviewPlaceables)
+	{
+		PreviewPlaceable->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+
+		// let client move them locally
+		PreviewPlaceable->SetReplicateMovement(false);
+		PreviewPlaceable->ForceNetUpdate();
+	}
+
+	for (APlayerState* Player : GameState->PlayerArray)
+	{
+		Player->ForceNetUpdate();
 	}
 
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
@@ -276,11 +291,11 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
 		if (IsValid(PlayerController))
 		{
-			PlayerController->ClientStatePlacingPieces(GetWorld()->GetTimeSeconds());
+			PlayerController->ClientStatePlacing(GetWorld()->GetTimeSeconds());
 		}
 	}
 
-	GearMatchState = EGearMatchState::Placing;
+
 }
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()

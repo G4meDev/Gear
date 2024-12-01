@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "GearBuilderPawn.generated.h"
 
+class UPlaceableSocket;
 class UStaticMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
@@ -27,6 +28,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void TeleportToRoadEnd();
+
+	UFUNCTION(BlueprintCallable)
+	void FlipSelectedRoadModule();
+
+	void UpdateSelectedPlaceable();
 
 protected:
 	
@@ -66,7 +72,16 @@ protected:
 
 	bool bCanMove;
 
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
+	UPlaceableSocket* SelectedSocket;
+
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
+	bool bCanPlaceInSelectedSocket;
+
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
+	bool bSelectedRoadModule;
+
 private:
 	
-
+	void MoveSelectedRoadModuleToEnd();
 };

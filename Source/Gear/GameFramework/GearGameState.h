@@ -7,6 +7,7 @@
 #include "GameFramework/GearTypes.h"
 #include "GearGameState.generated.h"
 
+class UPlaceableSocket;
 class AGearRoadModule;
 class AGearHazard;
 
@@ -27,7 +28,7 @@ public:
 
 	bool FindStartRoadModuleAndAddToStack();
 
-	void GetRoadEndSocket(FVector& Location, FRotator& Rotation);
+	UPlaceableSocket* GetRoadEndSocket();
 
 protected:
 	

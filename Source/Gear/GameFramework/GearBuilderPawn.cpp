@@ -2,6 +2,12 @@
 
 #include "GameFramework/GearBuilderPawn.h"
 #include "GameFramework/GearGameState.h"
+#include "GameFramework/GearPlayerState.h"
+#include "Placeable/GearPlaceable.h"
+#include "Placeable/PlaceableSocket.h"
+#include "Placeable/GearRoadModule.h"
+#include "Placeable/GearHazard.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringarmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -27,11 +33,15 @@ AGearBuilderPawn::AGearBuilderPawn()
 	Camera->SetupAttachment(CameraBoom);
 
 	bCanMove = false;
-	MovementSpeed = 40.0f;
-	Damping = 0.0f;
-	Drag = 0.0f;
+	MovementSpeed = 80.0f;
+	Damping = 3.0f;
+	Drag = 4.0f;
 	ScreenDragValue = FVector2D::Zero();
 	Velocity = FVector2D::Zero();
+
+	SelectedSocket = nullptr;
+	bSelectedRoadModule = false;
+	bCanPlaceInSelectedSocket = true;
 }
 
 void AGearBuilderPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -99,6 +109,14 @@ void AGearBuilderPawn::StartPlacing()
 {
 	bCanMove = true;
 
+	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
+	if (IsValid(GearPlayerState) && IsValid(GearPlayerState->SelectedPlaceable))
+	{
+		GearPlayerState->SelectedPlaceable->SetActorScale3D(FVector::One());
+		bSelectedRoadModule = GearPlayerState->SelectedPlaceable->IsA(AGearRoadModule::StaticClass());
+		UpdateSelectedPlaceable();
+	}
+
 	TeleportToRoadEnd();
 }
 
@@ -107,12 +125,53 @@ void AGearBuilderPawn::TeleportToRoadEnd()
 	AGearGameState* GearGameState = Cast<AGearGameState>(UGameplayStatics::GetGameState(GetWorld()));
 	if (IsValid(GearGameState))
 	{
-		Velocity = FVector2D::Zero();
+		UPlaceableSocket* RoadEndSocket = GearGameState->GetRoadEndSocket();
+		if (IsValid(RoadEndSocket))
+		{
+			Velocity = FVector2D::Zero();
+			SetActorLocationAndRotation(RoadEndSocket->GetComponentLocation(), RoadEndSocket->GetComponentRotation());
+		}
+	}
+}
 
-		FVector TargetLocation;
-		FRotator TargetRotation;
+void AGearBuilderPawn::FlipSelectedRoadModule()
+{
+	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
+	if (IsValid(GearPlayerState))
+	{
+		AGearRoadModule* RoadModule = Cast<AGearRoadModule>(GearPlayerState->SelectedPlaceable);
+		if (IsValid(RoadModule))
+		{
+			RoadModule->Flip();
+		}
+	}
+}
 
-		GearGameState->GetRoadEndSocket(TargetLocation, TargetRotation);
-		SetActorLocationAndRotation(TargetLocation, TargetRotation);
+void AGearBuilderPawn::UpdateSelectedPlaceable()
+{
+	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
+	if (IsValid(GearPlayerState->SelectedPlaceable))
+	{
+		if (GearPlayerState->SelectedPlaceable->IsA(AGearRoadModule::StaticClass()))
+		{
+			MoveSelectedRoadModuleToEnd();
+		}
+	}
+}
+
+void AGearBuilderPawn::MoveSelectedRoadModuleToEnd()
+{
+	AGearGameState* GearGameState = Cast<AGearGameState>(UGameplayStatics::GetGameState(GetWorld()));
+	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
+
+	if (IsValid(GearGameState) && IsValid(GearPlayerState) && IsValid(GearPlayerState->SelectedPlaceable))
+	{
+		UPlaceableSocket* RoadEndSocket = GearGameState->GetRoadEndSocket();
+
+		if (IsValid(RoadEndSocket))
+		{
+			GearPlayerState->SelectedPlaceable->SetActorLocationAndRotation(RoadEndSocket->GetComponentLocation(), RoadEndSocket->GetComponentRotation());
+			SelectedSocket = RoadEndSocket;
+		}
 	}
 }

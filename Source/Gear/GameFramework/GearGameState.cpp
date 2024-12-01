@@ -52,13 +52,14 @@ bool AGearGameState::FindStartRoadModuleAndAddToStack()
 	return true;
 }
 
-void AGearGameState::GetRoadEndSocket(FVector& Location, FRotator& Rotation)
+UPlaceableSocket* AGearGameState::GetRoadEndSocket()
 {
 	if (!RoadModuleStack.IsEmpty())
 	{
-		Location = RoadModuleStack.Top()->RoadEndSocket->GetComponentLocation();
-		Rotation = RoadModuleStack.Top()->RoadEndSocket->GetComponentRotation();
+		return RoadModuleStack.Top()->RoadEndSocket;
 	}
+
+	return nullptr;
 }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)
