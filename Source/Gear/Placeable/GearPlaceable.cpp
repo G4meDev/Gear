@@ -32,8 +32,6 @@ AGearPlaceable::AGearPlaceable()
 	PlaceableState = EPlaceableState::Idle;
 	PreviewScale = 1.0f;
 
-	bFliped = false;
-
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -70,16 +68,19 @@ void AGearPlaceable::BeginPlay()
 
 void AGearPlaceable::SelectionBoxClicked()
 {
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	if (PlaceableState == EPlaceableState::Preview)
 	{
-		APlayerController* const PlayerController = Iterator->Get();
-		if (PlayerController && PlayerController->IsLocalController())
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-
-			if (IsValid(GearController))
+			APlayerController* const PlayerController = Iterator->Get();
+			if (PlayerController && PlayerController->IsLocalController())
 			{
-				GearController->SelectPlaceable(this);
+				AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
+
+				if (IsValid(GearController))
+				{
+					GearController->SelectPlaceable(this);
+				}
 			}
 		}
 	}
@@ -100,6 +101,12 @@ void AGearPlaceable::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
+}
+
+void AGearPlaceable::MarkNotReplicated()
+{
+	SetReplicates(false);
+	SetReplicateMovement(false);
 }
 
 void AGearPlaceable::RoundReset()
@@ -153,23 +160,4 @@ void AGearPlaceable::AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint)
 	AttachToActor(SpawnPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	SetActorScale3D(FVector(PreviewScale));
 	SetActorRelativeLocation(-PreviewRotationPivot->GetRelativeLocation() * PreviewScale);
-}
-
-bool AGearPlaceable::IsFlipable()
-{
-	return false;
-}
-
-void AGearPlaceable::Flip()
-{
-	bFliped = !bFliped;
-
-	if (bFliped)
-	{
-		SetActorRelativeScale3D(FVector(1, -1, 1));
-	}
-	else
-	{
-		SetActorRelativeScale3D(FVector::One());
-	}
 }

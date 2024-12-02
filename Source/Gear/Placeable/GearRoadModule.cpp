@@ -12,7 +12,6 @@ AGearRoadModule::AGearRoadModule()
 	RoadEndSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("EndSocket"));
 	RoadEndSocket->SetupAttachment(Root);
 
-	bFliped = false;
 	PreviewScale = 0.1f;
 }
 
@@ -21,12 +20,6 @@ void AGearRoadModule::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 }
-
-// void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-// {
-// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-// 
-// }
 
 void AGearRoadModule::BeginPlay()
 {
@@ -51,9 +44,4 @@ void AGearRoadModule::SetPreview()
 void AGearRoadModule::SetSelectedBy(AGearBuilderPawn* Player)
 {
 	Super::SetSelectedBy(Player);
-}
-
-bool AGearRoadModule::IsFlipable()
-{
-	return true;
 }

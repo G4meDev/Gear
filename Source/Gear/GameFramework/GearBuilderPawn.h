@@ -7,12 +7,22 @@
 #include "GearBuilderPawn.generated.h"
 
 class AGearPlaceable;
+class AGearRoadModule;
 class UPlaceableSocket;
 class UStaticMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 struct FInputActionInstance;
+
+UENUM(BlueprintType)
+enum class EBuilderPawnState : uint8
+{
+	Preview,
+	PlacingRoadModules,
+	PlacingHazards,
+	Waiting
+};
 
 UCLASS()
 class GEAR_API AGearBuilderPawn : public APawn
@@ -30,17 +40,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TeleportToRoadEnd();
 
-	UFUNCTION(BlueprintCallable)
-	void FlipSelectedRoadModule();
-
-	void UpdateSelectedPlaceable();
-
 	void SetSelectedPlaceable(AGearPlaceable* Placeable);
 	bool HasSelectedPlaceable() const;
 
 	UFUNCTION()
 	void OnRep_SelectedPlaceable(AGearPlaceable* OldSelected);
 
+	UFUNCTION()
+	void OnRep_SelectedPlaceableClass();
 
 protected:
 	
@@ -81,17 +88,38 @@ protected:
 	bool bCanMove;
 
 	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
+	EBuilderPawnState BuilderPawnState;
+
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
 	UPlaceableSocket* SelectedSocket;
 
+	// in preview
 	UPROPERTY(ReplicatedUsing=OnRep_SelectedPlaceable, BlueprintReadWrite)
 	AGearPlaceable* SelectedPlaceable;
 
+	UPROPERTY(ReplicatedUsing=OnRep_SelectedPlaceableClass, BlueprintReadWrite)
+	TSubclassOf<AGearPlaceable> SelectedPlaceableClass;
 
+	AGearRoadModule* PlacingRoadModule;
+	AGearRoadModule* PlacingRoadModuleMirroredY;
+
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
+	bool bSelectedMirroredX;
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
+	bool bSelectedMirroredY;
+
+	void SpawnPlacingRoadModules();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY);
+
+	friend class AGearGameMode;
 
 private:
 	
-	void MoveSelectedRoadModuleToEnd();
+	
 
 	bool bPlacingUnhandled;
+
 };
 

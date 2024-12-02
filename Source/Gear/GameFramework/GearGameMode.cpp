@@ -262,12 +262,23 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 		AssignPlaceablesToUnowningPlayers();
 	}
 
+	AGearGameState* GearGameState = GetGameState<AGearGameState>();
+	if (IsValid(GearGameState))
+	{
+		for (APlayerState* PlayerState : GearGameState->PlayerArray)
+		{
+			AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(PlayerState->GetPawn());
+			if (IsValid(BuilderPawn) && BuilderPawn->HasSelectedPlaceable())
+			{
+				BuilderPawn->SelectedPlaceableClass = BuilderPawn->SelectedPlaceable->GetClass();
+				BuilderPawn->SelectedPlaceable = nullptr;
+			}
+		}
+	}
+
 	for (AGearPlaceable* PreviewPlaceable : PreviewPlaceables)
 	{
-		PreviewPlaceable->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-
-		// let client move them locally
-		PreviewPlaceable->SetReplicateMovement(false);
+		PreviewPlaceable->Destroy();
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("start placing pieces"));

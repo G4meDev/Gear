@@ -21,8 +21,6 @@ public:
 
 	void PostInitializeComponents() override;
 
-	//void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	virtual void Tick(float DeltaTime) override;
 
 	void SetPreview() override;
@@ -31,7 +29,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UPlaceableSocket* RoadEndSocket;
 
-	virtual bool IsFlipable() override;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AGearRoadModule> RoadModuleMirroredClass;
 
 protected:
 	virtual void BeginPlay() override;
