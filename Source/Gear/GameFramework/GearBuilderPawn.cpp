@@ -16,6 +16,7 @@
 #include "EnhancedInputComponent.h"
 #include "Components/InputComponent.h"
 #include "InputAction.h"
+#include "Net/UnrealNetwork.h"
 
 AGearBuilderPawn::AGearBuilderPawn()
 {
@@ -42,6 +43,17 @@ AGearBuilderPawn::AGearBuilderPawn()
 	SelectedSocket = nullptr;
 	bSelectedRoadModule = false;
 	bCanPlaceInSelectedSocket = true;
+
+	bPlacingUnhandled = false;
+
+	bReplicates = true;
+}
+
+void AGearBuilderPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGearBuilderPawn, SelectedPlaceable);
 }
 
 void AGearBuilderPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -105,19 +117,33 @@ void AGearBuilderPawn::Tick(float DeltaTime)
 	}
 }
 
-void AGearBuilderPawn::StartPlacing()
+void AGearBuilderPawn::OnRep_SelectedPlaceable(AGearPlaceable* OldSelected)
 {
-	bCanMove = true;
-
-	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
-	if (IsValid(GearPlayerState) && IsValid(GearPlayerState->SelectedPlaceable))
+	if (bPlacingUnhandled)
 	{
-		GearPlayerState->SelectedPlaceable->SetActorScale3D(FVector::One());
-		bSelectedRoadModule = GearPlayerState->SelectedPlaceable->IsA(AGearRoadModule::StaticClass());
-		UpdateSelectedPlaceable();
+		AGearGameState* GearGameState = Cast<AGearGameState>(UGameplayStatics::GetGameState(GetWorld()));
+		if (IsValid(GearGameState) && GearGameState->GearMatchState == EGearMatchState::Placing)
+		{
+			StartPlacing();
+		}
 	}
 
+}
+
+void AGearBuilderPawn::StartPlacing()
+{
+	if (!HasSelectedPlaceable())
+	{
+		bPlacingUnhandled = true;
+		return;
+	}
+
+	bCanMove = true;
 	TeleportToRoadEnd();
+
+	SelectedPlaceable->SetActorScale3D(FVector::One());
+	bSelectedRoadModule = SelectedPlaceable->IsA(AGearRoadModule::StaticClass());
+	UpdateSelectedPlaceable();
 }
 
 void AGearBuilderPawn::TeleportToRoadEnd()
@@ -136,41 +162,60 @@ void AGearBuilderPawn::TeleportToRoadEnd()
 
 void AGearBuilderPawn::FlipSelectedRoadModule()
 {
-	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
-	if (IsValid(GearPlayerState))
+	AGearRoadModule* RoadModule = Cast<AGearRoadModule>(SelectedPlaceable);
+	if (IsValid(RoadModule))
 	{
-		AGearRoadModule* RoadModule = Cast<AGearRoadModule>(GearPlayerState->SelectedPlaceable);
-		if (IsValid(RoadModule))
-		{
-			RoadModule->Flip();
-		}
+		RoadModule->Flip();
 	}
 }
 
 void AGearBuilderPawn::UpdateSelectedPlaceable()
 {
-	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
-	if (IsValid(GearPlayerState->SelectedPlaceable))
+	if (IsValid(SelectedPlaceable))
 	{
-		if (GearPlayerState->SelectedPlaceable->IsA(AGearRoadModule::StaticClass()))
+		if (SelectedPlaceable->IsA(AGearRoadModule::StaticClass()))
 		{
 			MoveSelectedRoadModuleToEnd();
 		}
 	}
 }
 
+void AGearBuilderPawn::SetSelectedPlaceable(AGearPlaceable* Placeable)
+{
+	if (HasAuthority())
+	{
+		if (IsValid(SelectedPlaceable))
+		{
+			SelectedPlaceable->OwningPlayer = nullptr;
+			SelectedPlaceable->OnRep_OwningPlayer();
+		}
+
+		if (IsValid(Placeable))
+		{
+			Placeable->OwningPlayer = this;
+			Placeable->OnRep_OwningPlayer();
+		}
+
+		SelectedPlaceable = Placeable;
+	}
+}
+
+bool AGearBuilderPawn::HasSelectedPlaceable() const
+{
+	return SelectedPlaceable != nullptr;
+}
+
 void AGearBuilderPawn::MoveSelectedRoadModuleToEnd()
 {
 	AGearGameState* GearGameState = Cast<AGearGameState>(UGameplayStatics::GetGameState(GetWorld()));
-	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
 
-	if (IsValid(GearGameState) && IsValid(GearPlayerState) && IsValid(GearPlayerState->SelectedPlaceable))
+	if (IsValid(GearGameState) && IsValid(SelectedPlaceable))
 	{
 		UPlaceableSocket* RoadEndSocket = GearGameState->GetRoadEndSocket();
 
 		if (IsValid(RoadEndSocket))
 		{
-			GearPlayerState->SelectedPlaceable->SetActorLocationAndRotation(RoadEndSocket->GetComponentLocation(), RoadEndSocket->GetComponentRotation());
+			SelectedPlaceable->SetActorLocationAndRotation(RoadEndSocket->GetComponentLocation(), RoadEndSocket->GetComponentRotation());
 			SelectedSocket = RoadEndSocket;
 		}
 	}

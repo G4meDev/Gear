@@ -8,10 +8,9 @@
 #include "GameFramework/GearTypes.h"
 #include "GearPlaceable.generated.h"
 
-class AGearPlayerState;
+class AGearBuilderPawn;
 class UBoxComponent;
 class UStaticMeshComponent;
-class AGearPlayerState;
 class APlaceableSpawnPoint;
 
 UCLASS(Blueprintable)
@@ -31,7 +30,7 @@ public:
 
 	virtual void SetPreview();
 
-	virtual void SetSelectedBy(AGearPlayerState* Player);
+	virtual void SetSelectedBy(AGearBuilderPawn* Player);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void RoundRestBlueprintEvent();
@@ -40,7 +39,7 @@ public:
 	EPlaceableSocketType SocketType;
 
 	UPROPERTY(ReplicatedUsing=OnRep_OwningPlayer)
-	AGearPlayerState* OwningPlayer;
+	AGearBuilderPawn* OwningPlayer;
 
 	bool HasOwningPlayer() const;
 

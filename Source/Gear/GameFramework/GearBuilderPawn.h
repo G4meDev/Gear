@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "GearBuilderPawn.generated.h"
 
+class AGearPlaceable;
 class UPlaceableSocket;
 class UStaticMeshComponent;
 class USpringArmComponent;
@@ -33,6 +34,13 @@ public:
 	void FlipSelectedRoadModule();
 
 	void UpdateSelectedPlaceable();
+
+	void SetSelectedPlaceable(AGearPlaceable* Placeable);
+	bool HasSelectedPlaceable() const;
+
+	UFUNCTION()
+	void OnRep_SelectedPlaceable(AGearPlaceable* OldSelected);
+
 
 protected:
 	
@@ -81,7 +89,13 @@ protected:
 	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
 	bool bSelectedRoadModule;
 
+	UPROPERTY(ReplicatedUsing=OnRep_SelectedPlaceable, BlueprintReadWrite)
+	AGearPlaceable* SelectedPlaceable;
+
 private:
 	
 	void MoveSelectedRoadModuleToEnd();
+
+	bool bPlacingUnhandled;
 };
+

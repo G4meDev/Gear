@@ -20,7 +20,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	void SetPreview() override;
-	void SetSelectedBy(AGearPlayerState* Player) override;
+	void SetSelectedBy(AGearBuilderPawn* Player) override;
 
 
 

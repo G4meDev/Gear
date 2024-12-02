@@ -38,7 +38,7 @@ void AGearHazard::SetPreview()
 	Super::SetPreview();
 }
 
-void AGearHazard::SetSelectedBy(AGearPlayerState* Player)
+void AGearHazard::SetSelectedBy(AGearBuilderPawn* Player)
 {
 	Super::SetSelectedBy(Player);
 }

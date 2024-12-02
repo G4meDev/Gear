@@ -8,6 +8,7 @@
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
+#include "GameFramework/GearBuilderPawn.h"
 #include "Placeable/PlaceableSpawnPoint.h"
 
 AGearPlaceable::AGearPlaceable()
@@ -113,15 +114,19 @@ void AGearPlaceable::SetPreview()
 	}
 }
 
-void AGearPlaceable::SetSelectedBy(AGearPlayerState* Player)
+void AGearPlaceable::SetSelectedBy(AGearBuilderPawn* Player)
 {
 	if (HasAuthority())
 	{
 		PlaceableState = EPlaceableState::Selected;
 	}
 
-	SelectionIndicatorMaterial->SetVectorParameterValue(TEXT("Color"), Player->PlayerColor);
-	SelectionIndicator->SetVisibility(true);
+	AGearPlayerState* PlayerState = Player->GetPlayerState<AGearPlayerState>();
+	if (IsValid(PlayerState))
+	{
+		SelectionIndicatorMaterial->SetVectorParameterValue(TEXT("Color"), PlayerState->PlayerColor);
+		SelectionIndicator->SetVisibility(true);
+	}
 }
 
 bool AGearPlaceable::HasOwningPlayer() const

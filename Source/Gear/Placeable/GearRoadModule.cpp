@@ -49,7 +49,7 @@ void AGearRoadModule::SetPreview()
 	Super::SetPreview();
 }
 
-void AGearRoadModule::SetSelectedBy(AGearPlayerState* Player)
+void AGearRoadModule::SetSelectedBy(AGearBuilderPawn* Player)
 {
 	Super::SetSelectedBy(Player);
 }

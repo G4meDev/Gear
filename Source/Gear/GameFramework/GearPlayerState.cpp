@@ -17,7 +17,6 @@ void AGearPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGearPlayerState, ColorCode);
-	DOREPLIFETIME(AGearPlayerState, SelectedPlaceable);
 }
 
 void AGearPlayerState::OnRep_PlayerName()
@@ -39,29 +38,4 @@ void AGearPlayerState::OnRep_ColorCode()
 {
 	PlayerColor = UDataHelperBFL::ResolveColorCode(ColorCode);
 
-}
-
-void AGearPlayerState::SetSelectedHazard(AGearPlaceable* Placeable)
-{
-	if (HasAuthority())
-	{
-		if (IsValid(SelectedPlaceable))
-		{
-			SelectedPlaceable->OwningPlayer = nullptr;
-			SelectedPlaceable->OnRep_OwningPlayer();
-		}
-
-		if (IsValid(Placeable))
-		{
-			Placeable->OwningPlayer = this;
-			Placeable->OnRep_OwningPlayer();
-		}
-
-		SelectedPlaceable = Placeable;
-	}
-}
-
-bool AGearPlayerState::HasSelectedHazard() const
-{
-	return SelectedPlaceable != nullptr;
 }

@@ -8,6 +8,7 @@
 #include "GearGameMode.generated.h"
 
 struct FHazardDescription;
+class AGearBuilderPawn;
 class AGearGameState;
 class AGearPlayerState;
 class AGearPlaceable;
@@ -26,7 +27,7 @@ public:
 
 	void Tick(float DeltaSeconds) override;
 	
-	void RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearPlayerState* Player);
+	void RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearBuilderPawn* Player);
 
 protected:
 

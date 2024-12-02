@@ -160,15 +160,15 @@ void AGearPlayerController::ClientStateMatchStarted()
 
 void AGearPlayerController::SelectPlaceable_Implementation(AGearPlaceable* Placeable)
 {
-	AGearPlayerState* GearPlayer = GetPlayerState<AGearPlayerState>();
+	AGearBuilderPawn* BuilderPawn = GetPawn<AGearBuilderPawn>();
 
-	if (IsValid(GearPlayer))
+	if (IsValid(BuilderPawn))
 	{
 		AGearGameMode* GearGameMode = Cast<AGearGameMode>(GetWorld()->GetAuthGameMode());
 
 		if (IsValid(GearGameMode))
 		{
-			GearGameMode->RequestSelectingPlaceableForPlayer(Placeable, GearPlayer);
+			GearGameMode->RequestSelectingPlaceableForPlayer(Placeable, BuilderPawn);
 		}
 	}
 }

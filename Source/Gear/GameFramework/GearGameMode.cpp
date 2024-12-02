@@ -160,11 +160,11 @@ bool AGearGameMode::LoadPlaceableSpawnPoints()
 	return HazardPreviewSpawnPoints.Num() == 5;
 }
 
-void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearPlayerState* Player)
+void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearBuilderPawn* Player)
 {
 	if (GearMatchState == EGearMatchState::SelectingPlaceables && IsValid(Placeable) && IsValid(Player) && !Placeable->HasOwningPlayer())
 	{
-		Player->SetSelectedHazard(Placeable);
+		Player->SetSelectedPlaceable(Placeable);
 	}
 }
 
@@ -194,31 +194,31 @@ void AGearGameMode::StartFirstPhase()
 
 void AGearGameMode::AssignPlaceablesToUnowningPlayers()
 {
-	TArray<AGearPlayerState*> UnowningPlayers;
-	TArray<AGearPlaceable*> UnownedHazards;
+	TArray<AGearBuilderPawn*> UnowningPlayers;
+	TArray<AGearPlaceable*> UnownedPlaceables;
 
 	for (APlayerState* Player : GameState->PlayerArray)
 	{
-		AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(Player);
-		if (IsValid(GearPlayer) && !GearPlayer->HasSelectedHazard())
+		AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(Player->GetPawn());
+		if (IsValid(BuilderPawn) && !BuilderPawn->HasSelectedPlaceable())
 		{
-			UnowningPlayers.Add(GearPlayer);
+			UnowningPlayers.Add(BuilderPawn);
 		}
 	}
 
-	for (AGearPlaceable* Hazard : PreviewPlaceables)
+	for (AGearPlaceable* Placeable : PreviewPlaceables)
 	{
-		if (!Hazard->HasOwningPlayer())
+		if (!Placeable->HasOwningPlayer())
 		{
-			UnownedHazards.Add(Hazard);
+			UnownedPlaceables.Add(Placeable);
 		}
 	}
 
 	for (int i = 0; i < UnowningPlayers.Num(); i++)
 	{
-		check(i < UnownedHazards.Num());
+		check(i < UnownedPlaceables.Num());
 
-		UnowningPlayers[i]->SetSelectedHazard(UnownedHazards[i]);
+		UnowningPlayers[i]->SetSelectedPlaceable(UnownedPlaceables[i]);
 	}
 }
 
@@ -242,8 +242,8 @@ bool AGearGameMode::IsEveryPlayerSelectedPlaceables()
 {
 	for (APlayerState* Player : GameState->PlayerArray)
 	{
-		AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(Player);
-		if (IsValid(GearPlayer) && !GearPlayer->HasSelectedHazard())
+		AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(Player->GetPawn());
+		if (IsValid(BuilderPawn) && !BuilderPawn->HasSelectedPlaceable())
 		{
 			return false;
 		}
