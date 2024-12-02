@@ -44,6 +44,8 @@ protected:
 
 // -------------------------------------------------------------------------
 
+	void SetGearMatchState(EGearMatchState InGearMatchState);
+
 	bool CheckIsEveryPlayerReady();
 	void AllPlayerJoined();
 

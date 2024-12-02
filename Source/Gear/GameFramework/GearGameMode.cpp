@@ -71,7 +71,7 @@ void AGearGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 
-	GearMatchState = EGearMatchState::Ended;
+	SetGearMatchState(EGearMatchState::Ended);
 }
 
 bool AGearGameMode::ShouldAbort()
@@ -175,17 +175,20 @@ void AGearGameMode::HandleMatchAborted()
 	UE_LOG(LogTemp, Error, TEXT("Match Aborted!"));
 }
 
-void AGearGameMode::StartFirstPhase()
+void AGearGameMode::SetGearMatchState(EGearMatchState InGearMatchState)
 {
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	AGearGameState* GearGameState = GetGameState<AGearGameState>();
+	if (IsValid(GearGameState))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController))
-		{
-			PlayerController->ClientStateMatchStarted();
-		}
+		GearGameState->GearMatchState = InGearMatchState;
+		GearGameState->OnRep_GearMatchState(GearMatchState);
 	}
-	
+
+	GearMatchState = InGearMatchState;
+}
+
+void AGearGameMode::StartFirstPhase()
+{	
 	StartSelectingPlaceables();
 }
 
@@ -226,23 +229,13 @@ bool AGearGameMode::ReadyToEndMatch_Implementation()
 
 void AGearGameMode::StartSelectingPlaceables()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces"));
-
-	GearMatchState = EGearMatchState::SelectingPlaceables;
-
 	SpawnNewBuilderPawns();
 	SpawnNewPlaceables();
 
 	GetWorld()->GetTimerManager().SetTimer(SelectingPiecesTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartPlaceing, false), UGameVariablesBFL::GV_PieceSelectionTimeLimit(), false);
 
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController))
-		{
-			PlayerController->ClientStateSelectingPieces(GetWorld()->GetTimeSeconds());
-		}
-	}
+	UE_LOG(LogTemp, Warning, TEXT("Selecting pieces"));
+	SetGearMatchState(EGearMatchState::SelectingPlaceables);
 }
 
 bool AGearGameMode::IsEveryPlayerSelectedPlaceables()
@@ -261,10 +254,6 @@ bool AGearGameMode::IsEveryPlayerSelectedPlaceables()
 
 void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 {
-	UE_LOG(LogTemp, Warning, TEXT("start placing pieces"));
-
-	GearMatchState = EGearMatchState::Placing;
-
 	GetWorld()->GetTimerManager().ClearTimer(SelectingPiecesTimerHandle);
 
 	if (!bEveryPlayerIsReady)
@@ -278,24 +267,10 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 
 		// let client move them locally
 		PreviewPlaceable->SetReplicateMovement(false);
-		PreviewPlaceable->ForceNetUpdate();
 	}
 
-	for (APlayerState* Player : GameState->PlayerArray)
-	{
-		Player->ForceNetUpdate();
-	}
-
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController))
-		{
-			PlayerController->ClientStatePlacing(GetWorld()->GetTimeSeconds());
-		}
-	}
-
-
+	UE_LOG(LogTemp, Warning, TEXT("start placing pieces"));
+	SetGearMatchState(EGearMatchState::Placing);
 }
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()
@@ -333,22 +308,9 @@ bool AGearGameMode::CheckIsEveryPlayerReady()
 
 void AGearGameMode::AllPlayerJoined()
 {
-	if (GearMatchState == EGearMatchState::WaitingForPlayerToJoin)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("all player joined"));
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay());
 
-		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(*Iterator);	
-			if (IsValid(GearController))
-			{
-				GearController->ClientStateAllPlayersJoined();
-			}
-		}
-
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay());
-
-		GearMatchState = EGearMatchState::AllPlayersJoined;
-	}
+	UE_LOG(LogTemp, Warning, TEXT("all player joined"));
+	SetGearMatchState(EGearMatchState::AllPlayersJoined);
 }

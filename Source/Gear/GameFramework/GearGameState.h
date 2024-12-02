@@ -23,6 +23,14 @@ public:
 	
 	AGearGameState();
 
+	void AllPlayerJoined_Start();
+	void SelectingPlaceables_Start();
+	void Placing_Start();
+
+
+	UFUNCTION()
+	void OnRep_GearMatchState(EGearMatchState OldState);
+
 	UFUNCTION()
 	void OnRep_RoadModuleStack();
 
@@ -30,13 +38,17 @@ public:
 
 	UPlaceableSocket* GetRoadEndSocket();
 
+	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
+	EGearMatchState GearMatchState;
+
+	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack)
+	TArray<AGearRoadModule*> RoadModuleStack;
+
 protected:
-	
+
 	virtual void BeginPlay() override;
 
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;
 
-	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack)
-	TArray<AGearRoadModule*> RoadModuleStack;
 };

@@ -54,20 +54,20 @@ public:
 	void OnNewPlayer(AGearPlayerState* GearPlayer);
 	void OnRemovePlayer(AGearPlayerState* GearPlayer);
 
-	UFUNCTION(Client, Reliable)
+	//UFUNCTION(Client, Reliable)
 	void ClientStateAllPlayersJoined();
 
-	UFUNCTION(Client, Reliable)
+	//UFUNCTION(Client, Reliable)
 	void ClientStateMatchStarted();
 
 	UFUNCTION(Server, Reliable)
 	void SelectPlaceable(AGearPlaceable* Placeable);
 
 
-	UFUNCTION(Client, Reliable)
+	//UFUNCTION(Client, Reliable)
 	void ClientStateSelectingPieces(float StateStartTime);
 
-	UFUNCTION(Client, Reliable)
+	//UFUNCTION(Client, Reliable)
 	void ClientStatePlacing(float StateStartTime);
 
 };

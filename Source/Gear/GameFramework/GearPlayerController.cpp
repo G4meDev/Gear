@@ -140,7 +140,7 @@ void AGearPlayerController::UpdateScreenDragValueAndInjectInput()
 
 }
 
-void AGearPlayerController::ClientStateAllPlayersJoined_Implementation()
+void AGearPlayerController::ClientStateAllPlayersJoined()
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
@@ -149,7 +149,7 @@ void AGearPlayerController::ClientStateAllPlayersJoined_Implementation()
 	}
 }
 
-void AGearPlayerController::ClientStateMatchStarted_Implementation()
+void AGearPlayerController::ClientStateMatchStarted()
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
@@ -173,7 +173,7 @@ void AGearPlayerController::SelectPlaceable_Implementation(AGearPlaceable* Place
 	}
 }
 
-void AGearPlayerController::ClientStateSelectingPieces_Implementation(float StateStartTime)
+void AGearPlayerController::ClientStateSelectingPieces(float StateStartTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
@@ -182,7 +182,7 @@ void AGearPlayerController::ClientStateSelectingPieces_Implementation(float Stat
 	}
 }
 
-void AGearPlayerController::ClientStatePlacing_Implementation(float StateStartTime)
+void AGearPlayerController::ClientStatePlacing(float StateStartTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))

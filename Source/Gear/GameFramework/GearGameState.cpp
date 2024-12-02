@@ -14,6 +14,7 @@
 
 AGearGameState::AGearGameState()
 {
+	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
 
 }
 
@@ -21,6 +22,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
+	DOREPLIFETIME(AGearGameState, GearMatchState);
 	DOREPLIFETIME(AGearGameState, RoadModuleStack);
 }
 
@@ -31,9 +33,76 @@ void AGearGameState::BeginPlay()
 
 }
 
+void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
+{
+	switch (GearMatchState)
+	{
+	case EGearMatchState::WaitingForPlayerToJoin:
+		break;
+
+	case EGearMatchState::AllPlayersJoined:
+		AllPlayerJoined_Start();
+		break;
+
+	case EGearMatchState::SelectingPlaceables:
+		SelectingPlaceables_Start();
+		break;
+
+	case EGearMatchState::Placing:
+		Placing_Start();
+		break;
+
+	case EGearMatchState::Racing:
+		break;
+
+	case EGearMatchState::Ended:
+		break;
+
+	default:
+		break;
+	}
+}
+
 void AGearGameState::OnRep_RoadModuleStack()
 {
 
+}
+
+void AGearGameState::AllPlayerJoined_Start()
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		AGearPlayerController* GearController = Cast<AGearPlayerController>(*Iterator);
+		if (IsValid(GearController) && GearController->IsLocalController())
+		{
+			GearController->ClientStateAllPlayersJoined();
+		}
+	}
+}
+
+void AGearGameState::SelectingPlaceables_Start()
+{
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			PlayerController->ClientStateMatchStarted();
+			PlayerController->ClientStateSelectingPieces(GetWorld()->GetTimeSeconds());
+		}
+	}
+}
+
+void AGearGameState::Placing_Start()
+{
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			PlayerController->ClientStatePlacing(GetWorld()->GetTimeSeconds());
+		}
+	}
 }
 
 bool AGearGameState::FindStartRoadModuleAndAddToStack()
