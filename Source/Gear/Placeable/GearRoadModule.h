@@ -21,20 +21,17 @@ public:
 
 	void PostInitializeComponents() override;
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	//void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void Tick(float DeltaTime) override;
 
 	void SetPreview() override;
 	void SetSelectedBy(AGearBuilderPawn* Player) override;
 
-	void Flip();
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UPlaceableSocket* RoadEndSocket;
 
-	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
-	bool bFliped;
+	virtual bool IsFlipable() override;
 
 protected:
 	virtual void BeginPlay() override;

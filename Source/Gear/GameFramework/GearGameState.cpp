@@ -23,6 +23,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(AGearGameState, GearMatchState);
+	DOREPLIFETIME(AGearGameState, LastGameStateTransitionTime);
 	DOREPLIFETIME(AGearGameState, RoadModuleStack);
 }
 
@@ -35,6 +36,8 @@ void AGearGameState::BeginPlay()
 
 void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 {
+	
+
 	switch (GearMatchState)
 	{
 	case EGearMatchState::WaitingForPlayerToJoin:
@@ -88,7 +91,7 @@ void AGearGameState::SelectingPlaceables_Start()
 		if (IsValid(PlayerController) && PlayerController->IsLocalController())
 		{
 			PlayerController->ClientStateMatchStarted();
-			PlayerController->ClientStateSelectingPieces(GetWorld()->GetTimeSeconds());
+			PlayerController->ClientStateSelectingPieces(LastGameStateTransitionTime);
 		}
 	}
 }
@@ -100,7 +103,7 @@ void AGearGameState::Placing_Start()
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
 		if (IsValid(PlayerController) && PlayerController->IsLocalController())
 		{
-			PlayerController->ClientStatePlacing(GetWorld()->GetTimeSeconds());
+			PlayerController->ClientStatePlacing(LastGameStateTransitionTime);
 		}
 	}
 }

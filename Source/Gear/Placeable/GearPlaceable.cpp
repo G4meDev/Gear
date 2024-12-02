@@ -32,6 +32,8 @@ AGearPlaceable::AGearPlaceable()
 	PlaceableState = EPlaceableState::Idle;
 	PreviewScale = 1.0f;
 
+	bFliped = false;
+
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -151,4 +153,23 @@ void AGearPlaceable::AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint)
 	AttachToActor(SpawnPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	SetActorScale3D(FVector(PreviewScale));
 	SetActorRelativeLocation(-PreviewRotationPivot->GetRelativeLocation() * PreviewScale);
+}
+
+bool AGearPlaceable::IsFlipable()
+{
+	return false;
+}
+
+void AGearPlaceable::Flip()
+{
+	bFliped = !bFliped;
+
+	if (bFliped)
+	{
+		SetActorRelativeScale3D(FVector(1, -1, 1));
+	}
+	else
+	{
+		SetActorRelativeScale3D(FVector::One());
+	}
 }

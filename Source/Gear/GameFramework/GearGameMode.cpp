@@ -181,6 +181,7 @@ void AGearGameMode::SetGearMatchState(EGearMatchState InGearMatchState)
 	if (IsValid(GearGameState))
 	{
 		GearGameState->GearMatchState = InGearMatchState;
+		GearGameState->LastGameStateTransitionTime = GearGameState->GetServerWorldTimeSeconds();
 		GearGameState->OnRep_GearMatchState(GearMatchState);
 	}
 

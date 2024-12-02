@@ -66,6 +66,13 @@ public:
 
 	void AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint);
 
+	UFUNCTION(BlueprintPure)
+	virtual bool IsFlipable();
+
+	void Flip();
+
+	bool bFliped;
+
 protected:
 	virtual void BeginPlay() override;
 

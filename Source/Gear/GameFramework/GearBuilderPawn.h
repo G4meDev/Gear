@@ -83,14 +83,10 @@ protected:
 	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
 	UPlaceableSocket* SelectedSocket;
 
-	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
-	bool bCanPlaceInSelectedSocket;
-
-	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
-	bool bSelectedRoadModule;
-
 	UPROPERTY(ReplicatedUsing=OnRep_SelectedPlaceable, BlueprintReadWrite)
 	AGearPlaceable* SelectedPlaceable;
+
+
 
 private:
 	

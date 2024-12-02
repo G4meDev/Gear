@@ -22,12 +22,11 @@ void AGearRoadModule::PostInitializeComponents()
 
 }
 
-void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AGearRoadModule, bFliped);
-}
+// void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+// {
+// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+// 
+// }
 
 void AGearRoadModule::BeginPlay()
 {
@@ -54,16 +53,7 @@ void AGearRoadModule::SetSelectedBy(AGearBuilderPawn* Player)
 	Super::SetSelectedBy(Player);
 }
 
-void AGearRoadModule::Flip()
+bool AGearRoadModule::IsFlipable()
 {
-	bFliped = !bFliped;
-
-	if (bFliped)
-	{
-		SetActorRelativeScale3D(FVector(1, -1, 1));
-	}
-	else
-	{
-		SetActorRelativeScale3D(FVector::One());
-	}
+	return true;
 }

@@ -41,8 +41,6 @@ AGearBuilderPawn::AGearBuilderPawn()
 	Velocity = FVector2D::Zero();
 
 	SelectedSocket = nullptr;
-	bSelectedRoadModule = false;
-	bCanPlaceInSelectedSocket = true;
 
 	bPlacingUnhandled = false;
 
@@ -142,7 +140,6 @@ void AGearBuilderPawn::StartPlacing()
 	TeleportToRoadEnd();
 
 	SelectedPlaceable->SetActorScale3D(FVector::One());
-	bSelectedRoadModule = SelectedPlaceable->IsA(AGearRoadModule::StaticClass());
 	UpdateSelectedPlaceable();
 }
 

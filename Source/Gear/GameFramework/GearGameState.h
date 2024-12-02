@@ -41,6 +41,9 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
 
+	UPROPERTY(Replicated)
+	double LastGameStateTransitionTime;
+
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack)
 	TArray<AGearRoadModule*> RoadModuleStack;
 
@@ -50,5 +53,4 @@ protected:
 
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;
-
 };
