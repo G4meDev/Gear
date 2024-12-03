@@ -138,11 +138,11 @@ bool AGearGameState::FindStartRoadModuleAndAddToStack()
 	return true;
 }
 
-UPlaceableSocket* AGearGameState::GetRoadEndSocket()
+UPlaceableSocket* AGearGameState::GetRoadStackAttachableSocket()
 {
 	if (!RoadModuleStack.IsEmpty())
 	{
-		return RoadModuleStack.Top()->RoadEndSocket;
+		return RoadModuleStack.Top()->GetAttachableSocket();
 	}
 
 	return nullptr;

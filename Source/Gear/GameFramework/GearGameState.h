@@ -36,7 +36,7 @@ public:
 
 	bool FindStartRoadModuleAndAddToStack();
 
-	UPlaceableSocket* GetRoadEndSocket();
+	UPlaceableSocket* GetRoadStackAttachableSocket();
 
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;

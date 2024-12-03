@@ -29,13 +29,20 @@ public:
 	void MoveToSocket(UPlaceableSocket* TargetSocket, bool InMirrorX);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPlaceableSocket* RoadStartSocket;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UPlaceableSocket* RoadEndSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> RoadModuleMirroredClass;
 
+	UPlaceableSocket* GetAttachableSocket();
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	bool bMirrorX;
+
 protected:
 	virtual void BeginPlay() override;
 
-	bool bMirrorX;
 };

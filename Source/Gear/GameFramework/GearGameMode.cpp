@@ -182,10 +182,15 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 
 		if (IsValid(GearGameState) && IsValid(BuilderPawn))
 		{
-			AActor* SpawnActor = GetWorld()->SpawnActor(RoadModule);
+			FTransform SpawnTransform;
+
+			AActor* SpawnActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), RoadModule, SpawnTransform);
 			AGearRoadModule* SpawnRoadModule = Cast<AGearRoadModule>(SpawnActor);
 			if (IsValid(SpawnRoadModule))
 			{
+				SpawnRoadModule->bMirrorX = bMirrorX;
+				UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
+
 				SpawnRoadModule->MoveToSocket(TargetSocket, bMirrorX);
 				GearGameState->RoadModuleStack.Add(SpawnRoadModule);
 				GearGameState->OnRep_RoadModuleStack();

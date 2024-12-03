@@ -2,6 +2,7 @@
 
 
 #include "Placeable/PlaceableSocket.h"
+#include "Placeable/GearRoadModule.h"
 #include "Net/UnrealNetwork.h"
 
 UPlaceableSocket::UPlaceableSocket()
@@ -41,4 +42,15 @@ bool UPlaceableSocket::IsOccupied() const
 void UPlaceableSocket::MarkOccupied()
 {
 	Occupied = true;
+}
+
+FTransform UPlaceableSocket::GetPlaceableSocketTransform()
+{
+	AGearRoadModule* AttachedRoadModule = Cast<AGearRoadModule>(GetOwner());
+	if (IsValid(AttachedRoadModule) && AttachedRoadModule->bMirrorX)
+	{
+		return FTransform(GetComponentRotation().Quaternion() * FQuat(GetUpVector(), PI), GetComponentLocation(), FVector::One());
+	}
+
+	return FTransform(GetComponentRotation(), GetComponentLocation(), FVector::One());
 }

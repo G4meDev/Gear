@@ -26,6 +26,8 @@ public:
 
 	void MarkOccupied();
 
+	FTransform GetPlaceableSocketTransform();
+
 protected:
 	virtual void BeginPlay() override;
 	

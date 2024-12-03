@@ -9,11 +9,21 @@ AGearRoadModule::AGearRoadModule()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	RoadStartSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("StartSocket"));
+	RoadStartSocket->SetupAttachment(Root);
+
 	RoadEndSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("EndSocket"));
 	RoadEndSocket->SetupAttachment(Root);
 
 	PreviewScale = 0.1f;
 	bMirrorX = false;
+}
+
+void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AGearRoadModule, bMirrorX, COND_InitialOnly);
 }
 
 void AGearRoadModule::PostInitializeComponents()
@@ -53,18 +63,29 @@ void AGearRoadModule::MoveToSocket(UPlaceableSocket* TargetSocket, bool InMirror
 	{
 		bMirrorX = InMirrorX;
 
-		FVector TargetLocation = TargetSocket->GetComponentLocation();
-		FRotator TargetRotation = TargetSocket->GetComponentRotation();
+		FTransform TargetSocketTransform = TargetSocket->GetPlaceableSocketTransform();
 
+		FVector TargetLocation = TargetSocketTransform.GetLocation();
+		FRotator TargetRotation = TargetSocketTransform.Rotator();
+
+		FVector DebugStart = TargetLocation + FVector::UpVector * 20;
+
+		DrawDebugLine(GetWorld(), DebugStart, DebugStart + TargetRotation.Vector() * 50.0f, FColor::Red, false, 2, 0, 20);
+		
 		if (bMirrorX)
 		{
 			FRotator DeltaRotator = FRotator(0, 180, 0) - RoadEndSocket->GetRelativeRotation();
-			TargetRotation = TargetSocket->GetComponentTransform().TransformRotation(DeltaRotator.Quaternion()).Rotator();
+			TargetRotation = TargetSocketTransform.TransformRotation(DeltaRotator.Quaternion()).Rotator();
 
-			FVector DeltaLocation = DeltaRotator.RotateVector(RoadEndSocket->GetRelativeLocation());
-			TargetLocation = TargetSocket->GetComponentTransform().TransformPositionNoScale(-DeltaLocation);
+			FVector DeltaLocation = DeltaRotator.RotateVector(RoadEndSocket->GetRelativeTransform().GetLocation());
+			TargetLocation = TargetSocketTransform.TransformPositionNoScale(-DeltaLocation);
 		}
 
 		SetActorLocationAndRotation(TargetLocation, TargetRotation);
 	}
+}
+
+UPlaceableSocket* AGearRoadModule::GetAttachableSocket()
+{
+	return bMirrorX ? RoadStartSocket : RoadEndSocket;
 }

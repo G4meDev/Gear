@@ -222,9 +222,9 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 
 	if (IsValid(GearGameState))
 	{
-		UPlaceableSocket* RoadEndSocket = GearGameState->GetRoadEndSocket();
+		UPlaceableSocket* AttachableSocket = GearGameState->GetRoadStackAttachableSocket();
 
-		if (IsValid(RoadEndSocket))
+		if (IsValid(AttachableSocket))
 		{
 			bSelectedMirroredX = bMirroredX;
 			bSelectedMirroredY = bMirroredY;
@@ -234,7 +234,7 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 
 			if (IsValid(ActiveRoadModule))
 			{
-				ActiveRoadModule->MoveToSocket(RoadEndSocket, bSelectedMirroredX);
+				ActiveRoadModule->MoveToSocket(AttachableSocket, bSelectedMirroredX);
 			}
 
 			if (IsValid(DeactiveRoadModule))
@@ -242,7 +242,7 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 				DeactiveRoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
 			}
 
-			SelectedSocket = RoadEndSocket;
+			SelectedSocket = AttachableSocket;
 		}
 	}
 }
@@ -252,11 +252,11 @@ void AGearBuilderPawn::TeleportToRoadEnd()
 	AGearGameState* GearGameState = Cast<AGearGameState>(UGameplayStatics::GetGameState(GetWorld()));
 	if (IsValid(GearGameState))
 	{
-		UPlaceableSocket* RoadEndSocket = GearGameState->GetRoadEndSocket();
+		UPlaceableSocket* RoadEndSocket = GearGameState->GetRoadStackAttachableSocket();
 		if (IsValid(RoadEndSocket))
 		{
 			Velocity = FVector2D::Zero();
-			SetActorLocationAndRotation(RoadEndSocket->GetComponentLocation(), RoadEndSocket->GetComponentRotation());
+			SetActorLocation(RoadEndSocket->GetComponentLocation());
 		}
 	}
 }
@@ -270,7 +270,7 @@ void AGearBuilderPawn::PlaceRoadModule()
 		AGearPlayerController* GearController = GetController<AGearPlayerController>();
 		if (IsValid(GearController) && IsValid(GearGameState))
 		{
-			GearController->PlaceRoadModule(ActiveRoadModule->GetClass(), GearGameState->GetRoadEndSocket(), bSelectedMirroredX);
+			GearController->PlaceRoadModule(ActiveRoadModule->GetClass(), GearGameState->GetRoadStackAttachableSocket(), bSelectedMirroredX);
 		}
 	}
 }
