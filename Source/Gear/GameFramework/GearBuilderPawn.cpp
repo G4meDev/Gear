@@ -225,7 +225,19 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 
 			if (IsValid(ActiveRoadModule))
 			{
-				ActiveRoadModule->SetActorLocationAndRotation(RoadEndSocket->GetComponentLocation(), RoadEndSocket->GetComponentRotation());
+				FVector TargetLocation = RoadEndSocket->GetComponentLocation();
+				FRotator TargetRotation = RoadEndSocket->GetComponentRotation();
+
+				if (bSelectedMirroredX)
+				{
+					FRotator DeltaRotator = FRotator(0, 180, 0) - ActiveRoadModule->RoadEndSocket->GetRelativeRotation();
+					TargetRotation = RoadEndSocket->GetComponentTransform().TransformRotation(DeltaRotator.Quaternion()).Rotator();
+
+					FVector DeltaLocation = DeltaRotator.RotateVector(ActiveRoadModule->RoadEndSocket->GetRelativeLocation());
+					TargetLocation = RoadEndSocket->GetComponentTransform().TransformPositionNoScale(-DeltaLocation);
+				}
+
+				ActiveRoadModule->SetActorLocationAndRotation(TargetLocation, TargetRotation);
 			}
 
 			if (IsValid(DeactiveRoadModule))
