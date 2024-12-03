@@ -4,6 +4,7 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearPlayerController.h"
+#include "GameFramework/GearBuilderPawn.h"
 
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
@@ -68,7 +69,20 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 
 void AGearGameState::OnRep_RoadModuleStack()
 {
-
+	if (GearMatchState == EGearMatchState::Placing)
+	{
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			if (Iterator->Get()->IsLocalController())
+			{
+				AGearBuilderPawn* BuilderPawn = Iterator->Get()->GetPawn<AGearBuilderPawn>();
+				if (IsValid(BuilderPawn))
+				{
+					BuilderPawn->RoadModuleStackChanged();
+				}
+			}
+		}
+	}
 }
 
 void AGearGameState::AllPlayerJoined_Start()

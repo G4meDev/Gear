@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GameFramework/GearBuilderPawn.h"
+#include "GameFramework/GearplayerController.h"
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "Placeable/GearPlaceable.h"
@@ -137,6 +138,14 @@ void AGearBuilderPawn::OnRep_SelectedPlaceableClass()
 	}
 }
 
+void AGearBuilderPawn::RoadModuleStackChanged()
+{
+	if (BuilderPawnState == EBuilderPawnState::PlacingRoadModules)
+	{
+		UpdatePlacingRoadModule(bSelectedMirroredX, bSelectedMirroredY);
+	}
+}
+
 void AGearBuilderPawn::StartPlacing()
 {
 	if (IsLocallyControlled())
@@ -225,19 +234,7 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 
 			if (IsValid(ActiveRoadModule))
 			{
-				FVector TargetLocation = RoadEndSocket->GetComponentLocation();
-				FRotator TargetRotation = RoadEndSocket->GetComponentRotation();
-
-				if (bSelectedMirroredX)
-				{
-					FRotator DeltaRotator = FRotator(0, 180, 0) - ActiveRoadModule->RoadEndSocket->GetRelativeRotation();
-					TargetRotation = RoadEndSocket->GetComponentTransform().TransformRotation(DeltaRotator.Quaternion()).Rotator();
-
-					FVector DeltaLocation = DeltaRotator.RotateVector(ActiveRoadModule->RoadEndSocket->GetRelativeLocation());
-					TargetLocation = RoadEndSocket->GetComponentTransform().TransformPositionNoScale(-DeltaLocation);
-				}
-
-				ActiveRoadModule->SetActorLocationAndRotation(TargetLocation, TargetRotation);
+				ActiveRoadModule->MoveToSocket(RoadEndSocket, bSelectedMirroredX);
 			}
 
 			if (IsValid(DeactiveRoadModule))
@@ -260,6 +257,20 @@ void AGearBuilderPawn::TeleportToRoadEnd()
 		{
 			Velocity = FVector2D::Zero();
 			SetActorLocationAndRotation(RoadEndSocket->GetComponentLocation(), RoadEndSocket->GetComponentRotation());
+		}
+	}
+}
+
+void AGearBuilderPawn::PlaceRoadModule()
+{
+	AGearRoadModule* ActiveRoadModule = bSelectedMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
+	if (IsValid(ActiveRoadModule))
+	{
+		AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();
+		AGearPlayerController* GearController = GetController<AGearPlayerController>();
+		if (IsValid(GearController) && IsValid(GearGameState))
+		{
+			GearController->PlaceRoadModule(ActiveRoadModule->GetClass(), GearGameState->GetRoadEndSocket(), bSelectedMirroredX);
 		}
 	}
 }

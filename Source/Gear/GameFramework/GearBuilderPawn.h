@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TeleportToRoadEnd();
 
+	UFUNCTION(BlueprintCallable)
+	void PlaceRoadModule();
+
 	void SetSelectedPlaceable(AGearPlaceable* Placeable);
 	bool HasSelectedPlaceable() const;
 
@@ -48,6 +51,8 @@ public:
 
 	UFUNCTION()
 	void OnRep_SelectedPlaceableClass();
+
+	void RoadModuleStackChanged();
 
 protected:
 	

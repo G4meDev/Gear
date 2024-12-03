@@ -8,6 +8,9 @@
 #include "GearGameMode.generated.h"
 
 struct FHazardDescription;
+class AGearPlayerController;
+class AGearRoadModule;
+class UPlaceableSocket;
 class AGearBuilderPawn;
 class AGearGameState;
 class AGearPlayerState;
@@ -28,6 +31,8 @@ public:
 	void Tick(float DeltaSeconds) override;
 	
 	void RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearBuilderPawn* Player);
+
+	void RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, TSubclassOf<AGearRoadModule> RoadModule, UPlaceableSocket* TargetSocket, bool bMirrorX);
 
 protected:
 

@@ -7,8 +7,10 @@
 #include "GearPlayerController.generated.h"
 
 class AGearPlayerState;
-class AGearHUD;
 class AGearPlaceable;
+class AGearRoadModule;
+class UPlaceableSocket;
+class AGearHUD;
 class UInputMappingContext;
 class UInputAction;
 
@@ -54,20 +56,16 @@ public:
 	void OnNewPlayer(AGearPlayerState* GearPlayer);
 	void OnRemovePlayer(AGearPlayerState* GearPlayer);
 
-	//UFUNCTION(Client, Reliable)
-	void ClientStateAllPlayersJoined();
-
-	//UFUNCTION(Client, Reliable)
-	void ClientStateMatchStarted();
 
 	UFUNCTION(Server, Reliable)
 	void SelectPlaceable(AGearPlaceable* Placeable);
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void PlaceRoadModule(TSubclassOf<AGearRoadModule> RoadModule, UPlaceableSocket* TargetSocket, bool bMirrorX);
 
-	//UFUNCTION(Client, Reliable)
+	void ClientStateAllPlayersJoined();
+	void ClientStateMatchStarted();
 	void ClientStateSelectingPieces(float StateStartTime);
-
-	//UFUNCTION(Client, Reliable)
 	void ClientStatePlacing(float StateStartTime);
 
 };

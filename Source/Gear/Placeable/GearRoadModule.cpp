@@ -13,6 +13,7 @@ AGearRoadModule::AGearRoadModule()
 	RoadEndSocket->SetupAttachment(Root);
 
 	PreviewScale = 0.1f;
+	bMirrorX = false;
 }
 
 void AGearRoadModule::PostInitializeComponents()
@@ -44,4 +45,26 @@ void AGearRoadModule::SetPreview()
 void AGearRoadModule::SetSelectedBy(AGearBuilderPawn* Player)
 {
 	Super::SetSelectedBy(Player);
+}
+
+void AGearRoadModule::MoveToSocket(UPlaceableSocket* TargetSocket, bool InMirrorX)
+{
+	if (IsValid(TargetSocket))
+	{
+		bMirrorX = InMirrorX;
+
+		FVector TargetLocation = TargetSocket->GetComponentLocation();
+		FRotator TargetRotation = TargetSocket->GetComponentRotation();
+
+		if (bMirrorX)
+		{
+			FRotator DeltaRotator = FRotator(0, 180, 0) - RoadEndSocket->GetRelativeRotation();
+			TargetRotation = TargetSocket->GetComponentTransform().TransformRotation(DeltaRotator.Quaternion()).Rotator();
+
+			FVector DeltaLocation = DeltaRotator.RotateVector(RoadEndSocket->GetRelativeLocation());
+			TargetLocation = TargetSocket->GetComponentTransform().TransformPositionNoScale(-DeltaLocation);
+		}
+
+		SetActorLocationAndRotation(TargetLocation, TargetRotation);
+	}
 }

@@ -26,6 +26,8 @@ public:
 	void SetPreview() override;
 	void SetSelectedBy(AGearBuilderPawn* Player) override;
 
+	void MoveToSocket(UPlaceableSocket* TargetSocket, bool InMirrorX);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UPlaceableSocket* RoadEndSocket;
 
@@ -35,4 +37,5 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	bool bMirrorX;
 };

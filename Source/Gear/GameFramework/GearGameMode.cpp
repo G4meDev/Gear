@@ -6,10 +6,13 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearBuilderPawn.h"
-#include "Placeable/GearPlaceable.h"
-#include "Placeable/PlaceableSpawnPoint.h"
-#include "Utils/GameVariablesBFL.h"
 
+#include "Placeable/GearPlaceable.h"
+#include "Placeable/GearRoadModule.h"
+#include "Placeable/PlaceableSocket.h"
+#include "Placeable/PlaceableSpawnPoint.h"
+
+#include "Utils/GameVariablesBFL.h"
 #include "kismet/GameplayStatics.h"
 
 AGearGameMode::AGearGameMode()
@@ -165,6 +168,35 @@ void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable
 	if (GearMatchState == EGearMatchState::SelectingPlaceables && IsValid(Placeable) && IsValid(Player) && !Placeable->HasOwningPlayer())
 	{
 		Player->SetSelectedPlaceable(Placeable);
+	}
+}
+
+void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, TSubclassOf<AGearRoadModule> RoadModule, UPlaceableSocket* TargetSocket, bool bMirrorX)
+{
+	if (GearMatchState == EGearMatchState::Placing && IsValid(RoadModule) && IsValid(TargetSocket) && !TargetSocket->IsOccupied())
+	{
+		// TODO: sweep test
+
+		AGearGameState* GearGameState = GetGameState<AGearGameState>();
+		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
+
+		if (IsValid(GearGameState) && IsValid(BuilderPawn))
+		{
+			AActor* SpawnActor = GetWorld()->SpawnActor(RoadModule);
+			AGearRoadModule* SpawnRoadModule = Cast<AGearRoadModule>(SpawnActor);
+			if (IsValid(SpawnRoadModule))
+			{
+				SpawnRoadModule->MoveToSocket(TargetSocket, bMirrorX);
+				GearGameState->RoadModuleStack.Add(SpawnRoadModule);
+				GearGameState->OnRep_RoadModuleStack();
+
+				BuilderPawn->SelectedPlaceableClass = nullptr;
+			}
+			else
+			{
+				SpawnActor->Destroy();
+			}
+		}
 	}
 }
 
