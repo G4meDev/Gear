@@ -198,12 +198,6 @@ void AGearPlayerController::ClientStatePlacing(float StateStartTime)
 	{
 		GearHUD->StartPlacingPieces(StateStartTime);
 	}
-
-	AGearBuilderPawn* BuilderPawn = GetPawn<AGearBuilderPawn>();
-	if (IsValid(BuilderPawn))
-	{
-		BuilderPawn->StartPlacing();
-	}
 }
 
 void AGearPlayerController::PeekClientIsReady_Implementation()

@@ -198,6 +198,7 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 				GearGameState->OnRep_RoadModuleStack();
 
 				BuilderPawn->SelectedPlaceableClass = nullptr;
+				BuilderPawn->OnRep_SelectedPlaceableClass();
 			}
 			else
 			{
@@ -311,6 +312,7 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 			{
 				BuilderPawn->SelectedPlaceableClass = BuilderPawn->SelectedPlaceable->GetClass();
 				BuilderPawn->SelectedPlaceable = nullptr;
+				BuilderPawn->OnRep_SelectedPlaceableClass();
 			}
 		}
 	}

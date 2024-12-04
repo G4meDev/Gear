@@ -118,13 +118,11 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY);
 
+	void Cleanup_SpawnedActors();
+
 	friend class AGearGameMode;
 
 private:
-	
-	
-
-	bool bPlacingUnhandled;
 
 };
 

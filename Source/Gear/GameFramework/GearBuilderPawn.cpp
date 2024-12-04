@@ -46,7 +46,6 @@ AGearBuilderPawn::AGearBuilderPawn()
 	BuilderPawnState = EBuilderPawnState::Preview;
 	bSelectedMirroredX = false;
 	bSelectedMirroredY = false;
-	bPlacingUnhandled = false;
 	
 
 	bReplicates = true;
@@ -88,13 +87,14 @@ void AGearBuilderPawn::Destroyed()
 {
 	Super::Destroyed();
 	
+	Cleanup_SpawnedActors();
 }
 
 void AGearBuilderPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bCanMove)
+	if (IsLocallyControlled() && bCanMove)
 	{
 		Velocity += -ScreenDragValue * MovementSpeed * DeltaTime;
 
@@ -128,12 +128,18 @@ void AGearBuilderPawn::OnRep_SelectedPlaceable(AGearPlaceable* OldSelected)
 
 void AGearBuilderPawn::OnRep_SelectedPlaceableClass()
 {
-	if (bPlacingUnhandled)
+	if (IsLocallyControlled())
 	{
-		AGearGameState* GearGameState = Cast<AGearGameState>(UGameplayStatics::GetGameState(GetWorld()));
-		if (IsValid(GearGameState) && GearGameState->GearMatchState == EGearMatchState::Placing)
+		if (IsValid(SelectedPlaceableClass))
 		{
 			StartPlacing();
+		}
+
+		else if (SelectedPlaceableClass == nullptr)
+		{
+			BuilderPawnState = EBuilderPawnState::Waiting;
+			SelectedSocket = nullptr;
+			Cleanup_SpawnedActors();
 		}
 	}
 }
@@ -148,33 +154,23 @@ void AGearBuilderPawn::RoadModuleStackChanged()
 
 void AGearBuilderPawn::StartPlacing()
 {
-	if (IsLocallyControlled())
+	bCanMove = true;
+	TeleportToRoadEnd();
+
+	if (SelectedPlaceableClass->IsChildOf<AGearRoadModule>())
 	{
-		if (!IsValid(SelectedPlaceableClass))
-		{
-			bPlacingUnhandled = true;
-			return;
-		}
-
-		bCanMove = true;
-		TeleportToRoadEnd();
-
-		if (SelectedPlaceableClass->IsChildOf<AGearRoadModule>())
-		{
-			BuilderPawnState = EBuilderPawnState::PlacingRoadModules;
-			SpawnPlacingRoadModules();
-			UpdatePlacingRoadModule(bSelectedMirroredX, bSelectedMirroredY);
-		}
-
-		else if(SelectedPlaceableClass->IsChildOf<AGearHazard>())
-		{
-			BuilderPawnState = EBuilderPawnState::PlacingHazards;
-		}
-		
-
+		BuilderPawnState = EBuilderPawnState::PlacingRoadModules;
+		SpawnPlacingRoadModules();
+		UpdatePlacingRoadModule(bSelectedMirroredX, bSelectedMirroredY);
 	}
 
-	//UpdateSelectedPlaceable();
+	else if (SelectedPlaceableClass->IsChildOf<AGearHazard>())
+	{
+		BuilderPawnState = EBuilderPawnState::PlacingHazards;
+	}
+		
+
+
 }
 
 void AGearBuilderPawn::SpawnPlacingRoadModules()
@@ -247,6 +243,22 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 	}
 }
 
+void AGearBuilderPawn::Cleanup_SpawnedActors()
+{
+	if (IsValid(PlacingRoadModule))
+	{
+		PlacingRoadModule->Destroy();	
+		PlacingRoadModule = nullptr;	
+	}
+
+	if (IsValid(PlacingRoadModuleMirroredY))
+	{
+		PlacingRoadModuleMirroredY->Destroy();
+		PlacingRoadModuleMirroredY = nullptr;
+		PlacingRoadModuleMirroredY = nullptr;
+	}
+}
+
 void AGearBuilderPawn::TeleportToRoadEnd()
 {
 	AGearGameState* GearGameState = Cast<AGearGameState>(UGameplayStatics::GetGameState(GetWorld()));
@@ -263,14 +275,17 @@ void AGearBuilderPawn::TeleportToRoadEnd()
 
 void AGearBuilderPawn::PlaceRoadModule()
 {
-	AGearRoadModule* ActiveRoadModule = bSelectedMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
-	if (IsValid(ActiveRoadModule))
+	if (IsLocallyControlled())
 	{
-		AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();
-		AGearPlayerController* GearController = GetController<AGearPlayerController>();
-		if (IsValid(GearController) && IsValid(GearGameState))
+		AGearRoadModule* ActiveRoadModule = bSelectedMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
+		if (IsValid(ActiveRoadModule))
 		{
-			GearController->PlaceRoadModule(ActiveRoadModule->GetClass(), GearGameState->GetRoadStackAttachableSocket(), bSelectedMirroredX);
+			AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();
+			AGearPlayerController* GearController = GetController<AGearPlayerController>();
+			if (IsValid(GearController) && IsValid(GearGameState))
+			{
+				GearController->PlaceRoadModule(ActiveRoadModule->GetClass(), GearGameState->GetRoadStackAttachableSocket(), bSelectedMirroredX);
+			}
 		}
 	}
 }
