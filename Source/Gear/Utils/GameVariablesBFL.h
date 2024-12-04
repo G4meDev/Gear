@@ -20,4 +20,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = GameVariables)
 	static float GV_PieceSelectionTimeLimit();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static float GV_PlacingTimeLimit();
 };

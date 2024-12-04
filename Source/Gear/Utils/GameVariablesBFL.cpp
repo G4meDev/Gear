@@ -12,3 +12,8 @@ float UGameVariablesBFL::GV_PieceSelectionTimeLimit()
 {
 	return 10.0f;
 }
+
+float UGameVariablesBFL::GV_PlacingTimeLimit()
+{
+	return 10.0f;
+}
