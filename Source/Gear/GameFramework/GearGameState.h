@@ -23,6 +23,8 @@ public:
 	
 	AGearGameState();
 
+	void Tick( float DeltaSeconds ) override;
+
 	void AllPlayerJoined_Start();
 	void SelectingPlaceables_Start();
 	void Placing_Start();
@@ -44,7 +46,7 @@ public:
 	UPROPERTY(Replicated)
 	double LastGameStateTransitionTime;
 
-	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack)
+	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack, BlueprintReadWrite, VisibleInstanceOnly)
 	TArray<AGearRoadModule*> RoadModuleStack;
 
 protected:

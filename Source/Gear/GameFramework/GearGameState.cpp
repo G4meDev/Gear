@@ -19,6 +19,12 @@ AGearGameState::AGearGameState()
 
 }
 
+void AGearGameState::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+}
+
 void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -69,8 +75,12 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 
 void AGearGameState::OnRep_RoadModuleStack()
 {
-	if (GearMatchState == EGearMatchState::Placing)
+	AGearRoadModule* TopModule = RoadModuleStack.Top();
+
+	if (IsValid(TopModule) && TopModule->bShouldNotifyGameState && !TopModule->bGameStateNotified && GearMatchState == EGearMatchState::Placing)
 	{
+		RoadModuleStack.Top()->bGameStateNotified = true;
+
 		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
 			if (Iterator->Get()->IsLocalController())
@@ -140,11 +150,11 @@ bool AGearGameState::FindStartRoadModuleAndAddToStack()
 
 UPlaceableSocket* AGearGameState::GetRoadStackAttachableSocket()
 {
-	if (!RoadModuleStack.IsEmpty())
+	if (!RoadModuleStack.IsEmpty() && IsValid(RoadModuleStack.Top()))
 	{
 		return RoadModuleStack.Top()->GetAttachableSocket();
 	}
-
+	
 	return nullptr;
 }
 

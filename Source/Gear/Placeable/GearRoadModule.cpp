@@ -2,6 +2,7 @@
 
 
 #include "Placeable/GearRoadModule.h"
+#include "GameFramework/GearGameState.h"
 #include "Placeable/PlaceableSocket.h"
 #include "Net/UnrealNetwork.h"
 
@@ -17,6 +18,9 @@ AGearRoadModule::AGearRoadModule()
 
 	PreviewScale = 0.1f;
 	bMirrorX = false;
+
+	bShouldNotifyGameState = false;
+	bGameStateNotified = false;
 }
 
 void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
@@ -24,6 +28,7 @@ void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AGearRoadModule, bMirrorX, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(AGearRoadModule, bShouldNotifyGameState, COND_InitialOnly);
 }
 
 void AGearRoadModule::PostInitializeComponents()
@@ -39,10 +44,24 @@ void AGearRoadModule::BeginPlay()
 
 }
 
+void AGearRoadModule::PostNetInit()
+{
+	Super::PostNetInit();
+
+	// handle late spawn nullptr in AGearGameState::RoadModuleStack
+	if (bShouldNotifyGameState && !bGameStateNotified)
+	{
+		AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();
+		if (IsValid(GearGameState))
+		{
+			GearGameState->OnRep_RoadModuleStack();
+		}
+	}
+}
+
 void AGearRoadModule::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 
 
 }

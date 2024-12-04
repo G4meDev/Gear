@@ -42,7 +42,13 @@ public:
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
 	bool bMirrorX;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	bool bShouldNotifyGameState;
+
+	bool bGameStateNotified;
+
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void PostNetInit() override;
 };

@@ -189,6 +189,8 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 			if (IsValid(SpawnRoadModule))
 			{
 				SpawnRoadModule->bMirrorX = bMirrorX;
+				SpawnRoadModule->bShouldNotifyGameState = true;
+				SetOwner(GetOwner());
 				UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
 
 				SpawnRoadModule->MoveToSocket(TargetSocket, bMirrorX);
