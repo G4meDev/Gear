@@ -24,23 +24,38 @@ AGearVehicle::AGearVehicle()
 	Camera->SetupAttachment(CameraBoom);
 
 	SteerValue = 0.0f;
+
+	bAlwaysRelevant = true;
+
 }
 
 void AGearVehicle::BeginPlay()
 {
 	Super::BeginPlay();
 
-#if WITH_EDITOR
-	bInTestMap = GetWorld()->GetName().Equals(VEHICLE_TESTMAP_NAME);
-#endif
+
 }
 
 void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	Input->BindAction(SteerActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Steer);
+#if WITH_EDITOR
+	bInTestMap = GetWorld()->GetName().Equals(VEHICLE_TESTMAP_NAME);
+#endif
+
+	if (IsLocallyControlled())
+	{
+		UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+		Input->BindAction(SteerActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Steer);
+#if WITH_EDITOR
+		if (bInTestMap)
+		{
+			Input->BindAction(ThrottleActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Throttle);
+			Input->BindAction(BrakeActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Brake);
+		}
+#endif
+	}
 }
 
 void AGearVehicle::Input_Steer(const FInputActionInstance& Instance)
@@ -48,15 +63,38 @@ void AGearVehicle::Input_Steer(const FInputActionInstance& Instance)
 	SteerValue = Instance.GetValue().Get<float>();
 }
 
+#if WITH_EDITOR
+void AGearVehicle::Input_Throttle(const FInputActionInstance& Instance)
+{
+	ThrottleValue = Instance.GetValue().Get<float>();
+}
+
+void AGearVehicle::Input_Brake(const FInputActionInstance& Instance)
+{
+	BrakeValue = Instance.GetValue().Get<float>();
+}
+#endif
+
 void AGearVehicle::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
-	GetVehicleMovementComponent()->SetSteeringInput(SteerValue);
-
-	if (CanDrive())
+	if (IsLocallyControlled())
 	{
-		GetVehicleMovementComponent()->SetThrottleInput(1.0f);
+		GetVehicleMovementComponent()->SetSteeringInput(SteerValue);
+
+		if (CanDrive())
+		{
+			GetVehicleMovementComponent()->SetThrottleInput(1.0f);
+		}
+
+#if WITH_EDITOR
+		if (bInTestMap)
+		{
+			GetVehicleMovementComponent()->SetThrottleInput(ThrottleValue);
+			GetVehicleMovementComponent()->SetBrakeInput(BrakeValue);
+		}
+#endif
 	}
 }
 

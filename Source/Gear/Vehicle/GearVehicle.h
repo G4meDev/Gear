@@ -50,6 +50,18 @@ protected:
 	AGearGameState* GearGameState;
 
 #if WITH_EDITORONLY_DATA
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInputAction* ThrottleActionInput;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInputAction* BrakeActionInput;
+
+	void Input_Throttle(const FInputActionInstance& Instance);
+	void Input_Brake(const FInputActionInstance& Instance);
+
+	float ThrottleValue;
+	float BrakeValue;
+
 	bool bInTestMap = false; 
 #endif
 
