@@ -200,6 +200,26 @@ void AGearPlayerController::ClientStatePlacing(float StateStartTime)
 	}
 }
 
+
+
+void AGearPlayerController::ClientStatePlacing_Finish()
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->PlacingPieces_End();
+	}
+}
+
+void AGearPlayerController::ClientStateRacing_Start(float StateStartTime)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->Racing_Start(StateStartTime);
+	}
+}
+
 void AGearPlayerController::PeekClientIsReady_Implementation()
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();

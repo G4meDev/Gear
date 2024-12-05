@@ -66,6 +66,10 @@ public:
 	void ClientStateAllPlayersJoined();
 	void ClientStateMatchStarted();
 	void ClientStateSelectingPieces(float StateStartTime);
+
 	void ClientStatePlacing(float StateStartTime);
+	void ClientStatePlacing_Finish();
+	
+	void ClientStateRacing_Start(float StateStartTime);
 
 };

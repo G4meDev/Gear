@@ -28,6 +28,8 @@ public:
 	void AllPlayerJoined_Start();
 	void SelectingPlaceables_Start();
 	void Placing_Start();
+	void Placing_End();
+	void Racing_Start();
 
 
 	UFUNCTION()

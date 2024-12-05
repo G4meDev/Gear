@@ -34,6 +34,12 @@ public:
 	void StartPlacingPieces(float Time);
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void PlacingPieces_End();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Racing_Start(float Time);
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void AddPlayer(AGearPlayerState* InPlayer);
 
 	UFUNCTION(BlueprintImplementableEvent)

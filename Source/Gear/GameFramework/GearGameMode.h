@@ -62,6 +62,11 @@ protected:
 
 	bool IsEveryPlayerSelectedPlaceables();
 	void StartPlaceing(bool bEveryPlayerIsReady);
+	FTimerHandle PlacingTimerHandle;
+
+	bool IsEveryPlayerPlaced();
+	void PlaceUnplaced();
+	void StartRacing(bool bEveryPlayerPlaced);
 
 	bool ShouldAbort();
 

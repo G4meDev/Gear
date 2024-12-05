@@ -63,6 +63,14 @@ void AGearGameMode::Tick(float DeltaSeconds)
 		}
 	}
 
+	else if (GearMatchState == EGearMatchState::Placing)
+	{
+		if (IsEveryPlayerPlaced())
+		{
+			StartRacing(true);
+		}
+	}
+
 	if (ShouldAbort())
 	{
 		AbortMatch();
@@ -123,6 +131,11 @@ bool AGearGameMode::LoadPlaceables()
 
 		for (FPlaceableDescription* Desc : RawHazards)
 		{
+			if (Desc->bDepracated)
+			{
+				continue;
+			}
+
 			TSubclassOf<AGearPlaceable> HazardClass = StaticLoadClass(AGearPlaceable::StaticClass(), nullptr, *Desc->ClassPath);
 			if (IsValid(HazardClass))
 			{
@@ -296,6 +309,7 @@ bool AGearGameMode::IsEveryPlayerSelectedPlaceables()
 void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 {
 	GetWorld()->GetTimerManager().ClearTimer(SelectingPiecesTimerHandle);
+	GetWorld()->GetTimerManager().SetTimer(PlacingTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartRacing, false), UGameVariablesBFL::GV_PlacingTimeLimit(), false);
 
 	if (!bEveryPlayerIsReady)
 	{
@@ -324,6 +338,59 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 
 	UE_LOG(LogTemp, Warning, TEXT("start placing pieces"));
 	SetGearMatchState(EGearMatchState::Placing);
+}
+
+bool AGearGameMode::IsEveryPlayerPlaced()
+{
+	for (APlayerState* Player : GameState->PlayerArray)
+	{
+		AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(Player->GetPawn());
+		if (IsValid(BuilderPawn) && IsValid(BuilderPawn->SelectedPlaceableClass))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void AGearGameMode::PlaceUnplaced()
+{
+	TArray<AGearBuilderPawn*> UnplacedRoadModulePawns;
+
+	for (APlayerState* Player : GameState->PlayerArray)
+	{
+		AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(Player->GetPawn());
+		if (IsValid(BuilderPawn) && BuilderPawn->SelectedPlaceableClass && BuilderPawn->SelectedPlaceableClass->IsChildOf(AGearRoadModule::StaticClass()))
+		{
+			UnplacedRoadModulePawns.Add(BuilderPawn);
+		}
+	}
+
+	for (AGearBuilderPawn* BuilderPawn : UnplacedRoadModulePawns)
+	{
+		AGearPlayerController* GearPlayerController = BuilderPawn->GetController<AGearPlayerController>();
+		TSubclassOf<AGearRoadModule> RoadModuleClass = BuilderPawn->SelectedPlaceableClass->GetAuthoritativeClass();
+		AGearGameState* GearGameState = GetGameState<AGearGameState>();
+
+		if (IsValid(GearPlayerController) && IsValid(GearGameState))
+		{
+			RequestPlaceRoadModuleForPlayer(GearPlayerController, RoadModuleClass, GearGameState->GetRoadStackAttachableSocket(), false);
+		}
+	}
+}
+
+void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
+{
+	GetWorld()->GetTimerManager().ClearTimer(PlacingTimerHandle);
+
+	if (!bEveryPlayerPlaced)
+	{
+		PlaceUnplaced();
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("start racing"));
+	SetGearMatchState(EGearMatchState::Racing);
 }
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()

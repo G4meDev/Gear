@@ -46,15 +46,12 @@ public:
 
 	UPROPERTY()
 	TSubclassOf<AGearPlaceable> Class;
-	
-	UPROPERTY()
-	bool HasBeenSpawned = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ClassPath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool OnlySpawnOne = false;
+	bool bDepracated;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SpawnChance_Round_1 = 10.0f;

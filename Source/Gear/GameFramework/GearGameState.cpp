@@ -63,6 +63,8 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		break;
 
 	case EGearMatchState::Racing:
+		Placing_End();
+		Racing_Start();
 		break;
 
 	case EGearMatchState::Ended:
@@ -128,6 +130,30 @@ void AGearGameState::Placing_Start()
 		if (IsValid(PlayerController) && PlayerController->IsLocalController())
 		{
 			PlayerController->ClientStatePlacing(LastGameStateTransitionTime);
+		}
+	}
+}
+
+void AGearGameState::Placing_End()
+{
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			PlayerController->ClientStatePlacing_Finish();
+		}
+	}
+}
+
+void AGearGameState::Racing_Start()
+{
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			PlayerController->ClientStateRacing_Start(LastGameStateTransitionTime);
 		}
 	}
 }
