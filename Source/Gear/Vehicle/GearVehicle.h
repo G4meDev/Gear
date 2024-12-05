@@ -8,6 +8,8 @@
 
 class AGearGameState;
 class UInputAction;
+class USpringArmComponent;
+class UCameraComponent;
 struct FInputActionInstance;
 
 /**
@@ -29,6 +31,14 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UCameraComponent* Camera;
+
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* SteerActionInput;

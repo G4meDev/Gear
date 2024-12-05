@@ -3,6 +3,9 @@
 
 
 #include "Vehicle/GearVehicle.h"
+#include "GameFramework/SpringarmComponent.h"
+#include "Camera/CameraComponent.h"
+
 #include "GameFramework/GearGameState.h"
 #include "ChaosVehicleMovementComponent.h"
 #include "EnhancedInputComponent.h"
@@ -13,6 +16,13 @@
 
 AGearVehicle::AGearVehicle()
 {
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->bDoCollisionTest = false;
+	CameraBoom->SetupAttachment(GetMesh());
+
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(CameraBoom);
+
 	SteerValue = 0.0f;
 }
 
