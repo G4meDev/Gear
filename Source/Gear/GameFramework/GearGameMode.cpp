@@ -6,6 +6,7 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearBuilderPawn.h"
+#include "Vehicle/GearVehicle.h"
 
 #include "Placeable/GearPlaceable.h"
 #include "Placeable/GearRoadModule.h"
@@ -380,16 +381,53 @@ void AGearGameMode::PlaceUnplaced()
 	}
 }
 
+void AGearGameMode::DestroyBuilderAndSpawnVehicle()
+{
+	for (APlayerState* Player : GameState->PlayerArray)
+	{
+		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(Player);
+		if (IsValid(GearPlayerState) && IsValid(GearPlayerState->VehicleClass))
+		{
+			AActor* SpawnActor = GetWorld()->SpawnActor(GearPlayerState->VehicleClass);
+			AGearVehicle* GearVehicle = Cast<AGearVehicle>(SpawnActor);
+
+			if (!IsValid(GearVehicle))
+			{
+				SpawnActor->Destroy();
+			}
+
+			AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(Player->GetPawn());
+			if (IsValid(BuilderPawn) && IsValid(GearVehicle) && IsValid(BuilderPawn->Controller))
+			{
+				BuilderPawn->Controller->Possess(GearVehicle);
+				BuilderPawn->Destroy();
+			}
+		}
+	}
+}
+
 void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 {
 	GetWorld()->GetTimerManager().ClearTimer(PlacingTimerHandle);
+	GetWorld()->GetTimerManager().SetTimer(RacingWaitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::RacingWaitTimeFinished), 3.0f, false);
 
 	if (!bEveryPlayerPlaced)
 	{
 		PlaceUnplaced();
 	}
 	
+	DestroyBuilderAndSpawnVehicle();
+
 	UE_LOG(LogTemp, Warning, TEXT("start racing"));
+	SetGearMatchState(EGearMatchState::Racing_WaitTime);
+}
+
+void AGearGameMode::RacingWaitTimeFinished()
+{
+	GetWorld()->GetTimerManager().ClearTimer(RacingWaitTimerHandle);
+
+
+
 	SetGearMatchState(EGearMatchState::Racing);
 }
 

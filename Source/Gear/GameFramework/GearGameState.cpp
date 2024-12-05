@@ -62,9 +62,12 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		Placing_Start();
 		break;
 
-	case EGearMatchState::Racing:
+	case EGearMatchState::Racing_WaitTime:
 		Placing_End();
 		Racing_Start();
+		break;
+
+	case EGearMatchState::Racing:
 		break;
 
 	case EGearMatchState::Ended:

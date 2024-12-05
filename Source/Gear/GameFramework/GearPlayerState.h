@@ -7,6 +7,8 @@
 #include "GameFramework/GearTypes.h"
 #include "GearPlayerState.generated.h"
 
+class AGearVehicle;
+
 /**
  * 
  */
@@ -28,6 +30,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AGearVehicle> VehicleClass;
 
 protected:
 

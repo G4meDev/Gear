@@ -66,7 +66,11 @@ protected:
 
 	bool IsEveryPlayerPlaced();
 	void PlaceUnplaced();
+	void DestroyBuilderAndSpawnVehicle();
 	void StartRacing(bool bEveryPlayerPlaced);
+	FTimerHandle RacingWaitTimerHandle;
+
+	void RacingWaitTimeFinished();
 
 	bool ShouldAbort();
 

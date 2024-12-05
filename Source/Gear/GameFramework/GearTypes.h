@@ -17,6 +17,7 @@ enum class EGearMatchState : uint8
 	AllPlayersJoined,
 	SelectingPlaceables,
 	Placing,
+	Racing_WaitTime,
 	Racing,
 	Ended
 };
