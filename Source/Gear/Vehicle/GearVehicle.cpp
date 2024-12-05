@@ -8,6 +8,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 
+#define VEHICLE_TESTMAP_NAME "VehicleTestMap"
+
 
 AGearVehicle::AGearVehicle()
 {
@@ -18,7 +20,9 @@ void AGearVehicle::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+#if WITH_EDITOR
+	bInTestMap = GetWorld()->GetName().Equals(VEHICLE_TESTMAP_NAME);
+#endif
 }
 
 void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -27,7 +31,6 @@ void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	Input->BindAction(SteerActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Steer);
-	//Input->BindAction(MoveScreenAction, ETriggerEvent::Completed, this, &AGearBuilderPawn::MoveScreenInputCompleted);
 }
 
 void AGearVehicle::Input_Steer(const FInputActionInstance& Instance)
@@ -49,8 +52,10 @@ void AGearVehicle::Tick(float DeltaSeconds)
 
 bool AGearVehicle::CanDrive()
 {
-	return true;
-// 	bool RaceStarted = IsValid(GearGameState) ? GearGameState->GearMatchState == EGearMatchState::Racing : false;
-// 	
-// 	return RaceStarted;
+#if WITH_EDITOR
+	if (bInTestMap) return true;
+#endif
+
+	bool RaceStarted = IsValid(GearGameState) ? GearGameState->GearMatchState == EGearMatchState::Racing : false;
+	return RaceStarted;
 }

@@ -388,13 +388,11 @@ void AGearGameMode::DestroyBuilderAndSpawnVehicle()
 		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(Player);
 		if (IsValid(GearPlayerState) && IsValid(GearPlayerState->VehicleClass))
 		{
-			AActor* SpawnActor = GetWorld()->SpawnActor(GearPlayerState->VehicleClass);
-			AGearVehicle* GearVehicle = Cast<AGearVehicle>(SpawnActor);
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			FTransform SpawnTransform = FTransform::Identity;
 
-			if (!IsValid(GearVehicle))
-			{
-				SpawnActor->Destroy();
-			}
+			AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnTransform, SpawnParams);
 
 			AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(Player->GetPawn());
 			if (IsValid(BuilderPawn) && IsValid(GearVehicle) && IsValid(BuilderPawn->Controller))

@@ -39,5 +39,9 @@ protected:
 
 	AGearGameState* GearGameState;
 
+#if WITH_EDITORONLY_DATA
+	bool bInTestMap = false; 
+#endif
+
 private:
 };
