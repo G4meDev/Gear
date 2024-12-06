@@ -33,7 +33,7 @@ void AGearVehicle::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	GearGameState = GetWorld()->GetGameState<AGearGameState>();
 }
 
 void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -104,6 +104,7 @@ bool AGearVehicle::CanDrive()
 	if (bInTestMap) return true;
 #endif
 
-	bool RaceStarted = IsValid(GearGameState) ? GearGameState->GearMatchState == EGearMatchState::Racing : false;
-	return RaceStarted;
+	bool bRaceStarted = IsValid(GearGameState) ? GearGameState->GearMatchState == EGearMatchState::Racing : false;
+
+	return bRaceStarted;
 }

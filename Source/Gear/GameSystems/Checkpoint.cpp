@@ -2,6 +2,7 @@
 
 
 #include "GameSystems/Checkpoint.h"
+#include "GameSystems/VehicleStart.h"
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
 
@@ -19,16 +20,16 @@ ACheckpoint::ACheckpoint()
 	StartLineMesh->SetupAttachment(Root);
 	StartLineMesh->SetRelativeLocation(FVector::UpVector * 1.0f);
 
-	StartPonit_1 = CreateDefaultSubobject<USceneComponent>(TEXT("StartPoint_1"));
+	StartPonit_1 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_1"));
 	StartPonit_1->SetupAttachment(Root);
 
-	StartPonit_2 = CreateDefaultSubobject<USceneComponent>(TEXT("StartPoint_2"));
+	StartPonit_2 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_2"));
 	StartPonit_2->SetupAttachment(Root);
 
-	StartPonit_3 = CreateDefaultSubobject<USceneComponent>(TEXT("StartPoint_3"));
+	StartPonit_3 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_3"));
 	StartPonit_3->SetupAttachment(Root);
 
-	StartPonit_4 = CreateDefaultSubobject<USceneComponent>(TEXT("StartPoint_4"));
+	StartPonit_4 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_4"));
 	StartPonit_4->SetupAttachment(Root);
 
 #if WITH_EDITORONLY_DATA

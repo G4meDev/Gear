@@ -7,6 +7,7 @@
 #include "GameFramework/GearTypes.h"
 #include "GearGameState.generated.h"
 
+class ACheckpoint;
 class UPlaceableSocket;
 class AGearRoadModule;
 class AGearHazard;
@@ -38,9 +39,16 @@ public:
 	UFUNCTION()
 	void OnRep_RoadModuleStack();
 
+	UFUNCTION()
+	void OnRep_CheckpointsStack();
+
 	bool FindStartRoadModuleAndAddToStack();
 
+	bool FindStartCheckpointAndAddToStack();
+
 	UPlaceableSocket* GetRoadStackAttachableSocket();
+
+	ACheckpoint* GetCheckPointAtIndex(int Index);
 
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
@@ -50,6 +58,9 @@ public:
 
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack, BlueprintReadWrite, VisibleInstanceOnly)
 	TArray<AGearRoadModule*> RoadModuleStack;
+
+	UPROPERTY(ReplicatedUsing=OnRep_CheckpointsStack, BlueprintReadWrite, VisibleInstanceOnly)
+	TArray<ACheckpoint*> CheckpointsStack;
 
 protected:
 

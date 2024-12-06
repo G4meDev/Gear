@@ -10,6 +10,8 @@
 #include "Placeable/GearHazard.h"
 #include "Placeable/PlaceableSocket.h"
 
+#include "GameSystems/Checkpoint.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -32,6 +34,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AGearGameState, GearMatchState);
 	DOREPLIFETIME(AGearGameState, LastGameStateTransitionTime);
 	DOREPLIFETIME(AGearGameState, RoadModuleStack);
+	DOREPLIFETIME(AGearGameState, CheckpointsStack);
 }
 
 void AGearGameState::BeginPlay()
@@ -98,6 +101,12 @@ void AGearGameState::OnRep_RoadModuleStack()
 			}
 		}
 	}
+}
+
+void AGearGameState::OnRep_CheckpointsStack()
+{
+
+	
 }
 
 void AGearGameState::AllPlayerJoined_Start()
@@ -177,6 +186,22 @@ bool AGearGameState::FindStartRoadModuleAndAddToStack()
 	return true;
 }
 
+bool AGearGameState::FindStartCheckpointAndAddToStack()
+{
+	TArray<AActor*> AlreadyPlacedCheckpoints;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACheckpoint::StaticClass(), AlreadyPlacedCheckpoints);
+
+	if (AlreadyPlacedCheckpoints.Num() != 1)
+	{
+		UE_LOG(LogTemp, Error, TEXT("only one checkpoint should be placed in level but found %i"), AlreadyPlacedCheckpoints.Num());
+		return false;
+	}
+
+	ACheckpoint* Checkpoint = Cast<ACheckpoint>(AlreadyPlacedCheckpoints[0]);
+	CheckpointsStack.Add(Checkpoint);
+	return true;
+}
+
 UPlaceableSocket* AGearGameState::GetRoadStackAttachableSocket()
 {
 	if (!RoadModuleStack.IsEmpty() && IsValid(RoadModuleStack.Top()))
@@ -185,6 +210,13 @@ UPlaceableSocket* AGearGameState::GetRoadStackAttachableSocket()
 	}
 	
 	return nullptr;
+}
+
+ACheckpoint* AGearGameState::GetCheckPointAtIndex(int Index)
+{
+	check(Index >= 0 && Index < CheckpointsStack.Num());
+	
+	return CheckpointsStack[Index];
 }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)

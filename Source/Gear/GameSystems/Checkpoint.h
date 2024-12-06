@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Checkpoint.generated.h"
 
+class UVehicleStart;
 class UBoxComponent;
 class UArrowComponent;
 
@@ -37,7 +38,7 @@ public:
 	float LongitudinalSeperation;
 
 	UPROPERTY()
-	TArray<USceneComponent*> StartPoints;
+	TArray<UVehicleStart*> StartPoints;
 
 protected:
 
@@ -57,16 +58,16 @@ protected:
 	UStaticMeshComponent* StartLineMesh;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USceneComponent* StartPonit_1;
+	UVehicleStart* StartPonit_1;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USceneComponent* StartPonit_2;
+	UVehicleStart* StartPonit_2;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USceneComponent* StartPonit_3;
+	UVehicleStart* StartPonit_3;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USceneComponent* StartPonit_4;
+	UVehicleStart* StartPonit_4;
 
 #if WITH_EDITORONLY_DATA
 

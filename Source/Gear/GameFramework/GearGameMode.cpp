@@ -8,6 +8,9 @@
 #include "GameFramework/GearBuilderPawn.h"
 #include "Vehicle/GearVehicle.h"
 
+#include "GameSystems/Checkpoint.h"
+#include "GameSystems/VehicleStart.h"
+
 #include "Placeable/GearPlaceable.h"
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/PlaceableSocket.h"
@@ -31,25 +34,37 @@ void AGearGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bool bFailed = false;
+
 	if (!LoadPlaceables())
 	{
 		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards found"));
-		AbortMatch();
+		bFailed = true;
 	}
 
 	if (!LoadPlaceableSpawnPoints())
 	{
 		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards preview spawn point found"));
-		AbortMatch();
+		bFailed = true;
 	}
 
 	AGearGameState* GearGameState = GetGameState<AGearGameState>();
 	if (!GearGameState || !GearGameState->FindStartRoadModuleAndAddToStack())
 	{
 		UE_LOG(LogGameMode, Error, TEXT("finding first raod module failed"));
-		AbortMatch();
+		bFailed = true;
 	}
 
+	if (!GearGameState || !GearGameState->FindStartCheckpointAndAddToStack())
+	{
+		UE_LOG(LogGameMode, Error, TEXT("finding start checkpoint failed"));
+		bFailed = true;
+	}
+
+	if (bFailed)
+	{
+		AbortMatch();
+	}
 }
 
 void AGearGameMode::Tick(float DeltaSeconds)
@@ -381,26 +396,38 @@ void AGearGameMode::PlaceUnplaced()
 	}
 }
 
-void AGearGameMode::DestroyBuilderAndSpawnVehicle()
+void AGearGameMode::DestroyPawns()
 {
 	for (APlayerState* Player : GameState->PlayerArray)
 	{
-		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(Player);
-		if (IsValid(GearPlayerState) && IsValid(GearPlayerState->VehicleClass))
+		if (IsValid(Player->GetPawn()))
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			FTransform SpawnTransform = FTransform::Identity;
-
-			AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnTransform, SpawnParams);
-
-			AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(Player->GetPawn());
-			if (IsValid(BuilderPawn) && IsValid(GearVehicle) && IsValid(BuilderPawn->Controller))
-			{
-				BuilderPawn->Controller->Possess(GearVehicle);
-				BuilderPawn->Destroy();
-			}
+			Player->GetPawn()->Destroy();
 		}
+	}
+}
+
+void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
+{
+	DestroyPawns();
+
+	AGearGameState* GearGameState = GetGameState<AGearGameState>();
+	ACheckpoint* Checkpoint = GearGameState ? GearGameState->GetCheckPointAtIndex(CheckpointIndex) : nullptr;
+
+	check(IsValid(GearGameState) && IsValid(Checkpoint));
+
+	for (int i = 0; i < GearGameState->PlayerArray.Num(); i++)
+	{
+		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(GearGameState->PlayerArray[i]);
+		check(i < Checkpoint->StartPoints.Num() && IsValid(GearPlayerState) && IsValid(GearPlayerState->VehicleClass));
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		FVector SpawnLocation = Checkpoint->StartPoints[i]->GetComponentLocation();
+		FRotator SpawnRotation = Checkpoint->StartPoints[i]->GetComponentRotation();
+
+		AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
+		GearPlayerState->GetPlayerController()->Possess(GearVehicle);
 	}
 }
 
@@ -414,7 +441,7 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 		PlaceUnplaced();
 	}
 	
-	DestroyBuilderAndSpawnVehicle();
+	StartRacingAtCheckpoint(0);
 
 	UE_LOG(LogTemp, Warning, TEXT("start racing"));
 	SetGearMatchState(EGearMatchState::Racing_WaitTime);

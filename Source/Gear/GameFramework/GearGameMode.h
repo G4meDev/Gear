@@ -66,7 +66,8 @@ protected:
 
 	bool IsEveryPlayerPlaced();
 	void PlaceUnplaced();
-	void DestroyBuilderAndSpawnVehicle();
+	void DestroyPawns();
+	void StartRacingAtCheckpoint(int CheckpointIndex);
 	void StartRacing(bool bEveryPlayerPlaced);
 	FTimerHandle RacingWaitTimerHandle;
 
