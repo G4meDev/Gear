@@ -5,6 +5,7 @@
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearBuilderPawn.h"
+#include "GameFramework/GearCameraManager.h"
 
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
@@ -85,7 +86,7 @@ void AGearGameState::OnRep_RoadModuleStack()
 {
 	AGearRoadModule* TopModule = RoadModuleStack.Top();
 
-	if (IsValid(TopModule) && TopModule->bShouldNotifyGameState && !TopModule->bGameStateNotified && GearMatchState == EGearMatchState::Placing)
+	if (IsValid(TopModule) && TopModule->bShouldNotifyGameState && !TopModule->bGameStateNotified)
 	{
 		RoadModuleStack.Top()->bGameStateNotified = true;
 
@@ -97,6 +98,12 @@ void AGearGameState::OnRep_RoadModuleStack()
 				if (IsValid(BuilderPawn))
 				{
 					BuilderPawn->RoadModuleStackChanged();
+				}
+
+				AGearCameraManager* GearCameraManager = Cast<AGearCameraManager>(Iterator->Get()->PlayerCameraManager);
+				if (IsValid(GearCameraManager))
+				{
+					GearCameraManager->RoadModuleStackChanged(RoadModuleStack);
 				}
 			}
 		}
