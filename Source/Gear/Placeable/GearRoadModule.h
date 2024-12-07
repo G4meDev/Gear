@@ -7,6 +7,7 @@
 #include "GearRoadModule.generated.h"
 
 class UPlaceableSocket;
+class USplineComponent;
 
 /**
  * 
@@ -35,6 +36,9 @@ public:
 	UPlaceableSocket* RoadEndSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USplineComponent* RoadSpline;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> RoadModuleMirroredClass;
 
 	UPlaceableSocket* GetAttachableSocket();
@@ -47,8 +51,20 @@ public:
 
 	bool bGameStateNotified;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float RoadLength;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bDirty = false;
+#endif
+
 protected:
 	virtual void BeginPlay() override;
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
 	virtual void PostNetInit() override;
 };

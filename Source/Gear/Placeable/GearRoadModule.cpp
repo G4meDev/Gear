@@ -4,6 +4,7 @@
 #include "Placeable/GearRoadModule.h"
 #include "GameFramework/GearGameState.h"
 #include "Placeable/PlaceableSocket.h"
+#include "Components/SplineComponent.h"
 #include "Net/UnrealNetwork.h"
 
 AGearRoadModule::AGearRoadModule()
@@ -16,7 +17,10 @@ AGearRoadModule::AGearRoadModule()
 	RoadEndSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("EndSocket"));
 	RoadEndSocket->SetupAttachment(Root);
 
-	PreviewScale = 0.1f;
+	RoadSpline = CreateDefaultSubobject<USplineComponent>(TEXT("RoadSpline"));
+	RoadSpline->SetupAttachment(Root);
+
+	PreviewScale = 0.3f;
 	bMirrorX = false;
 
 	bShouldNotifyGameState = false;
@@ -43,6 +47,21 @@ void AGearRoadModule::BeginPlay()
 
 
 }
+
+#if WITH_EDITOR
+void AGearRoadModule::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName ProperyName = PropertyChangedEvent.Property == nullptr ? NAME_None : PropertyChangedEvent.Property->GetFName();
+
+	if (ProperyName == GET_MEMBER_NAME_CHECKED(AGearRoadModule, bDirty))
+	{
+		bDirty = false;
+		RoadLength = RoadSpline->GetSplineLength();
+	}
+}
+#endif
 
 void AGearRoadModule::PostNetInit()
 {

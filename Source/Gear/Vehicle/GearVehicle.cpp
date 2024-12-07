@@ -104,7 +104,9 @@ bool AGearVehicle::CanDrive()
 	if (bInTestMap) return true;
 #endif
 
-	bool bRaceStarted = IsValid(GearGameState) ? GearGameState->GearMatchState == EGearMatchState::Racing : false;
+	return false;
 
-	return bRaceStarted;
+// 	bool bRaceStarted = IsValid(GearGameState) ? GearGameState->GearMatchState == EGearMatchState::Racing : false;
+// 
+// 	return bRaceStarted;
 }
