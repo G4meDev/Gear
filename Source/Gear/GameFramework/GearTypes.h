@@ -111,3 +111,29 @@ enum class EPlayerColorCode : uint8
 	DeepPeach,
 	MAX_COLOR
 };
+
+USTRUCT(BlueprintType)
+struct FCrossTrackProperty
+{
+	GENERATED_BODY()
+
+public:
+	
+	FCrossTrackProperty()
+		: Position(FVector::Zero())
+		, Tangent(FVector::Zero())
+		, Up(FVector::Zero())
+		, Right(FVector::Zero())
+		, FlattenRight(FVector::Zero())
+		, Error(0.0f)
+	{
+
+	}
+
+	FVector Position;
+	FVector Tangent;
+	FVector Up;
+	FVector Right;
+	FVector FlattenRight;
+	float Error;
+};

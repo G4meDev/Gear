@@ -8,6 +8,7 @@
 #include "GameFramework/GearBuilderPawn.h"
 #include "GearHUD.h"
 #include "Placeable/GearPlaceable.h"
+#include "GameSystems/TrackSpline.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"

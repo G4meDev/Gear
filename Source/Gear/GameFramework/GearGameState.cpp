@@ -12,6 +12,7 @@
 #include "Placeable/PlaceableSocket.h"
 
 #include "GameSystems/Checkpoint.h"
+#include "GameSystems/TrackSpline.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -42,7 +43,21 @@ void AGearGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!IsValid(TrackSpline))
+	{
+		TrackSpline = GetWorld()->SpawnActor<ATrackSpline>(ATrackSpline::StaticClass(), FTransform::Identity);
+		check(TrackSpline);
+	}
+}
 
+void AGearGameState::Destroyed()
+{
+	Super::Destroyed();
+
+	if (IsValid(TrackSpline))
+	{
+		TrackSpline->Destroy();
+	}
 }
 
 void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
@@ -100,10 +115,9 @@ void AGearGameState::OnRep_RoadModuleStack()
 					BuilderPawn->RoadModuleStackChanged();
 				}
 
-				AGearCameraManager* GearCameraManager = Cast<AGearCameraManager>(Iterator->Get()->PlayerCameraManager);
-				if (IsValid(GearCameraManager))
+				if (IsValid(TrackSpline))
 				{
-					GearCameraManager->RoadModuleStackChanged(RoadModuleStack);
+					TrackSpline->RoadModuleStackChanged(RoadModuleStack);
 				}
 			}
 		}

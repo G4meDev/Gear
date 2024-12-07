@@ -25,6 +25,9 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_ColorCode, BlueprintReadWrite, EditAnywhere)
 	EPlayerColorCode ColorCode;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	uint8 Position;
+
 	UFUNCTION()
 	virtual void OnRep_ColorCode();
 

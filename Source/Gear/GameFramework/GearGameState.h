@@ -11,6 +11,8 @@ class ACheckpoint;
 class UPlaceableSocket;
 class AGearRoadModule;
 class AGearHazard;
+class ATrackSpline;
+struct FCrossTrackProperty;
 
 /**
  * 
@@ -56,6 +58,9 @@ public:
 	UPROPERTY(Replicated)
 	double LastGameStateTransitionTime;
 
+	UPROPERTY()
+	ATrackSpline* TrackSpline;
+
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack, BlueprintReadWrite, VisibleInstanceOnly)
 	TArray<AGearRoadModule*> RoadModuleStack;
 
@@ -65,6 +70,8 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void Destroyed() override;
 
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;

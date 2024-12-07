@@ -6,8 +6,8 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GearCameraManager.generated.h"
 
-class ATrackSpline;
 class AGearRoadModule;
+class AGearGameState;
 
 /**
  * 
@@ -19,9 +19,7 @@ class GEAR_API AGearCameraManager : public APlayerCameraManager
 	
 public:
 	
-	ATrackSpline* TrackSpline;
-
-	void RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadModulesStack);
+	virtual void Tick( float DeltaSeconds ) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -29,4 +27,6 @@ protected:
 	virtual void InitializeFor(class APlayerController* PC) override;
 
 	virtual void Destroyed() override;
+
+	AGearGameState* GearGameState;
 };

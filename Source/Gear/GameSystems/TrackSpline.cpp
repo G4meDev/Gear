@@ -78,3 +78,18 @@ void ATrackSpline::RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadMod
 
 	Spline->UpdateSpline();
 }
+
+void ATrackSpline::GetTrackPropertiesAtLocation(const FVector& Position, FCrossTrackProperty& CrossTrackProperty)
+{
+	float InputKey = Spline->FindInputKeyClosestToWorldLocation(Position);
+
+	CrossTrackProperty.Position = Spline->GetLocationAtSplineInputKey(InputKey, ESplineCoordinateSpace::World);
+	CrossTrackProperty.Tangent = Spline->GetTangentAtSplineInputKey(InputKey, ESplineCoordinateSpace::World);
+	CrossTrackProperty.Up = Spline->GetUpVectorAtSplineInputKey(InputKey, ESplineCoordinateSpace::World);
+
+	CrossTrackProperty.Right = FVector::CrossProduct(CrossTrackProperty.Up, CrossTrackProperty.Tangent).GetSafeNormal();
+	CrossTrackProperty.FlattenRight = CrossTrackProperty.Right.GetSafeNormal2D();
+
+	FVector NearestToPosition = Position - CrossTrackProperty.Position;
+	CrossTrackProperty.Error = FVector::DotProduct(CrossTrackProperty.FlattenRight, NearestToPosition);
+}

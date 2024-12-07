@@ -41,6 +41,8 @@ protected:
 
 	void UpdateScreenDragValueAndInjectInput();
 
+
+
 public:
 
 	void Tick( float DeltaSeconds ) override;

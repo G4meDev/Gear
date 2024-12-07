@@ -8,6 +8,7 @@
 
 class USplineComponent;
 class AGearRoadModule;
+struct FCrossTrackProperty;
 
 UCLASS()
 class GEAR_API ATrackSpline : public AActor
@@ -27,4 +28,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadModulesStack);
+
+	void GetTrackPropertiesAtLocation(const FVector& Position, FCrossTrackProperty& CrossTrackProperty);
 };
