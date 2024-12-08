@@ -21,6 +21,7 @@ AGearGameState::AGearGameState()
 {
 	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
 
+	LastPlacedCheckpointModuleStackIndex = 0;
 }
 
 void AGearGameState::Tick(float DeltaSeconds)
@@ -122,12 +123,6 @@ void AGearGameState::OnRep_RoadModuleStack()
 			}
 		}
 	}
-}
-
-void AGearGameState::OnRep_CheckpointsStack()
-{
-
-	
 }
 
 void AGearGameState::AllPlayerJoined_Start()

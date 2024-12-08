@@ -30,6 +30,9 @@ public:
 	void MoveToSocket(UPlaceableSocket* TargetSocket, bool InMirrorX);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UStaticMeshComponent* RoadMesh;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UPlaceableSocket* RoadStartSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

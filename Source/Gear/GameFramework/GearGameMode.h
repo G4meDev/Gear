@@ -16,6 +16,7 @@ class AGearGameState;
 class AGearPlayerState;
 class AGearPlaceable;
 class APlaceableSpawnPoint;
+class ACheckpoint;
 
 /**
  * 
@@ -37,6 +38,8 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	AGearGameState* GearGameState;
 
 // ---------------- AGameMode ----------------------------------------------
 
@@ -71,6 +74,10 @@ protected:
 	void StartRacing(bool bEveryPlayerPlaced);
 	FTimerHandle RacingWaitTimerHandle;
 
+	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
+	bool ShouldAddCheckpoint() const;
+	void AddCheckpoint();
+
 	void RacingWaitTimeFinished();
 
 	bool ShouldAbort();
@@ -87,6 +94,15 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UDataTable* PlaceableSpawnRulesDataTable;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AGearRoadModule> CheckpointModuleClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<ACheckpoint> CheckpointClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float CheckpointDistance;
 	
 	TArray<FPlaceableDescription> AvaliablePlaceables;
 	TArray<APlaceableSpawnPoint*> HazardPreviewSpawnPoints;

@@ -55,6 +55,9 @@ ACheckpoint::ACheckpoint()
 	StartPoints.Add(StartPonit_4);
 
 	Init(200.0f, 300.0f, 750.0f, 0.65f, 500.0f);
+
+	bReplicates = true;
+	bAlwaysRelevant = true;
 }
 
 void ACheckpoint::Init(float InWidth, float InHeight, float InLength, float InLateralSeperationRatio, float InLongitudinalSeperation)

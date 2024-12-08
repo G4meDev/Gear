@@ -41,9 +41,6 @@ public:
 	UFUNCTION()
 	void OnRep_RoadModuleStack();
 
-	UFUNCTION()
-	void OnRep_CheckpointsStack();
-
 	bool FindStartRoadModuleAndAddToStack();
 
 	bool FindStartCheckpointAndAddToStack();
@@ -64,8 +61,10 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack, BlueprintReadWrite, VisibleInstanceOnly)
 	TArray<AGearRoadModule*> RoadModuleStack;
 
-	UPROPERTY(ReplicatedUsing=OnRep_CheckpointsStack, BlueprintReadWrite, VisibleInstanceOnly)
+	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
 	TArray<ACheckpoint*> CheckpointsStack;
+
+	int LastPlacedCheckpointModuleStackIndex;
 
 protected:
 
@@ -75,4 +74,5 @@ protected:
 
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;
+
 };

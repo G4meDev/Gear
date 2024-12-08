@@ -11,6 +11,9 @@ AGearRoadModule::AGearRoadModule()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	RoadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RoadMesh"));
+	RoadMesh->SetupAttachment(Root);
+
 	RoadStartSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("StartSocket"));
 	RoadStartSocket->SetupAttachment(Root);
 

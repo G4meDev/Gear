@@ -28,11 +28,16 @@ AGearGameMode::AGearGameMode()
 	bUseSeamlessTravel = true;
 
 	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
+	CheckpointDistance = 1000.0f;
 }
 
 void AGearGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GearGameState = GetGameState<AGearGameState>();
+	check(IsValid(GearGameState));
+
 
 	bool bFailed = false;
 
@@ -48,14 +53,13 @@ void AGearGameMode::BeginPlay()
 		bFailed = true;
 	}
 
-	AGearGameState* GearGameState = GetGameState<AGearGameState>();
-	if (!GearGameState || !GearGameState->FindStartRoadModuleAndAddToStack())
+	if (!GearGameState->FindStartRoadModuleAndAddToStack())
 	{
 		UE_LOG(LogGameMode, Error, TEXT("finding first raod module failed"));
 		bFailed = true;
 	}
 
-	if (!GearGameState || !GearGameState->FindStartCheckpointAndAddToStack())
+	if (!GearGameState->FindStartCheckpointAndAddToStack())
 	{
 		UE_LOG(LogGameMode, Error, TEXT("finding start checkpoint failed"));
 		bFailed = true;
@@ -202,38 +206,82 @@ void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable
 
 void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, TSubclassOf<AGearRoadModule> RoadModule, UPlaceableSocket* TargetSocket, bool bMirrorX)
 {
-	if (GearMatchState == EGearMatchState::Placing && IsValid(RoadModule) && IsValid(TargetSocket) && !TargetSocket->IsOccupied())
+	if (GearMatchState == EGearMatchState::Placing && IsValid(RoadModule) && IsValid(TargetSocket) && GearGameState->GetRoadStackAttachableSocket() == TargetSocket && !TargetSocket->IsOccupied())
 	{
 		// TODO: sweep test
 
-		AGearGameState* GearGameState = GetGameState<AGearGameState>();
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
 
-		if (IsValid(GearGameState) && IsValid(BuilderPawn))
+		if (IsValid(BuilderPawn))
 		{
-			FTransform SpawnTransform;
-
-			AActor* SpawnActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), RoadModule, SpawnTransform);
-			AGearRoadModule* SpawnRoadModule = Cast<AGearRoadModule>(SpawnActor);
-			if (IsValid(SpawnRoadModule))
+			if (IsValid(AddRoadModule(RoadModule, bMirrorX)))
 			{
-				SpawnRoadModule->bMirrorX = bMirrorX;
-				SpawnRoadModule->bShouldNotifyGameState = true;
-				SetOwner(GetOwner());
-				UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
-
-				SpawnRoadModule->MoveToSocket(TargetSocket, bMirrorX);
-				GearGameState->RoadModuleStack.Add(SpawnRoadModule);
-				GearGameState->OnRep_RoadModuleStack();
-
 				BuilderPawn->SelectedPlaceableClass = nullptr;
-				BuilderPawn->OnRep_SelectedPlaceableClass();
+				BuilderPawn->OnRep_SelectedPlaceableClass();				
 			}
-			else
+
+			if (ShouldAddCheckpoint())
 			{
-				SpawnActor->Destroy();
+				AddCheckpoint();
 			}
 		}
+	}
+}
+
+AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX)
+{
+	FTransform SpawnTransform;
+
+	AActor* SpawnActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), RoadModule, SpawnTransform);
+	AGearRoadModule* SpawnRoadModule = Cast<AGearRoadModule>(SpawnActor);
+
+	if (IsValid(SpawnRoadModule))
+	{
+		SpawnRoadModule->bMirrorX = bMirrorX;
+		SpawnRoadModule->bShouldNotifyGameState = true;
+		SetOwner(GetOwner());
+		UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
+
+		SpawnRoadModule->MoveToSocket(GearGameState->GetRoadStackAttachableSocket(), bMirrorX);
+		GearGameState->RoadModuleStack.Add(SpawnRoadModule);
+		GearGameState->OnRep_RoadModuleStack();
+
+		return SpawnRoadModule;
+	}
+
+	else if (IsValid(SpawnActor))
+	{
+		SpawnActor->Destroy();
+	}
+
+	return nullptr;
+}
+
+bool AGearGameMode::ShouldAddCheckpoint() const
+{
+	float DistanceFromLastCheckpoint = 0;
+	for (int i = GearGameState->LastPlacedCheckpointModuleStackIndex + 1; i < GearGameState->RoadModuleStack.Num(); i++)
+	{
+		check(IsValid(GearGameState->RoadModuleStack[i]));
+		DistanceFromLastCheckpoint += GearGameState->RoadModuleStack[i]->RoadLength;	
+	}
+
+	return DistanceFromLastCheckpoint > CheckpointDistance;
+}
+
+void AGearGameMode::AddCheckpoint()
+{
+	check(IsValid(CheckpointModuleClass) && IsValid(CheckpointClass));
+
+	AGearRoadModule* Module = AddRoadModule(CheckpointModuleClass, false);
+	if (IsValid(Module))
+	{
+		FTransform SocketTransform = Module->RoadMesh->GetSocketTransform(TEXT("Checkpoint"));
+		ACheckpoint* Checkpoint = GetWorld()->SpawnActor<ACheckpoint>(CheckpointClass, SocketTransform.GetLocation(), SocketTransform.Rotator());
+		
+		check(Checkpoint);
+		GearGameState->CheckpointsStack.Add(Checkpoint);
+		GearGameState->LastPlacedCheckpointModuleStackIndex = GearGameState->RoadModuleStack.Num() - 1;
 	}
 }
 
@@ -246,13 +294,9 @@ void AGearGameMode::HandleMatchAborted()
 
 void AGearGameMode::SetGearMatchState(EGearMatchState InGearMatchState)
 {
-	AGearGameState* GearGameState = GetGameState<AGearGameState>();
-	if (IsValid(GearGameState))
-	{
-		GearGameState->GearMatchState = InGearMatchState;
-		GearGameState->LastGameStateTransitionTime = GearGameState->GetServerWorldTimeSeconds();
-		GearGameState->OnRep_GearMatchState(GearMatchState);
-	}
+	GearGameState->GearMatchState = InGearMatchState;
+	GearGameState->LastGameStateTransitionTime = GearGameState->GetServerWorldTimeSeconds();
+	GearGameState->OnRep_GearMatchState(GearMatchState);
 
 	GearMatchState = InGearMatchState;
 }
@@ -332,18 +376,14 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 		AssignPlaceablesToUnowningPlayers();
 	}
 
-	AGearGameState* GearGameState = GetGameState<AGearGameState>();
-	if (IsValid(GearGameState))
+	for (APlayerState* PlayerState : GearGameState->PlayerArray)
 	{
-		for (APlayerState* PlayerState : GearGameState->PlayerArray)
+		AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(PlayerState->GetPawn());
+		if (IsValid(BuilderPawn) && BuilderPawn->HasSelectedPlaceable())
 		{
-			AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(PlayerState->GetPawn());
-			if (IsValid(BuilderPawn) && BuilderPawn->HasSelectedPlaceable())
-			{
-				BuilderPawn->SelectedPlaceableClass = BuilderPawn->SelectedPlaceable->GetClass();
-				BuilderPawn->SelectedPlaceable = nullptr;
-				BuilderPawn->OnRep_SelectedPlaceableClass();
-			}
+			BuilderPawn->SelectedPlaceableClass = BuilderPawn->SelectedPlaceable->GetClass();
+			BuilderPawn->SelectedPlaceable = nullptr;
+			BuilderPawn->OnRep_SelectedPlaceableClass();
 		}
 	}
 
@@ -387,9 +427,8 @@ void AGearGameMode::PlaceUnplaced()
 	{
 		AGearPlayerController* GearPlayerController = BuilderPawn->GetController<AGearPlayerController>();
 		TSubclassOf<AGearRoadModule> RoadModuleClass = BuilderPawn->SelectedPlaceableClass->GetAuthoritativeClass();
-		AGearGameState* GearGameState = GetGameState<AGearGameState>();
 
-		if (IsValid(GearPlayerController) && IsValid(GearGameState))
+		if (IsValid(GearPlayerController))
 		{
 			RequestPlaceRoadModuleForPlayer(GearPlayerController, RoadModuleClass, GearGameState->GetRoadStackAttachableSocket(), false);
 		}
@@ -411,10 +450,9 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 {
 	DestroyPawns();
 
-	AGearGameState* GearGameState = GetGameState<AGearGameState>();
-	ACheckpoint* Checkpoint = GearGameState ? GearGameState->GetCheckPointAtIndex(CheckpointIndex) : nullptr;
+	ACheckpoint* Checkpoint = GearGameState->GetCheckPointAtIndex(CheckpointIndex);
 
-	check(IsValid(GearGameState) && IsValid(Checkpoint));
+	check(IsValid(Checkpoint));
 
 	for (int i = 0; i < GearGameState->PlayerArray.Num(); i++)
 	{
