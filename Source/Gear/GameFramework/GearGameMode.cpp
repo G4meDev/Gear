@@ -454,6 +454,7 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 
 	check(IsValid(Checkpoint));
 
+	GearGameState->Vehicles.Empty(4);
 	for (int i = 0; i < GearGameState->PlayerArray.Num(); i++)
 	{
 		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(GearGameState->PlayerArray[i]);
@@ -466,6 +467,7 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 
 		AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
 		GearPlayerState->GetPlayerController()->Possess(GearVehicle);
+		GearGameState->Vehicles.Add(GearVehicle);
 	}
 }
 

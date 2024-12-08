@@ -30,4 +30,6 @@ public:
 	void RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadModulesStack);
 
 	void GetTrackPropertiesAtLocation(const FVector& Position, FCrossTrackProperty& CrossTrackProperty);
+
+	float GetTrackDistanceAtPosition(const FVector& Position);
 };

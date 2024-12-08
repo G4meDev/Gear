@@ -11,6 +11,8 @@ void AGearCameraManager::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	
+	
 // 	APlayerController* PlayerController = GetOwningPlayerController();
 // 	AGearVehicle* GearVehicle = PlayerController ? PlayerController->GetPawn<AGearVehicle>() : nullptr;
 // 

@@ -10,7 +10,6 @@ AGearPlayerState::AGearPlayerState()
 {
 	ColorCode = EPlayerColorCode::Black;
 	OnRep_ColorCode();
-	Position = -1;
 }
 
 void AGearPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

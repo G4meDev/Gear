@@ -8,6 +8,7 @@
 #include "GearGameState.generated.h"
 
 class ACheckpoint;
+class AGearVehicle;
 class UPlaceableSocket;
 class AGearRoadModule;
 class AGearHazard;
@@ -64,7 +65,12 @@ public:
 	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
 	TArray<ACheckpoint*> CheckpointsStack;
 
+	UPROPERTY(Replicated)
+	TArray<AGearVehicle*> Vehicles;
+
 	int LastPlacedCheckpointModuleStackIndex;
+
+	float FurthestReachedDistace;
 
 protected:
 
@@ -72,7 +78,8 @@ protected:
 
 	virtual void Destroyed() override;
 
+	void SortPlayersPosition();
+
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;
-
 };

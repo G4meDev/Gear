@@ -14,6 +14,8 @@
 #include "GameSystems/Checkpoint.h"
 #include "GameSystems/TrackSpline.h"
 
+#include "Vehicle/GearVehicle.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -22,12 +24,20 @@ AGearGameState::AGearGameState()
 	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
 
 	LastPlacedCheckpointModuleStackIndex = 0;
+	FurthestReachedDistace = 0;
 }
 
 void AGearGameState::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	
+	for (AGearVehicle* Vehicle : Vehicles)
+	{
+		if (IsValid(Vehicle))
+		{
+			FurthestReachedDistace = FMath::Max(FurthestReachedDistace, Vehicle->DistanaceAlongTrack);
+		}
+	}
 }
 
 void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
@@ -38,6 +48,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AGearGameState, LastGameStateTransitionTime);
 	DOREPLIFETIME(AGearGameState, RoadModuleStack);
 	DOREPLIFETIME(AGearGameState, CheckpointsStack);
+	DOREPLIFETIME(AGearGameState, Vehicles);
 }
 
 void AGearGameState::BeginPlay()

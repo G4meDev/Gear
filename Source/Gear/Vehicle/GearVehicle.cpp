@@ -3,10 +3,10 @@
 
 
 #include "Vehicle/GearVehicle.h"
-#include "GameFramework/SpringarmComponent.h"
-#include "Camera/CameraComponent.h"
 
 #include "GameFramework/GearGameState.h"
+#include "Vehicle/VehicleCamera.h"
+#include "GameSystems/TrackSpline.h"
 #include "ChaosVehicleMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
@@ -16,17 +16,10 @@
 
 AGearVehicle::AGearVehicle()
 {
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->bDoCollisionTest = false;
-	CameraBoom->SetupAttachment(GetMesh());
-
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(CameraBoom);
-
 	SteerValue = 0.0f;
 
 	bAlwaysRelevant = true;
-
+	DistanaceAlongTrack = 0;
 }
 
 void AGearVehicle::BeginPlay()
@@ -34,6 +27,62 @@ void AGearVehicle::BeginPlay()
 	Super::BeginPlay();
 
 	GearGameState = GetWorld()->GetGameState<AGearGameState>();
+
+
+}
+
+// only server
+void AGearVehicle::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+}
+
+// server and owning client
+void AGearVehicle::NotifyControllerChanged()
+{
+	Super::NotifyControllerChanged();
+
+
+}
+
+void AGearVehicle::BecomeViewTarget(APlayerController* PC)
+{
+	Super::BecomeViewTarget(PC);
+
+	InitCamera();
+}
+
+void AGearVehicle::Destroyed()
+{
+	Super::Destroyed();
+
+	if (IsLocallyControlled())
+	{
+		if (IsValid(VehicleCamera))
+		{
+			VehicleCamera->Destroy();
+		}
+	}
+}
+
+void AGearVehicle::InitCamera()
+{
+	VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
+	UpdateCamera();
+	VehicleCamera->MarkTeleport();
+
+	APlayerController* PC = GetController<APlayerController>();
+	check(PC);
+	PC->SetViewTarget(VehicleCamera);
+}
+
+void AGearVehicle::UpdateCamera()
+{
+	if (IsValid(VehicleCamera))
+	{	
+		VehicleCamera->SetActorLocation(GetActorLocation());
+	}
 }
 
 void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -41,7 +90,8 @@ void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 #if WITH_EDITOR
-	bInTestMap = GetWorld()->GetName().Equals(VEHICLE_TESTMAP_NAME);
+	//bInTestMap = GetWorld()->GetName().Equals(VEHICLE_TESTMAP_NAME);
+	bInTestMap = true;
 #endif
 
 	if (IsLocallyControlled())
@@ -81,6 +131,8 @@ void AGearVehicle::Tick(float DeltaSeconds)
 	
 	if (IsLocallyControlled())
 	{
+		UpdateCamera();
+
 		GetVehicleMovementComponent()->SetSteeringInput(SteerValue);
 
 		if (CanDrive())
@@ -96,6 +148,9 @@ void AGearVehicle::Tick(float DeltaSeconds)
 		}
 #endif
 	}
+
+
+	DistanaceAlongTrack = GearGameState->TrackSpline->GetTrackDistanceAtPosition(GetActorLocation());
 }
 
 bool AGearVehicle::CanDrive()

@@ -8,8 +8,7 @@
 
 class AGearGameState;
 class UInputAction;
-class USpringArmComponent;
-class UCameraComponent;
+class AVehicleCamera;
 struct FInputActionInstance;
 
 /**
@@ -28,17 +27,28 @@ public:
 
 	bool CanDrive();
 
+	float DistanaceAlongTrack;
+
 protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void NotifyControllerChanged() override;
+
+	virtual void BecomeViewTarget(APlayerController* PC);
+
+	virtual void Destroyed() override;
+
+	void InitCamera();
+
+	void UpdateCamera();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USpringArmComponent* CameraBoom;
+	TSubclassOf<AVehicleCamera> VehicleCameraClass;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UCameraComponent* Camera;
-
+	AVehicleCamera* VehicleCamera;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* SteerActionInput;
@@ -61,6 +71,7 @@ protected:
 
 	float ThrottleValue;
 	float BrakeValue;
+
 
 	bool bInTestMap = false; 
 #endif
