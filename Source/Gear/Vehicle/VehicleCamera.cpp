@@ -28,8 +28,10 @@ void AVehicleCamera::UpdateCamera()
 {
 	if (IsValid(GearGameState))
 	{
-		FVector WorldPos = GearGameState->TrackSpline->GetTrackLocationAtDistance(GearGameState->FurthestReachedDistace);
-		SetActorLocation(WorldPos);
+		FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(GearGameState->FurthestReachedDistace);
+		
+		SetActorLocation(TrackTransform.GetLocation());
+		SetActorRotation(TrackTransform.Rotator());
 	}
 }
 

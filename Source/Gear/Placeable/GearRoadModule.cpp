@@ -110,8 +110,6 @@ void AGearRoadModule::MoveToSocket(UPlaceableSocket* TargetSocket, bool InMirror
 		FRotator TargetRotation = TargetSocketTransform.Rotator();
 
 		FVector DebugStart = TargetLocation + FVector::UpVector * 20;
-
-		DrawDebugLine(GetWorld(), DebugStart, DebugStart + TargetRotation.Vector() * 50.0f, FColor::Red, false, 2, 0, 20);
 		
 		if (bMirrorX)
 		{

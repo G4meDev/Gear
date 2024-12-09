@@ -94,9 +94,9 @@ void ATrackSpline::GetTrackPropertiesAtLocation(const FVector& Position, FCrossT
 	CrossTrackProperty.Error = FVector::DotProduct(CrossTrackProperty.FlattenRight, NearestToPosition);
 }
 
-FVector ATrackSpline::GetTrackLocationAtDistance(float Distance)
+FTransform ATrackSpline::GetTrackTransfsormAtDistance(float Distance)
 {
-	return Spline->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+	return Spline->GetTransformAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
 }
 
 float ATrackSpline::GetTrackDistanceAtPosition(const FVector& Position)

@@ -27,10 +27,13 @@ AGearPlaceable::AGearPlaceable()
 
 	SelectionIndicator = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectionIndicator"));
 	SelectionIndicator->SetupAttachment(PreviewRotationPivot);
+	SelectionIndicator->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SelectionIndicator->SetIsReplicated(true);
 
 	PlaceableState = EPlaceableState::Idle;
 	PreviewScale = 1.0f;
+
+	bEnabledSelectionBox = true;
 
 	bReplicates = true;
 	SetReplicateMovement(true);
@@ -55,6 +58,7 @@ void AGearPlaceable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(AGearPlaceable, OwningPlayer);
 	DOREPLIFETIME(AGearPlaceable, PlaceableState);
+	DOREPLIFETIME(AGearPlaceable, bEnabledSelectionBox);
 }
 
 void AGearPlaceable::BeginPlay()
@@ -69,6 +73,8 @@ void AGearPlaceable::BeginPlay()
 
 void AGearPlaceable::SelectionBoxClicked()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Selected %s"), *GetName());
+
 	if (PlaceableState == EPlaceableState::Preview)
 	{
 		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
@@ -153,6 +159,14 @@ void AGearPlaceable::OnRep_OwningPlayer()
 	else
 	{
 		SetSelectedBy(OwningPlayer);
+	}
+}
+
+void AGearPlaceable::OnRep_EnabledSelectionBox()
+{
+	if (!bEnabledSelectionBox)
+	{
+		SelectionHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

@@ -151,6 +151,11 @@ void AGearVehicle::Tick(float DeltaSeconds)
 
 
 	UpdateDistanceAlongTrack();
+
+	if (HasAuthority())
+	{
+		
+	}
 }
 
 bool AGearVehicle::CanDrive()
@@ -169,4 +174,23 @@ bool AGearVehicle::CanDrive()
 void AGearVehicle::UpdateDistanceAlongTrack()
 {
 	DistanaceAlongTrack = GearGameState->TrackSpline->GetTrackDistanceAtPosition(GetActorLocation());
+
+	if (HasAuthority())
+	{
+		if (IsOutsideTrack())
+		{
+			Killed();
+		}
+	}
+}
+
+bool AGearVehicle::IsOutsideTrack() const
+{
+	FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(DistanaceAlongTrack);
+	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -200.0f;
+}
+
+void AGearVehicle::Killed()
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s Killed"), *GetName());
 }

@@ -64,6 +64,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float PreviewScale;
 
+	UFUNCTION()
+	void OnRep_EnabledSelectionBox();
+
+	UPROPERTY(ReplicatedUsing=OnRep_EnabledSelectionBox, BlueprintReadWrite, EditAnywhere)
+	bool bEnabledSelectionBox;
+
 	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
 
 	void AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint);

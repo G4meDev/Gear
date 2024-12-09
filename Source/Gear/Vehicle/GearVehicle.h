@@ -45,6 +45,10 @@ protected:
 
 	void InitCamera();
 
+	bool IsOutsideTrack() const;
+
+	void Killed();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AVehicleCamera> VehicleCameraClass;
 
