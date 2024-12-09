@@ -24,7 +24,7 @@ AGearGameState::AGearGameState()
 	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
 
 	LastPlacedCheckpointModuleStackIndex = 0;
-	FurthestReachedDistace = 0;
+	FurthestReachedDistace = 0.0f;
 }
 
 void AGearGameState::Tick(float DeltaSeconds)
@@ -33,10 +33,7 @@ void AGearGameState::Tick(float DeltaSeconds)
 	
 	for (AGearVehicle* Vehicle : Vehicles)
 	{
-		if (IsValid(Vehicle))
-		{
-			FurthestReachedDistace = FMath::Max(FurthestReachedDistace, Vehicle->DistanaceAlongTrack);
-		}
+		UpdateFurthestDistanceWithVehicle(Vehicle);
 	}
 }
 
@@ -69,6 +66,14 @@ void AGearGameState::Destroyed()
 	if (IsValid(TrackSpline))
 	{
 		TrackSpline->Destroy();
+	}
+}
+
+void AGearGameState::UpdateFurthestDistanceWithVehicle(AGearVehicle* GearVehicle)
+{
+	if (IsValid(GearVehicle))
+	{
+		FurthestReachedDistace = FMath::Max(FurthestReachedDistace, GearVehicle->DistanaceAlongTrack);
 	}
 }
 
@@ -210,6 +215,7 @@ bool AGearGameState::FindStartRoadModuleAndAddToStack()
 
 	AGearRoadModule* Module = Cast<AGearRoadModule>(AlreadyPlacedRoadModules[0]);
 	RoadModuleStack.Add(Module);
+	
 	return true;
 }
 

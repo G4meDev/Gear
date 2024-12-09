@@ -27,6 +27,8 @@ public:
 
 	bool CanDrive();
 
+	void UpdateDistanceAlongTrack();
+
 	float DistanaceAlongTrack;
 
 protected:
@@ -42,8 +44,6 @@ protected:
 	virtual void Destroyed() override;
 
 	void InitCamera();
-
-	void UpdateCamera();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AVehicleCamera> VehicleCameraClass;

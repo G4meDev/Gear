@@ -27,8 +27,10 @@ void AGearVehicle::BeginPlay()
 	Super::BeginPlay();
 
 	GearGameState = GetWorld()->GetGameState<AGearGameState>();
+	check(GearGameState);
 
-
+	UpdateDistanceAlongTrack();
+	GearGameState->UpdateFurthestDistanceWithVehicle(this);
 }
 
 // only server
@@ -50,7 +52,14 @@ void AGearVehicle::BecomeViewTarget(APlayerController* PC)
 {
 	Super::BecomeViewTarget(PC);
 
-	InitCamera();
+	if (PC->IsLocalController())
+	{
+		if(IsValid(VehicleCamera))
+			PC->SetViewTarget(VehicleCamera);
+
+		else
+			GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AGearVehicle::InitCamera));
+	}
 }
 
 void AGearVehicle::Destroyed()
@@ -68,20 +77,13 @@ void AGearVehicle::Destroyed()
 
 void AGearVehicle::InitCamera()
 {
-	VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
-	UpdateCamera();
-	VehicleCamera->MarkTeleport();
+	if (!IsValid(VehicleCamera))
+	{
+		VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
 
-	APlayerController* PC = GetController<APlayerController>();
-	check(PC);
-	PC->SetViewTarget(VehicleCamera);
-}
-
-void AGearVehicle::UpdateCamera()
-{
-	if (IsValid(VehicleCamera))
-	{	
-		VehicleCamera->SetActorLocation(GetActorLocation());
+		APlayerController* PC = GetController<APlayerController>();
+		check(PC);
+		PC->SetViewTarget(VehicleCamera);
 	}
 }
 
@@ -131,8 +133,6 @@ void AGearVehicle::Tick(float DeltaSeconds)
 	
 	if (IsLocallyControlled())
 	{
-		UpdateCamera();
-
 		GetVehicleMovementComponent()->SetSteeringInput(SteerValue);
 
 		if (CanDrive())
@@ -150,7 +150,7 @@ void AGearVehicle::Tick(float DeltaSeconds)
 	}
 
 
-	DistanaceAlongTrack = GearGameState->TrackSpline->GetTrackDistanceAtPosition(GetActorLocation());
+	UpdateDistanceAlongTrack();
 }
 
 bool AGearVehicle::CanDrive()
@@ -164,4 +164,9 @@ bool AGearVehicle::CanDrive()
 	bool bRaceStarted = IsValid(GearGameState) ? GearGameState->GearMatchState == EGearMatchState::Racing : false;
 
 	return bRaceStarted;
+}
+
+void AGearVehicle::UpdateDistanceAlongTrack()
+{
+	DistanaceAlongTrack = GearGameState->TrackSpline->GetTrackDistanceAtPosition(GetActorLocation());
 }

@@ -31,5 +31,7 @@ public:
 
 	void GetTrackPropertiesAtLocation(const FVector& Position, FCrossTrackProperty& CrossTrackProperty);
 
+	FVector GetTrackLocationAtDistance(float Distance);
+
 	float GetTrackDistanceAtPosition(const FVector& Position);
 };

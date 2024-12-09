@@ -6,7 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "VehicleCamera.generated.h"
 
-class USpringArmComponent;
+class AGearGameState;
+class UVehicleSpringArm;
 class UCameraComponent;
 
 UCLASS()
@@ -17,7 +18,7 @@ class GEAR_API AVehicleCamera : public AActor
 public:	
 	AVehicleCamera();
 
-	void MarkTeleport();
+	void UpdateCamera();
 
 protected:
 	virtual void BeginPlay() override;
@@ -26,13 +27,15 @@ protected:
 	USceneComponent* Root;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USpringArmComponent* CameraBoom;
+	UVehicleSpringArm* CameraBoom;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UCameraComponent* Camera;
 
+	UPROPERTY()
+	AGearGameState* GearGameState;
+
+
 public:	
 	virtual void Tick(float DeltaTime) override;
-
-	void ClearTeleport();
 };

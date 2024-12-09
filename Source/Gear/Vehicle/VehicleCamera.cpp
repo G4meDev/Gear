@@ -2,17 +2,21 @@
 
 
 #include "Vehicle/VehicleCamera.h"
-#include "GameFramework/SpringarmComponent.h"
+#include "GameFramework/GearGameState.h"
+#include "GameSystems/TrackSpline.h"
+#include "Vehicle/VehicleSpringArm.h"
 #include "Camera/CameraComponent.h"
+
 
 AVehicleCamera::AVehicleCamera()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = ETickingGroup::TG_PostPhysics;
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom = CreateDefaultSubobject<UVehicleSpringArm>(TEXT("CameraBoom"));
 	CameraBoom->bDoCollisionTest = false;
 	CameraBoom->SetupAttachment(Root);
 
@@ -20,28 +24,27 @@ AVehicleCamera::AVehicleCamera()
 	Camera->SetupAttachment(CameraBoom);
 }
 
-void AVehicleCamera::MarkTeleport()
+void AVehicleCamera::UpdateCamera()
 {
-	CameraBoom->bEnableCameraLag = false;
-	CameraBoom->bEnableCameraRotationLag = false;
-
-	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AVehicleCamera::ClearTeleport));
+	if (IsValid(GearGameState))
+	{
+		FVector WorldPos = GearGameState->TrackSpline->GetTrackLocationAtDistance(GearGameState->FurthestReachedDistace);
+		SetActorLocation(WorldPos);
+	}
 }
 
 void AVehicleCamera::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GearGameState = GetWorld()->GetGameState<AGearGameState>();
+ 	UpdateCamera();
+	CameraBoom->TeleportToDesireLocation();
 }
 
 void AVehicleCamera::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime);	
 
-}
-
-void AVehicleCamera::ClearTeleport()
-{
-	CameraBoom->bEnableCameraLag = true;
-	CameraBoom->bEnableCameraRotationLag = true;
+	UpdateCamera();
 }

@@ -35,6 +35,7 @@ public:
 	void Placing_End();
 	void Racing_Start();
 
+	void UpdateFurthestDistanceWithVehicle(AGearVehicle* GearVehicle);
 
 	UFUNCTION()
 	void OnRep_GearMatchState(EGearMatchState OldState);
