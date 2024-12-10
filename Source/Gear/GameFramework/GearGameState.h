@@ -7,6 +7,7 @@
 #include "GameFramework/GearTypes.h"
 #include "GearGameState.generated.h"
 
+class AGearPlayerState;
 class ACheckpoint;
 class AGearVehicle;
 class UPlaceableSocket;
@@ -14,6 +15,26 @@ class AGearRoadModule;
 class AGearHazard;
 class ATrackSpline;
 struct FCrossTrackProperty;
+
+USTRUCT(BlueprintType)
+struct FCheckpointResult 
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TArray<AGearPlayerState*> PlayerList;
+
+	AGearPlayerState* operator[](int i)
+	{
+		return PlayerList[i];
+	}
+
+	void Add(AGearPlayerState* PlayerState)
+	{
+		PlayerList.Add(PlayerState);
+	}
+};
 
 /**
  * 
@@ -51,6 +72,9 @@ public:
 
 	ACheckpoint* GetCheckPointAtIndex(int Index);
 
+	void ClearCheckpointResults();
+	void VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint);
+
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
 
@@ -68,6 +92,9 @@ public:
 
 	UPROPERTY(Replicated)
 	TArray<AGearVehicle*> Vehicles;
+
+	UPROPERTY(Replicated)
+	TArray<FCheckpointResult> CheckpointResults;
 
 	int LastPlacedCheckpointModuleStackIndex;
 

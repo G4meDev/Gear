@@ -20,6 +20,7 @@ AGearVehicle::AGearVehicle()
 
 	bAlwaysRelevant = true;
 	DistanaceAlongTrack = 0;
+	TargetCheckpoint = 1;
 }
 
 void AGearVehicle::BeginPlay()
@@ -45,46 +46,13 @@ void AGearVehicle::NotifyControllerChanged()
 {
 	Super::NotifyControllerChanged();
 
-
-}
-
-void AGearVehicle::BecomeViewTarget(APlayerController* PC)
-{
-	Super::BecomeViewTarget(PC);
-
-	if (PC->IsLocalController())
-	{
-		if(IsValid(VehicleCamera))
-			PC->SetViewTarget(VehicleCamera);
-
-		else
-			GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AGearVehicle::InitCamera));
-	}
 }
 
 void AGearVehicle::Destroyed()
 {
 	Super::Destroyed();
 
-	if (IsLocallyControlled())
-	{
-		if (IsValid(VehicleCamera))
-		{
-			VehicleCamera->Destroy();
-		}
-	}
-}
 
-void AGearVehicle::InitCamera()
-{
-	if (!IsValid(VehicleCamera))
-	{
-		VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
-
-		APlayerController* PC = GetController<APlayerController>();
-		check(PC);
-		PC->SetViewTarget(VehicleCamera);
-	}
 }
 
 void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -154,7 +122,10 @@ void AGearVehicle::Tick(float DeltaSeconds)
 
 	if (HasAuthority())
 	{
-		
+		if (IsOutsideTrack())
+		{
+			Killed();
+		}
 	}
 }
 
@@ -174,14 +145,6 @@ bool AGearVehicle::CanDrive()
 void AGearVehicle::UpdateDistanceAlongTrack()
 {
 	DistanaceAlongTrack = GearGameState->TrackSpline->GetTrackDistanceAtPosition(GetActorLocation());
-
-	if (HasAuthority())
-	{
-		if (IsOutsideTrack())
-		{
-			Killed();
-		}
-	}
 }
 
 bool AGearVehicle::IsOutsideTrack() const
@@ -190,7 +153,11 @@ bool AGearVehicle::IsOutsideTrack() const
 	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -200.0f;
 }
 
+// on server
 void AGearVehicle::Killed()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s Killed"), *GetName());
+
+	GearGameState->Vehicles.Remove(this);
+	Destroy();
 }

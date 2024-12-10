@@ -10,6 +10,7 @@ class AGearPlayerState;
 class AGearPlaceable;
 class AGearRoadModule;
 class UPlaceableSocket;
+class AVehicleCamera;
 class AGearHUD;
 class UInputMappingContext;
 class UInputAction;
@@ -41,7 +42,11 @@ protected:
 
 	void UpdateScreenDragValueAndInjectInput();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AVehicleCamera> VehicleCameraClass;
 
+	UPROPERTY()
+	AVehicleCamera* VehicleCamera;
 
 public:
 
@@ -73,5 +78,6 @@ public:
 	void ClientStatePlacing_Finish();
 	
 	void ClientStateRacing_Start(float StateStartTime);
+	void ClientStateRacing_End(float StateStartTime);
 
 };

@@ -280,6 +280,7 @@ void AGearGameMode::AddCheckpoint()
 	{
 		FTransform SocketTransform = Module->RoadMesh->GetSocketTransform(TEXT("Checkpoint"));
 		ACheckpoint* Checkpoint = GetWorld()->SpawnActor<ACheckpoint>(CheckpointClass, SocketTransform.GetLocation(), SocketTransform.Rotator());
+		Checkpoint->CheckpointIndex = GearGameState->CheckpointsStack.Num();
 		
 		check(Checkpoint);
 		GearGameState->CheckpointsStack.Add(Checkpoint);
@@ -482,7 +483,9 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 	{
 		PlaceUnplaced();
 	}
-	
+
+	GearGameState->ClearCheckpointResults();
+
 	StartRacingAtCheckpoint(0);
 
 	UE_LOG(LogTemp, Warning, TEXT("start racing"));

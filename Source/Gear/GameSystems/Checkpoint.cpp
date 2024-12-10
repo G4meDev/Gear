@@ -3,6 +3,8 @@
 
 #include "GameSystems/Checkpoint.h"
 #include "GameSystems/VehicleStart.h"
+#include "GameFramework/GearGameState.h"
+#include "Vehicle/GearVehicle.h"
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
 
@@ -13,12 +15,17 @@ ACheckpoint::ACheckpoint()
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
-	LapHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("LappHitbox"));
+	LapHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("LapHitbox"));
 	LapHitbox->SetupAttachment(Root);
+	LapHitbox->SetGenerateOverlapEvents(true);
+	LapHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	LapHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	LapHitbox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECR_Overlap);
 
 	StartLineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StartLineMesh"));
 	StartLineMesh->SetupAttachment(Root);
 	StartLineMesh->SetRelativeLocation(FVector::UpVector * 1.0f);
+	StartLineMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	StartPonit_1 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_1"));
 	StartPonit_1->SetupAttachment(Root);
@@ -55,6 +62,8 @@ ACheckpoint::ACheckpoint()
 	StartPoints.Add(StartPonit_4);
 
 	Init(200.0f, 300.0f, 750.0f, 0.65f, 500.0f);
+
+	CheckpointIndex = 0;
 
 	bReplicates = true;
 	bAlwaysRelevant = true;
@@ -115,7 +124,28 @@ void ACheckpoint::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GearGameState = GetWorld()->GetGameState<AGearGameState>();
+	check(IsValid(GearGameState));
+}
 
+void ACheckpoint::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	LapHitbox->OnComponentBeginOverlap.AddDynamic(this, &ACheckpoint::LapHitboxBeginOverlap);
+
+}
+
+void ACheckpoint::LapHitboxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{	
+	if (HasAuthority() && CheckpointIndex != 0)
+	{
+		AGearVehicle* GearVehicle = Cast<AGearVehicle>(OtherActor);
+		if (IsValid(GearVehicle))
+		{
+			GearGameState->VehicleReachedCheckpoint(GearVehicle, this);
+		}
+	}
 }
 
 void ACheckpoint::Tick(float DeltaTime)

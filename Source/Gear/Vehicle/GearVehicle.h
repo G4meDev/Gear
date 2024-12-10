@@ -31,6 +31,8 @@ public:
 
 	float DistanaceAlongTrack;
 
+	int TargetCheckpoint;
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -39,20 +41,11 @@ protected:
 
 	virtual void NotifyControllerChanged() override;
 
-	virtual void BecomeViewTarget(APlayerController* PC);
-
 	virtual void Destroyed() override;
-
-	void InitCamera();
 
 	bool IsOutsideTrack() const;
 
 	void Killed();
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSubclassOf<AVehicleCamera> VehicleCameraClass;
-
-	AVehicleCamera* VehicleCamera;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* SteerActionInput;

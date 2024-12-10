@@ -6,6 +6,7 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearGameMode.h"
 #include "GameFramework/GearBuilderPawn.h"
+#include "Vehicle/VehicleCamera.h"
 #include "GearHUD.h"
 #include "Placeable/GearPlaceable.h"
 #include "GameSystems/TrackSpline.h"
@@ -16,6 +17,8 @@
 
 AGearPlayerController::AGearPlayerController()
 {
+	bAutoManageActiveCameraTarget = false;
+
 	IsReady = false;
 
 	bDraging = false;
@@ -218,6 +221,20 @@ void AGearPlayerController::ClientStateRacing_Start(float StateStartTime)
 	if (IsValid(GearHUD))
 	{
 		GearHUD->Racing_Start(StateStartTime);
+	}
+
+	if (!IsValid(VehicleCamera))
+	{
+		VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
+		SetViewTarget(VehicleCamera);
+	}
+}
+
+void AGearPlayerController::ClientStateRacing_End(float StateStartTime)
+{
+	if (IsValid(VehicleCamera))
+	{
+		VehicleCamera->Destroy();
 	}
 }
 

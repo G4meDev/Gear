@@ -83,6 +83,15 @@ void AGearBuilderPawn::BeginPlay()
 
 }
 
+void AGearBuilderPawn::NotifyControllerChanged()
+{
+	APlayerController* PlayerController = GetController<APlayerController>();
+	if (IsValid(PlayerController) && PlayerController->IsLocalController())
+	{
+		PlayerController->SetViewTarget(this);
+	}
+}
+
 void AGearBuilderPawn::Destroyed()
 {
 	Super::Destroyed();
