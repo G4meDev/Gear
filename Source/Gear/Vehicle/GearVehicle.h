@@ -52,6 +52,12 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* SteerActionInput;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UUserWidget> VehicleInputWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* VehicleInputWidget;
+
 	void Input_Steer(const FInputActionInstance& Instance);
 
 	float SteerValue;

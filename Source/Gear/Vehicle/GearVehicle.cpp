@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
 
 #define VEHICLE_TESTMAP_NAME "VehicleTestMap"
 
@@ -60,15 +61,27 @@ void AGearVehicle::NotifyControllerChanged()
 {
 	Super::NotifyControllerChanged();
 
+	APlayerController* PC = GetController<APlayerController>();
+	if (IsValid(PC) && PC->IsLocalController())
+	{
+		VehicleInputWidget = CreateWidget(GetWorld(), VehicleInputWidgetClass);
+		VehicleInputWidget->AddToViewport();
+	}
 }
 
 void AGearVehicle::Destroyed()
 {
 	Super::Destroyed();
 
-	if (HasAuthority())
+	if (HasAuthority() && IsValid(GearGameState))
 	{
 		GearGameState->Vehicles.Remove(this);
+	}
+
+	if (IsValid(VehicleInputWidget))
+	{
+		VehicleInputWidget->RemoveFromViewport();
+		VehicleInputWidget = nullptr;
 	}
 }
 
@@ -85,11 +98,15 @@ void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	{
 		UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 		Input->BindAction(SteerActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Steer);
+		Input->BindAction(SteerActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Steer);
 #if WITH_EDITOR
 		if (bInTestMap)
 		{
 			Input->BindAction(ThrottleActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Throttle);
+			Input->BindAction(ThrottleActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Throttle);
+
 			Input->BindAction(BrakeActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Brake);
+			Input->BindAction(BrakeActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Brake);
 		}
 #endif
 	}
