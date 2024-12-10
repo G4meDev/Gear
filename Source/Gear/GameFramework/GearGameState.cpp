@@ -25,6 +25,7 @@ AGearGameState::AGearGameState()
 
 	LastPlacedCheckpointModuleStackIndex = 0;
 	FurthestReachedDistace = 0.0f;
+	FurthestReachedCheckpoint = 0;
 }
 
 void AGearGameState::Tick(float DeltaSeconds)
@@ -261,29 +262,6 @@ void AGearGameState::ClearCheckpointResults()
 	for (int i = 0; i < AvaliableCheckpointNum; i++)
 	{
 		CheckpointResults.AddDefaulted();
-	}
-}
-
-void AGearGameState::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint)
-{
-	check(IsValid(Vehicle) && IsValid(TargetCheckpoint));
-
-	if (Vehicle->TargetCheckpoint == TargetCheckpoint->CheckpointIndex)
-	{
-		AGearPlayerState* GearPlayerState = Vehicle->GetPlayerState<AGearPlayerState>();
-		check(GearPlayerState);
-
-		CheckpointResults[TargetCheckpoint->CheckpointIndex-1].Add(GearPlayerState);
-		Vehicle->TargetCheckpoint++;
-		UE_LOG(LogTemp, Warning, TEXT("%s is %i player to reached checkpoint number %i"), *GearPlayerState->GetPlayerName(), CheckpointResults[TargetCheckpoint->CheckpointIndex - 1].PlayerList.Num(), TargetCheckpoint->CheckpointIndex);
-
-		if (CheckpointsStack.Top() == TargetCheckpoint)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%s finished race"), *GearPlayerState->GetName());
-			Vehicle->Destroy();
-		}
-
-		// TODO: spawn elimanated players
 	}
 }
 

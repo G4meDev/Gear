@@ -451,26 +451,28 @@ void AGearGameMode::DestroyPawns()
 
 void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 {
-	DestroyPawns();
-
 	ACheckpoint* Checkpoint = GearGameState->GetCheckPointAtIndex(CheckpointIndex);
-
 	check(IsValid(Checkpoint));
 
-	GearGameState->Vehicles.Empty(4);
-	for (int i = 0; i < GearGameState->PlayerArray.Num(); i++)
+	int i = 0;
+	for (APlayerState* PlayerState : GearGameState->PlayerArray)
 	{
-		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(GearGameState->PlayerArray[i]);
-		check(i < Checkpoint->StartPoints.Num() && IsValid(GearPlayerState) && IsValid(GearPlayerState->VehicleClass));
+		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(PlayerState);
 
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		FVector SpawnLocation = Checkpoint->StartPoints[i]->GetComponentLocation();
-		FRotator SpawnRotation = Checkpoint->StartPoints[i]->GetComponentRotation();
+		if (!IsValid(GearPlayerState->GetPawn()))
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			FVector SpawnLocation = Checkpoint->StartPoints[i]->GetComponentLocation();
+			FRotator SpawnRotation = Checkpoint->StartPoints[i]->GetComponentRotation();
 
-		AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
-		GearPlayerState->GetPlayerController()->Possess(GearVehicle);
-		GearGameState->Vehicles.Add(GearVehicle);
+			AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
+			GearVehicle->TargetCheckpoint = CheckpointIndex + 1;
+			GearPlayerState->GetPlayerController()->Possess(GearVehicle);
+			GearGameState->Vehicles.Add(GearVehicle);
+
+			i++;
+		}
 	}
 }
 
@@ -484,6 +486,8 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 		PlaceUnplaced();
 	}
 
+	DestroyPawns();
+	GearGameState->Vehicles.Empty(4);
 	GearGameState->ClearCheckpointResults();
 
 	StartRacingAtCheckpoint(0);
@@ -499,6 +503,38 @@ void AGearGameMode::RacingWaitTimeFinished()
 
 
 	SetGearMatchState(EGearMatchState::Racing);
+}
+
+void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint)
+{
+	check(IsValid(Vehicle) && IsValid(TargetCheckpoint));
+
+	if (Vehicle->TargetCheckpoint == TargetCheckpoint->CheckpointIndex)
+	{
+		AGearPlayerState* GearPlayerState = Vehicle->GetPlayerState<AGearPlayerState>();
+		check(GearPlayerState);
+
+		const int CheckpointIndex = TargetCheckpoint->CheckpointIndex;
+
+		GearGameState->CheckpointResults[CheckpointIndex - 1].Add(GearPlayerState);
+		Vehicle->TargetCheckpoint = CheckpointIndex + 1;
+		UE_LOG(LogTemp, Warning, TEXT("%s is %i player to reached checkpoint number %i"), *GearPlayerState->GetPlayerName(), GearGameState->CheckpointResults[CheckpointIndex - 1].PlayerList.Num(), CheckpointIndex);
+
+		if (CheckpointIndex > GearGameState->FurthestReachedCheckpoint)
+		{
+			GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
+			if (GearGameState->CheckpointsStack.Top() != TargetCheckpoint)
+			{
+				StartRacingAtCheckpoint(TargetCheckpoint->CheckpointIndex);
+			}
+		}
+
+		if (GearGameState->CheckpointsStack.Top() == TargetCheckpoint)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s finished race"), *GearPlayerState->GetName());
+			Vehicle->Destroy();
+		}
+	}
 }
 
 bool AGearGameMode::ReadyToStartMatch_Implementation()

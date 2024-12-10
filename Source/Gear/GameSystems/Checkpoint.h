@@ -57,8 +57,6 @@ protected:
 	UFUNCTION()
 	void LapHitboxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	AGearGameState* GearGameState;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* Root;
 

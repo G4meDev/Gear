@@ -73,7 +73,6 @@ public:
 	ACheckpoint* GetCheckPointAtIndex(int Index);
 
 	void ClearCheckpointResults();
-	void VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint);
 
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
@@ -99,6 +98,7 @@ public:
 	int LastPlacedCheckpointModuleStackIndex;
 
 	float FurthestReachedDistace;
+	float FurthestReachedCheckpoint;
 
 protected:
 

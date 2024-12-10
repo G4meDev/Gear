@@ -3,7 +3,7 @@
 
 #include "GameSystems/Checkpoint.h"
 #include "GameSystems/VehicleStart.h"
-#include "GameFramework/GearGameState.h"
+#include "GameFramework/GearGameMode.h"
 #include "Vehicle/GearVehicle.h"
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
@@ -123,9 +123,8 @@ void ACheckpoint::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 void ACheckpoint::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	GearGameState = GetWorld()->GetGameState<AGearGameState>();
-	check(IsValid(GearGameState));
+
+
 }
 
 void ACheckpoint::PostInitializeComponents()
@@ -141,9 +140,12 @@ void ACheckpoint::LapHitboxBeginOverlap(UPrimitiveComponent* OverlappedComponent
 	if (HasAuthority() && CheckpointIndex != 0)
 	{
 		AGearVehicle* GearVehicle = Cast<AGearVehicle>(OtherActor);
-		if (IsValid(GearVehicle))
+		if (IsValid(GearVehicle) && GearVehicle->TargetCheckpoint == CheckpointIndex)
 		{
-			GearGameState->VehicleReachedCheckpoint(GearVehicle, this);
+			AGearGameMode* GearGameMode = GetWorld()->GetAuthGameMode<AGearGameMode>();
+			check(GearGameMode);
+			
+			GearGameMode->VehicleReachedCheckpoint(GearVehicle, this);
 		}
 	}
 }
