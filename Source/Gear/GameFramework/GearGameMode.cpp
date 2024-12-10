@@ -91,6 +91,22 @@ void AGearGameMode::Tick(float DeltaSeconds)
 		}
 	}
 
+	else if (GearMatchState == EGearMatchState::Racing)
+	{
+		if (GearGameState->Vehicles.Num() == 0)
+		{
+			if (GearGameState->FurthestReachedCheckpoint == GearGameState->CheckpointsStack.Num() - 1)
+			{
+				StartPostRace();
+			}
+
+			else
+			{
+				StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1); 
+			}
+		}
+	}
+
 	if (ShouldAbort())
 	{
 		AbortMatch();
@@ -227,6 +243,8 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 		}
 	}
 }
+
+
 
 AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX)
 {
@@ -503,6 +521,14 @@ void AGearGameMode::RacingWaitTimeFinished()
 
 
 	SetGearMatchState(EGearMatchState::Racing);
+}
+
+void AGearGameMode::StartPostRace()
+{
+	
+
+	UE_LOG(LogTemp, Warning, TEXT("start post race"));
+	SetGearMatchState(EGearMatchState::PostRace);
 }
 
 void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint)

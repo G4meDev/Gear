@@ -52,7 +52,10 @@ void AGearVehicle::Destroyed()
 {
 	Super::Destroyed();
 
-
+	if (HasAuthority())
+	{
+		GearGameState->Vehicles.Remove(this);
+	}
 }
 
 void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -158,6 +161,5 @@ void AGearVehicle::Killed()
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s Killed"), *GetName());
 
-	GearGameState->Vehicles.Remove(this);
 	Destroy();
 }

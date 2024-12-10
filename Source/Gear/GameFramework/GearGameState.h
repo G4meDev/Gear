@@ -98,7 +98,7 @@ public:
 	int LastPlacedCheckpointModuleStackIndex;
 
 	float FurthestReachedDistace;
-	float FurthestReachedCheckpoint;
+	int FurthestReachedCheckpoint;
 
 protected:
 
