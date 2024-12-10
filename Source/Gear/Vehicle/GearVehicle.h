@@ -43,6 +43,8 @@ protected:
 
 	virtual void Destroyed() override;
 
+	bool IsOutsideCameraFrustum();
+
 	bool IsOutsideTrack() const;
 
 	void Killed();
@@ -55,6 +57,8 @@ protected:
 	float SteerValue;
 
 	AGearGameState* GearGameState;
+
+	APlayerController* AuthorativeController;
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

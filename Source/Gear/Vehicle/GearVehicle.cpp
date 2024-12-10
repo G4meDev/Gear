@@ -10,6 +10,7 @@
 #include "ChaosVehicleMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
+#include "Kismet/GameplayStatics.h"
 
 #define VEHICLE_TESTMAP_NAME "VehicleTestMap"
 
@@ -32,6 +33,19 @@ void AGearVehicle::BeginPlay()
 
 	UpdateDistanceAlongTrack();
 	GearGameState->UpdateFurthestDistanceWithVehicle(this);
+
+	if (HasAuthority())
+	{
+		for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+		{
+			APlayerController* PC = Cast<APlayerController>(*It);
+			if (IsValid(PC) && PC->IsLocalController())
+			{
+				AuthorativeController = PC;
+				break;
+			}
+		}
+	}
 }
 
 // only server
@@ -125,7 +139,7 @@ void AGearVehicle::Tick(float DeltaSeconds)
 
 	if (HasAuthority())
 	{
-		if (IsOutsideTrack())
+		if (IsOutsideTrack() || IsOutsideCameraFrustum())
 		{
 			Killed();
 		}
@@ -154,6 +168,25 @@ bool AGearVehicle::IsOutsideTrack() const
 {
 	FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(DistanaceAlongTrack);
 	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -200.0f;
+}
+
+bool AGearVehicle::IsOutsideCameraFrustum()
+{
+	if (IsValid(AuthorativeController))
+	{
+		FVector2D ScreenPosition;
+		UGameplayStatics::ProjectWorldToScreen(AuthorativeController, GetActorLocation(), ScreenPosition);
+		
+		int32 SizeX;
+		int32 SizeY;
+		AuthorativeController->GetViewportSize(SizeX, SizeY);
+		ScreenPosition /= FVector2D(SizeX, SizeY);
+
+		return ScreenPosition.X < 0 || ScreenPosition.X > 1
+			|| ScreenPosition.Y < 0 || ScreenPosition.Y > 1;
+	}
+
+	return false;
 }
 
 // on server
