@@ -223,19 +223,12 @@ void AGearPlayerController::ClientStateRacing_Start(float StateStartTime)
 		GearHUD->Racing_Start(StateStartTime);
 	}
 
-	if (!IsValid(VehicleCamera))
-	{
-		VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
-		SetViewTarget(VehicleCamera);
-	}
+
 }
 
 void AGearPlayerController::ClientStateRacing_End(float StateStartTime)
 {
-	if (IsValid(VehicleCamera))
-	{
-		VehicleCamera->Destroy();
-	}
+
 }
 
 void AGearPlayerController::PeekClientIsReady_Implementation()

@@ -8,7 +8,6 @@
 
 class AGearGameState;
 class UInputAction;
-class AVehicleCamera;
 struct FInputActionInstance;
 
 /**
@@ -42,8 +41,6 @@ protected:
 	virtual void NotifyControllerChanged() override;
 
 	virtual void Destroyed() override;
-
-	bool IsOutsideCameraFrustum();
 
 	bool IsOutsideTrack() const;
 

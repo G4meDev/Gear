@@ -7,6 +7,7 @@
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearBuilderPawn.h"
 #include "Vehicle/GearVehicle.h"
+#include "Vehicle/VehicleCamera.h"
 
 #include "GameSystems/Checkpoint.h"
 #include "GameSystems/VehicleStart.h"
@@ -95,14 +96,14 @@ void AGearGameMode::Tick(float DeltaSeconds)
 	{
 		if (GearGameState->Vehicles.Num() == 0)
 		{
-			if (GearGameState->FurthestReachedCheckpoint == GearGameState->CheckpointsStack.Num() - 1)
+			if (GearGameState->FurthestReachedCheckpoint < GearGameState->CheckpointsStack.Num() - 2)
 			{
-				StartPostRace();
+				StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1);
 			}
 
 			else
 			{
-				StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1); 
+				StartPostRace();
 			}
 		}
 	}
@@ -472,6 +473,8 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 	ACheckpoint* Checkpoint = GearGameState->GetCheckPointAtIndex(CheckpointIndex);
 	check(IsValid(Checkpoint));
 
+	GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
+
 	int i = 0;
 	for (APlayerState* PlayerState : GearGameState->PlayerArray)
 	{
@@ -485,12 +488,19 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 			FRotator SpawnRotation = Checkpoint->StartPoints[i]->GetComponentRotation();
 
 			AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
-			GearVehicle->TargetCheckpoint = CheckpointIndex + 1;
 			GearPlayerState->GetPlayerController()->Possess(GearVehicle);
-			GearGameState->Vehicles.Add(GearVehicle);
+
+			GearGameState->RegisterVehicleAtCheckpoint(GearVehicle, CheckpointIndex);
 
 			i++;
 		}
+	}
+
+	if (IsValid(GearGameState->VehicleCamera))
+	{
+		GearGameState->VehicleCamera->UpdateCamera();
+		GearGameState->VehicleCamera->MarkTeleport();
+		GearGameState->VehicleCamera->UpdateCameraMatrix();
 	}
 }
 

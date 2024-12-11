@@ -15,6 +15,7 @@ class AGearRoadModule;
 class AGearHazard;
 class ATrackSpline;
 struct FCrossTrackProperty;
+class AVehicleCamera;
 
 USTRUCT(BlueprintType)
 struct FCheckpointResult 
@@ -55,6 +56,7 @@ public:
 	void Placing_Start();
 	void Placing_End();
 	void Racing_Start();
+	void Racing_End();
 
 	void UpdateFurthestDistanceWithVehicle(AGearVehicle* GearVehicle);
 
@@ -73,6 +75,8 @@ public:
 	ACheckpoint* GetCheckPointAtIndex(int Index);
 
 	void ClearCheckpointResults();
+
+	void RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, int CheckpointIndex);
 
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
@@ -95,6 +99,9 @@ public:
 	UPROPERTY(Replicated)
 	TArray<FCheckpointResult> CheckpointResults;
 
+	UPROPERTY()
+	AVehicleCamera* VehicleCamera;
+
 	int LastPlacedCheckpointModuleStackIndex;
 
 	float FurthestReachedDistace;
@@ -110,4 +117,7 @@ protected:
 
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AVehicleCamera> VehicleCameraClass;
 };

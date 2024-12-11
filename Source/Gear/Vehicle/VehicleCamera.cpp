@@ -6,6 +6,7 @@
 #include "GameSystems/TrackSpline.h"
 #include "Vehicle/VehicleSpringArm.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AVehicleCamera::AVehicleCamera()
@@ -33,6 +34,43 @@ void AVehicleCamera::UpdateCamera()
 		SetActorLocation(TrackTransform.GetLocation());
 		SetActorRotation(TrackTransform.Rotator());
 	}
+
+	
+}
+
+void AVehicleCamera::UpdateCameraMatrix()
+{
+	if (IsValid(OwnerController))
+	{
+		FMatrix ViewMatrix;
+		FMatrix ProjectionMatrix;
+
+		UGameplayStatics::CalculateViewProjectionMatricesFromViewTarget(this, ViewMatrix, ProjectionMatrix, ViewProjectionMatrix);
+
+		int32 SizeX;
+		int32 SizeY;
+		OwnerController->GetViewportSize(SizeX, SizeY);
+		ViewportSize = FVector2D(SizeX, SizeY);
+	}
+}
+
+void AVehicleCamera::MarkTeleport()
+{
+	CameraBoom->TeleportToDesireLocation();
+}
+
+bool AVehicleCamera::IsOutsideCameraFrustum(AActor* Target)
+{
+	if (IsValid(OwnerController))
+	{
+		FVector2D ScreenPos;
+		FSceneView::ProjectWorldToScreen(Target->GetActorLocation(), FIntRect(0, 0, ViewportSize.X, ViewportSize.Y), ViewProjectionMatrix, ScreenPos);
+
+		return ScreenPos.X < 0 || ScreenPos.X > ViewportSize.X
+			|| ScreenPos.Y < 0 || ScreenPos.Y > ViewportSize.Y;
+	}
+
+	return false;
 }
 
 void AVehicleCamera::BeginPlay()
@@ -41,7 +79,15 @@ void AVehicleCamera::BeginPlay()
 	
 	GearGameState = GetWorld()->GetGameState<AGearGameState>();
  	UpdateCamera();
-	CameraBoom->TeleportToDesireLocation();
+	MarkTeleport();
+}
+
+void AVehicleCamera::BecomeViewTarget(APlayerController* PC)
+{
+	Super::BecomeViewTarget(PC);
+
+	OwnerController = PC;
+	UpdateCameraMatrix();
 }
 
 void AVehicleCamera::Tick(float DeltaTime)
@@ -49,4 +95,5 @@ void AVehicleCamera::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);	
 
 	UpdateCamera();
+	UpdateCameraMatrix();
 }

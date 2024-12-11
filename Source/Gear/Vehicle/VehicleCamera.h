@@ -18,10 +18,22 @@ class GEAR_API AVehicleCamera : public AActor
 public:	
 	AVehicleCamera();
 
+	virtual void Tick(float DeltaTime) override;
+	
 	void UpdateCamera();
+
+	void UpdateCameraMatrix();
+
+	void MarkTeleport();
+
+	bool IsOutsideCameraFrustum(AActor* Target);
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void BecomeViewTarget(APlayerController* PC) override;
+
+	APlayerController* OwnerController;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* Root;
@@ -35,7 +47,7 @@ protected:
 	UPROPERTY()
 	AGearGameState* GearGameState;
 
+	FMatrix ViewProjectionMatrix;
 
-public:	
-	virtual void Tick(float DeltaTime) override;
+	FVector2D ViewportSize;
 };

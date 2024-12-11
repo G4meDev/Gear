@@ -4,6 +4,7 @@
 
 #include "Vehicle/GearVehicle.h"
 
+#include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearGameState.h"
 #include "Vehicle/VehicleCamera.h"
 #include "GameSystems/TrackSpline.h"
@@ -32,21 +33,20 @@ void AGearVehicle::BeginPlay()
 	GearGameState = GetWorld()->GetGameState<AGearGameState>();
 	check(GearGameState);
 
-	UpdateDistanceAlongTrack();
-	GearGameState->UpdateFurthestDistanceWithVehicle(this);
-
-	if (HasAuthority())
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
-		for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+		AGearPlayerController* PC = Cast<AGearPlayerController>(*It);
+		if (IsValid(PC) && PC->IsLocalController())
 		{
-			APlayerController* PC = Cast<APlayerController>(*It);
-			if (IsValid(PC) && PC->IsLocalController())
+			if (HasAuthority())
 			{
 				AuthorativeController = PC;
-				break;
 			}
+
+			break;
 		}
 	}
+
 }
 
 // only server
@@ -80,7 +80,7 @@ void AGearVehicle::Destroyed()
 
 	if (IsValid(VehicleInputWidget))
 	{
-		VehicleInputWidget->RemoveFromViewport();
+		VehicleInputWidget->RemoveFromParent();
 		VehicleInputWidget = nullptr;
 	}
 }
@@ -156,7 +156,8 @@ void AGearVehicle::Tick(float DeltaSeconds)
 
 	if (HasAuthority())
 	{
-		if (IsOutsideTrack() || IsOutsideCameraFrustum())
+		const bool bOutsideCameraFrustom = GearGameState->VehicleCamera ? GearGameState->VehicleCamera->IsOutsideCameraFrustum(this) : false;
+		if (IsOutsideTrack() || bOutsideCameraFrustom)
 		{
 			Killed();
 		}
@@ -185,25 +186,6 @@ bool AGearVehicle::IsOutsideTrack() const
 {
 	FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(DistanaceAlongTrack);
 	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -200.0f;
-}
-
-bool AGearVehicle::IsOutsideCameraFrustum()
-{
-	if (IsValid(AuthorativeController))
-	{
-		FVector2D ScreenPosition;
-		UGameplayStatics::ProjectWorldToScreen(AuthorativeController, GetActorLocation(), ScreenPosition);
-		
-		int32 SizeX;
-		int32 SizeY;
-		AuthorativeController->GetViewportSize(SizeX, SizeY);
-		ScreenPosition /= FVector2D(SizeX, SizeY);
-
-		return ScreenPosition.X < 0 || ScreenPosition.X > 1
-			|| ScreenPosition.Y < 0 || ScreenPosition.Y > 1;
-	}
-
-	return false;
 }
 
 // on server

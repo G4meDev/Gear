@@ -15,6 +15,7 @@
 #include "GameSystems/TrackSpline.h"
 
 #include "Vehicle/GearVehicle.h"
+#include "Vehicle/VehicleCamera.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -194,13 +195,27 @@ void AGearGameState::Placing_End()
 
 void AGearGameState::Racing_Start()
 {
+	if (!IsValid(VehicleCamera))
+	{
+		VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
+	}
+
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
 		if (IsValid(PlayerController) && PlayerController->IsLocalController())
 		{
 			PlayerController->ClientStateRacing_Start(LastGameStateTransitionTime);
+			PlayerController->SetViewTarget(VehicleCamera);
 		}
+	}
+}
+
+void AGearGameState::Racing_End()
+{
+	if (IsValid(VehicleCamera))
+	{
+		VehicleCamera->Destroy();
 	}
 }
 
@@ -263,6 +278,16 @@ void AGearGameState::ClearCheckpointResults()
 	{
 		CheckpointResults.AddDefaulted();
 	}
+}
+
+void AGearGameState::RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, int CheckpointIndex)
+{
+	Vehicle->TargetCheckpoint = CheckpointIndex + 1;
+	Vehicle->UpdateDistanceAlongTrack();
+	UpdateFurthestDistanceWithVehicle(Vehicle);
+	//Vehicle->AddTickPrerequisiteActor()
+
+	Vehicles.Add(Vehicle);
 }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)

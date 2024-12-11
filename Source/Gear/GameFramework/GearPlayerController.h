@@ -10,7 +10,6 @@ class AGearPlayerState;
 class AGearPlaceable;
 class AGearRoadModule;
 class UPlaceableSocket;
-class AVehicleCamera;
 class AGearHUD;
 class UInputMappingContext;
 class UInputAction;
@@ -41,12 +40,6 @@ protected:
 	bool bDraging;
 
 	void UpdateScreenDragValueAndInjectInput();
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSubclassOf<AVehicleCamera> VehicleCameraClass;
-
-	UPROPERTY()
-	AVehicleCamera* VehicleCamera;
 
 public:
 
