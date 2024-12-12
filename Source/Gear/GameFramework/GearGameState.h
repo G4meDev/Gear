@@ -104,8 +104,6 @@ protected:
 
 	virtual void Destroyed() override;
 
-	void SortPlayersPosition();
-
 	void AddPlayerState(APlayerState* PlayerState) override;
 	void RemovePlayerState(APlayerState* PlayerState) override;
 

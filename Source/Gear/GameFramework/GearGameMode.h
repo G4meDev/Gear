@@ -60,8 +60,8 @@ protected:
 
 	bool CheckIsEveryPlayerReady();
 	void AllPlayerJoined();
+	void StartNewRound();
 
-	void StartFirstPhase();
 	void StartSelectingPlaceables();
 	void AssignPlaceablesToUnowningPlayers();
 	FTimerHandle SelectingPiecesTimerHandle;
@@ -86,8 +86,6 @@ protected:
 	void StartScoreboard();
 	void ScoreboardLifespanFinished();
 	FTimerHandle ScoreboardTimerHandle;
-
-	void StartNewRound();
 
 	void GameFinished();
 

@@ -29,7 +29,7 @@ AGearGameState::AGearGameState()
 	LastPlacedCheckpointModuleStackIndex = 0;
 	FurthestReachedDistace = 0.0f;
 	FurthestReachedCheckpoint = 0;
-	RoundNumber = 1;
+	RoundNumber = 0;
 }
 
 void AGearGameState::Tick(float DeltaSeconds)
@@ -86,7 +86,38 @@ void AGearGameState::UpdateFurthestDistanceWithVehicle(AGearVehicle* GearVehicle
 
 void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 {
-	
+	switch (OldState)
+	{
+	case EGearMatchState::WaitingForPlayerToJoin:
+		break;
+
+	case EGearMatchState::AllPlayersJoined:
+		break;
+
+	case EGearMatchState::SelectingPlaceables:
+		break;
+
+	case EGearMatchState::Placing:
+		break;
+
+	case EGearMatchState::Racing_WaitTime:
+		break;
+
+	case EGearMatchState::Racing:
+		break;
+
+	case EGearMatchState::Scoreboard:
+		Scoreboard_End();
+		break;
+
+	case EGearMatchState::Ended:
+		break;
+
+	default:
+		break;
+	}
+
+	// ----------------------------------------------------
 
 	switch (GearMatchState)
 	{
@@ -271,7 +302,7 @@ void AGearGameState::Scoreboard_End()
 
 float AGearGameState::GetEstimatedScoreboardLifespan() const
 {	
-	return (CheckpointResults.Num() + 4) * UGameVariablesBFL::GV_ScoreboardTimeStep();
+	return (CheckpointResults.Num() + 3) * UGameVariablesBFL::GV_ScoreboardTimeStep();
 }
 
 bool AGearGameState::FindStartRoadModuleAndAddToStack()
@@ -340,7 +371,6 @@ void AGearGameState::RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, int Chec
 	Vehicle->TargetCheckpoint = CheckpointIndex + 1;
 	Vehicle->UpdateDistanceAlongTrack();
 	UpdateFurthestDistanceWithVehicle(Vehicle);
-	//Vehicle->AddTickPrerequisiteActor()
 
 	Vehicles.Add(Vehicle);
 }

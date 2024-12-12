@@ -323,11 +323,6 @@ void AGearGameMode::SetGearMatchState(EGearMatchState InGearMatchState)
 	GearMatchState = InGearMatchState;
 }
 
-void AGearGameMode::StartFirstPhase()
-{	
-	StartSelectingPlaceables();
-}
-
 void AGearGameMode::AssignPlaceablesToUnowningPlayers()
 {
 	TArray<AGearBuilderPawn*> UnowningPlayers;
@@ -523,6 +518,8 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 
 	DestroyPawns();
 	GearGameState->Vehicles.Empty(4);
+	GearGameState->FurthestReachedDistace = 0;
+	GearGameState->FurthestReachedCheckpoint = 0;
 	GearGameState->ClearCheckpointResults();
 
 	StartRacingAtCheckpoint(0);
@@ -544,6 +541,8 @@ void AGearGameMode::StartScoreboard()
 {
 	GetWorld()->GetTimerManager().SetTimer(ScoreboardTimerHandle,
 		FTimerDelegate::CreateUObject(this, &AGearGameMode::ScoreboardLifespanFinished), GearGameState->GetEstimatedScoreboardLifespan(), false);
+
+	UE_LOG(LogTemp, Warning, TEXT("%f"), GearGameState->GetEstimatedScoreboardLifespan());
 
 	UE_LOG(LogTemp, Warning, TEXT("start scoreboard"));
 	SetGearMatchState(EGearMatchState::Scoreboard);
@@ -568,7 +567,9 @@ void AGearGameMode::StartNewRound()
 {
 	UE_LOG(LogTemp, Warning, TEXT("starting new round"));
 
+	GearGameState->RoundNumber++;
 
+	StartSelectingPlaceables();
 }
 
 void AGearGameMode::GameFinished()
@@ -644,7 +645,7 @@ bool AGearGameMode::CheckIsEveryPlayerReady()
 void AGearGameMode::AllPlayerJoined()
 {
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartFirstPhase, UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay());
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartNewRound, UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay());
 
 	UE_LOG(LogTemp, Warning, TEXT("all player joined"));
 	SetGearMatchState(EGearMatchState::AllPlayersJoined);
