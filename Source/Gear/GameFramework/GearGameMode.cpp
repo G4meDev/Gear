@@ -542,10 +542,38 @@ void AGearGameMode::RacingWaitTimeFinished()
 
 void AGearGameMode::StartScoreboard()
 {
-	
+	GetWorld()->GetTimerManager().SetTimer(ScoreboardTimerHandle,
+		FTimerDelegate::CreateUObject(this, &AGearGameMode::ScoreboardLifespanFinished), GearGameState->GetEstimatedScoreboardLifespan(), false);
 
-	UE_LOG(LogTemp, Warning, TEXT("start post race"));
+	UE_LOG(LogTemp, Warning, TEXT("start scoreboard"));
 	SetGearMatchState(EGearMatchState::Scoreboard);
+}
+
+void AGearGameMode::ScoreboardLifespanFinished()
+{
+	ScoreboardTimerHandle.Invalidate();
+
+	if (GearGameState->IsAnyPlayerWinning())
+	{
+		
+		GameFinished();
+	}
+	else
+	{
+		StartNewRound();
+	}
+}
+
+void AGearGameMode::StartNewRound()
+{
+	UE_LOG(LogTemp, Warning, TEXT("starting new round"));
+
+
+}
+
+void AGearGameMode::GameFinished()
+{
+	UE_LOG(LogTemp, Warning, TEXT("game finished"));
 }
 
 void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint)

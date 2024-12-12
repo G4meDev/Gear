@@ -56,7 +56,7 @@ int32 AGearPlayerState::GetRoundBonusScore()
 void AGearPlayerState::GetRoundScoreToCheckpoint(int32 CheckpointIndex, int32& ScoreToCheckpoint, int32& CheckpointScore)
 {
 	check(CheckpointIndex >= 0 && CheckpointIndex < CheckpointsScore.Num());
-
+	
 	ScoreToCheckpoint = 0;
 
 	for (int32 i = 0; i < CheckpointIndex; i++)
@@ -91,4 +91,9 @@ void AGearPlayerState::UpdateRoundScore(const TArray<FCheckpointResult>& RoundSc
 
 	LastRoundScore = CurrentScore;
 	CurrentScore += Temp + BonusScore;
+}
+
+bool AGearPlayerState::IsWinner() const
+{
+	return CurrentScore >= UGameVariablesBFL::GV_WinningRequiredScore();
 }

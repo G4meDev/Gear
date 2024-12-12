@@ -17,6 +17,8 @@
 #include "Vehicle/GearVehicle.h"
 #include "Vehicle/VehicleCamera.h"
 
+#include "Utils/GameVariablesBFL.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -268,8 +270,8 @@ void AGearGameState::Scoreboard_End()
 }
 
 float AGearGameState::GetEstimatedScoreboardLifespan() const
-{
-	return 1.0f;
+{	
+	return (CheckpointResults.Num() + 4) * UGameVariablesBFL::GV_ScoreboardTimeStep();
 }
 
 bool AGearGameState::FindStartRoadModuleAndAddToStack()
@@ -341,6 +343,29 @@ void AGearGameState::RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, int Chec
 	//Vehicle->AddTickPrerequisiteActor()
 
 	Vehicles.Add(Vehicle);
+}
+
+TArray<AGearPlayerState*> AGearGameState::GetWinningPlayers() const
+{
+	TArray<AGearPlayerState*> WinningPlayers;
+
+	for (APlayerState* PlayerState : PlayerArray)
+	{
+		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(PlayerState);
+		check(GearPlayerState);
+
+		if (GearPlayerState->IsWinner())
+		{
+			WinningPlayers.Add(GearPlayerState);
+		}
+	}
+
+	return WinningPlayers;
+}
+
+bool AGearGameState::IsAnyPlayerWinning() const
+{
+	return GetWinningPlayers().Num() > 0;
 }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)

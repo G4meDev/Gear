@@ -77,13 +77,19 @@ protected:
 	void StartRacing(bool bEveryPlayerPlaced);
 	FTimerHandle RacingWaitTimerHandle;
 
-	void StartScoreboard();
-
 	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
 	bool ShouldAddCheckpoint() const;
 	void AddCheckpoint();
 
 	void RacingWaitTimeFinished();
+
+	void StartScoreboard();
+	void ScoreboardLifespanFinished();
+	FTimerHandle ScoreboardTimerHandle;
+
+	void StartNewRound();
+
+	void GameFinished();
 
 	bool ShouldAbort();
 

@@ -62,6 +62,10 @@ public:
 
 	void RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, int CheckpointIndex);
 
+	TArray<AGearPlayerState*> GetWinningPlayers() const;
+
+	bool IsAnyPlayerWinning() const;
+
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
 

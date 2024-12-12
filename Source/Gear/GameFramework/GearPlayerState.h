@@ -36,6 +36,8 @@ public:
 
 	void UpdateRoundScore(const TArray<FCheckpointResult>& RoundScore);
 
+	bool IsWinner() const;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
 
