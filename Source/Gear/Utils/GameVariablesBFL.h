@@ -32,4 +32,10 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = GameVariables)
 	static int32 GV_WinningRequiredScore();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static float GV_ScoreboardTimeStep();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static float GV_ScoreboardTimeDelay();
 };

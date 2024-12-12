@@ -37,8 +37,10 @@ public:
 	void Placing_End();
 	void Racing_Start();
 	void Racing_End();
-	void PostRace_Start();
-	void PostRace_End();
+	void Scoreboard_Start();
+	void Scoreboard_End();
+
+	float GetEstimatedScoreboardLifespan() const;
 
 	void UpdateFurthestDistanceWithVehicle(AGearVehicle* GearVehicle);
 

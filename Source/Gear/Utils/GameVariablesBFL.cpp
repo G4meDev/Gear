@@ -32,3 +32,13 @@ int32 UGameVariablesBFL::GV_WinningRequiredScore()
 {
 	return 3000;
 }
+
+float UGameVariablesBFL::GV_ScoreboardTimeStep()
+{
+	return 2.0f;
+}
+
+float UGameVariablesBFL::GV_ScoreboardTimeDelay()
+{
+	return 0.7f;
+}

@@ -20,7 +20,7 @@ enum class EGearMatchState : uint8
 	Placing,
 	Racing_WaitTime,
 	Racing,
-	PostRace,
+	Scoreboard,
 	Ended
 };
 

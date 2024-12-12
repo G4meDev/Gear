@@ -103,7 +103,7 @@ void AGearGameMode::Tick(float DeltaSeconds)
 
 			else
 			{
-				StartPostRace();
+				StartScoreboard();
 			}
 		}
 	}
@@ -533,12 +533,12 @@ void AGearGameMode::RacingWaitTimeFinished()
 	SetGearMatchState(EGearMatchState::Racing);
 }
 
-void AGearGameMode::StartPostRace()
+void AGearGameMode::StartScoreboard()
 {
 	
 
 	UE_LOG(LogTemp, Warning, TEXT("start post race"));
-	SetGearMatchState(EGearMatchState::PostRace);
+	SetGearMatchState(EGearMatchState::Scoreboard);
 }
 
 void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint)

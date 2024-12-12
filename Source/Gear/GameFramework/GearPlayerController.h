@@ -74,7 +74,7 @@ public:
 	void ClientStateRacing_Start(float StateStartTime);
 	void ClientStateRacing_End();
 
-	void ClientStatePostRace_Start(float StateStartTime, const TArray<FCheckpointResult>& RoundResults);
-	void ClientStatePostRace_End();
+	void ClientStateScoreboard_Start(float StateStartTime, const TArray<FCheckpointResult>& RoundResults);
+	void ClientStateScoreboard_End();
 
 };

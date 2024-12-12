@@ -111,9 +111,9 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 	case EGearMatchState::Racing:
 		break;
 
-	case EGearMatchState::PostRace:
+	case EGearMatchState::Scoreboard:
 		Racing_End();
-		PostRace_Start();
+		Scoreboard_Start();
 		break;
 
 	case EGearMatchState::Ended:
@@ -235,14 +235,14 @@ void AGearGameState::Racing_End()
 	}
 }
 
-void AGearGameState::PostRace_Start()
+void AGearGameState::Scoreboard_Start()
 {
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
 		if (IsValid(PlayerController) && PlayerController->IsLocalController())
 		{
-			PlayerController->ClientStatePostRace_Start(LastGameStateTransitionTime, CheckpointResults);
+			PlayerController->ClientStateScoreboard_Start(LastGameStateTransitionTime, CheckpointResults);
 		}
 	}
 
@@ -255,9 +255,21 @@ void AGearGameState::PostRace_Start()
 	}
 }
 
-void AGearGameState::PostRace_End()
+void AGearGameState::Scoreboard_End()
 {
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			PlayerController->ClientStateScoreboard_End();
+		}
+	}
+}
 
+float AGearGameState::GetEstimatedScoreboardLifespan() const
+{
+	return 1.0f;
 }
 
 bool AGearGameState::FindStartRoadModuleAndAddToStack()

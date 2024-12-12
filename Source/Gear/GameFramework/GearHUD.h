@@ -44,10 +44,10 @@ public:
 	void Racing_End();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void PostRace_Start(float Time, const TArray<FCheckpointResult>& RoundResults);
+	void Scoreboard_Start(float Time, const TArray<FCheckpointResult>& RoundResults);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void PostRace_End();
+	void Scoreboard_End();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void AddPlayer(AGearPlayerState* InPlayer);
