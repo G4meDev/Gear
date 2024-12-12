@@ -475,6 +475,8 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 
 	GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
 
+	bool bEveryPlayerEliminated = true;
+
 	int i = 0;
 	for (APlayerState* PlayerState : GearGameState->PlayerArray)
 	{
@@ -494,9 +496,14 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 
 			i++;
 		}
+
+		else
+		{
+			bEveryPlayerEliminated = false;
+		}
 	}
 
-	if (IsValid(GearGameState->VehicleCamera))
+	if (bEveryPlayerEliminated && IsValid(GearGameState->VehicleCamera))
 	{
 		GearGameState->VehicleCamera->UpdateCamera();
 		GearGameState->VehicleCamera->MarkTeleport();
