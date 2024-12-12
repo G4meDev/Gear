@@ -17,26 +17,6 @@ class ATrackSpline;
 struct FCrossTrackProperty;
 class AVehicleCamera;
 
-USTRUCT(BlueprintType)
-struct FCheckpointResult 
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadWrite)
-	TArray<AGearPlayerState*> PlayerList;
-
-	AGearPlayerState* operator[](int i)
-	{
-		return PlayerList[i];
-	}
-
-	void Add(AGearPlayerState* PlayerState)
-	{
-		PlayerList.Add(PlayerState);
-	}
-};
-
 /**
  * 
  */
@@ -57,6 +37,8 @@ public:
 	void Placing_End();
 	void Racing_Start();
 	void Racing_End();
+	void PostRace_Start();
+	void PostRace_End();
 
 	void UpdateFurthestDistanceWithVehicle(AGearVehicle* GearVehicle);
 
@@ -101,6 +83,9 @@ public:
 
 	UPROPERTY()
 	AVehicleCamera* VehicleCamera;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
+	int32 RoundNumber;
 
 	int LastPlacedCheckpointModuleStackIndex;
 

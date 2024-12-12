@@ -226,9 +226,31 @@ void AGearPlayerController::ClientStateRacing_Start(float StateStartTime)
 
 }
 
-void AGearPlayerController::ClientStateRacing_End(float StateStartTime)
+void AGearPlayerController::ClientStateRacing_End()
 {
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->Racing_End();
+	}
+}
 
+void AGearPlayerController::ClientStatePostRace_Start(float StateStartTime, const TArray<FCheckpointResult>& RoundResults)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->PostRace_Start(StateStartTime, RoundResults);
+	}
+}
+
+void AGearPlayerController::ClientStatePostRace_End()
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->PostRace_End();
+	}
 }
 
 void AGearPlayerController::PeekClientIsReady_Implementation()

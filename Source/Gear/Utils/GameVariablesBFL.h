@@ -23,4 +23,13 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = GameVariables)
 	static float GV_PlacingTimeLimit();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static int32 GV_FinishingCheckpointScore();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static int32 GV_FirstFinishAdditionalScore();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static int32 GV_WinningRequiredScore();
 };

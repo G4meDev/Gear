@@ -27,6 +27,7 @@ AGearGameState::AGearGameState()
 	LastPlacedCheckpointModuleStackIndex = 0;
 	FurthestReachedDistace = 0.0f;
 	FurthestReachedCheckpoint = 0;
+	RoundNumber = 1;
 }
 
 void AGearGameState::Tick(float DeltaSeconds)
@@ -49,6 +50,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AGearGameState, CheckpointsStack);
 	DOREPLIFETIME(AGearGameState, Vehicles);
 	DOREPLIFETIME(AGearGameState, CheckpointResults);
+	DOREPLIFETIME(AGearGameState, RoundNumber);
 }
 
 void AGearGameState::BeginPlay()
@@ -107,6 +109,11 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		break;
 
 	case EGearMatchState::Racing:
+		break;
+
+	case EGearMatchState::PostRace:
+		Racing_End();
+		PostRace_Start();
 		break;
 
 	case EGearMatchState::Ended:
@@ -217,6 +224,40 @@ void AGearGameState::Racing_End()
 	{
 		VehicleCamera->Destroy();
 	}
+
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			PlayerController->ClientStateRacing_End();
+		}
+	}
+}
+
+void AGearGameState::PostRace_Start()
+{
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			PlayerController->ClientStatePostRace_Start(LastGameStateTransitionTime, CheckpointResults);
+		}
+	}
+
+	for (APlayerState* PlayerState : PlayerArray)
+	{
+		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(PlayerState);
+		check(GearPlayerState);
+
+		GearPlayerState->UpdateRoundScore(CheckpointResults);
+	}
+}
+
+void AGearGameState::PostRace_End()
+{
+
 }
 
 bool AGearGameState::FindStartRoadModuleAndAddToStack()

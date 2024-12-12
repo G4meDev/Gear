@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/GearTypes.h"
 #include "GearPlayerController.generated.h"
 
 class AGearPlayerState;
@@ -71,6 +72,9 @@ public:
 	void ClientStatePlacing_Finish();
 	
 	void ClientStateRacing_Start(float StateStartTime);
-	void ClientStateRacing_End(float StateStartTime);
+	void ClientStateRacing_End();
+
+	void ClientStatePostRace_Start(float StateStartTime, const TArray<FCheckpointResult>& RoundResults);
+	void ClientStatePostRace_End();
 
 };

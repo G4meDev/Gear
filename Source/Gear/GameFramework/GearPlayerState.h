@@ -28,11 +28,28 @@ public:
 	UFUNCTION()
 	virtual void OnRep_ColorCode();
 
+	UFUNCTION(BlueprintPure)
+	int32 GetRoundBonusScore();
+
+	UFUNCTION(BlueprintPure)
+	void GetRoundScoreToCheckpoint(int32 CheckpointIndex, int32& ScoreToCheckpoint, int32& CheckpointScore);
+
+	void UpdateRoundScore(const TArray<FCheckpointResult>& RoundScore);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearVehicle> VehicleClass;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	int32 LastRoundScore;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	int32 CurrentScore;
+
+	TArray<int> CheckpointsScore;
+	int32 BonusScore;
 
 protected:
 

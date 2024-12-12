@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "GameFramework/Geartypes.h"
 #include "GearHUD.generated.h"
 
 class AGearPlayerState;
@@ -38,6 +39,15 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Racing_Start(float Time);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Racing_End();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PostRace_Start(float Time, const TArray<FCheckpointResult>& RoundResults);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PostRace_End();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void AddPlayer(AGearPlayerState* InPlayer);

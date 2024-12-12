@@ -17,3 +17,18 @@ float UGameVariablesBFL::GV_PlacingTimeLimit()
 {
 	return 10.0f;
 }
+
+int32 UGameVariablesBFL::GV_FinishingCheckpointScore()
+{
+	return 150;
+}
+
+int32 UGameVariablesBFL::GV_FirstFinishAdditionalScore()
+{
+	return 100;
+}
+
+int32 UGameVariablesBFL::GV_WinningRequiredScore()
+{
+	return 3000;
+}

@@ -9,6 +9,7 @@
 
 
 class AGearPlaceable;
+class AGearPlayerState;
 
 UENUM(BlueprintType)
 enum class EGearMatchState : uint8
@@ -137,4 +138,24 @@ public:
 	FVector Right;
 	FVector FlattenRight;
 	float Error;
+};
+
+USTRUCT(BlueprintType)
+struct FCheckpointResult 
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TArray<AGearPlayerState*> PlayerList;
+
+	AGearPlayerState* operator[](int i)
+	{
+		return PlayerList[i];
+	}
+
+	void Add(AGearPlayerState* PlayerState)
+	{
+		PlayerList.Add(PlayerState);
+	}
 };
