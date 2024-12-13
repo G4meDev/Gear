@@ -39,6 +39,7 @@ public:
 	void Racing_End();
 	void Scoreboard_Start();
 	void Scoreboard_End();
+	void GameFinished();
 
 	float GetEstimatedScoreboardLifespan() const;
 
@@ -63,8 +64,10 @@ public:
 	void RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, int CheckpointIndex);
 
 	TArray<AGearPlayerState*> GetWinningPlayers() const;
-
 	bool IsAnyPlayerWinning() const;
+
+	UFUNCTION(BlueprintPure)
+	TArray<AGearPlayerState*> GetPlayersPlacement();
 
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;

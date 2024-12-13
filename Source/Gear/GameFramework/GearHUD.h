@@ -50,6 +50,9 @@ public:
 	void Scoreboard_End();
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void GameFinished(float Time);
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void AddPlayer(AGearPlayerState* InPlayer);
 
 	UFUNCTION(BlueprintImplementableEvent)

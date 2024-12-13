@@ -253,6 +253,15 @@ void AGearPlayerController::ClientStateScoreboard_End()
 	}
 }
 
+void AGearPlayerController::ClientStateGameFinished(float StateStartTime)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->GameFinished(StateStartTime);
+	}
+}
+
 void AGearPlayerController::PeekClientIsReady_Implementation()
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();

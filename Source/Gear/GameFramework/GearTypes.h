@@ -21,7 +21,7 @@ enum class EGearMatchState : uint8
 	Racing_WaitTime,
 	Racing,
 	Scoreboard,
-	Ended
+	GameFinished
 };
 
 UENUM(BlueprintType)

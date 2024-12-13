@@ -98,19 +98,22 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		break;
 
 	case EGearMatchState::Placing:
+		Placing_End();
 		break;
 
 	case EGearMatchState::Racing_WaitTime:
 		break;
 
 	case EGearMatchState::Racing:
+		Racing_End();
 		break;
 
 	case EGearMatchState::Scoreboard:
 		Scoreboard_End();
 		break;
 
-	case EGearMatchState::Ended:
+	case EGearMatchState::GameFinished:
+
 		break;
 
 	default:
@@ -137,7 +140,6 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		break;
 
 	case EGearMatchState::Racing_WaitTime:
-		Placing_End();
 		Racing_Start();
 		break;
 
@@ -145,11 +147,11 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		break;
 
 	case EGearMatchState::Scoreboard:
-		Racing_End();
 		Scoreboard_Start();
 		break;
 
-	case EGearMatchState::Ended:
+	case EGearMatchState::GameFinished:
+		GameFinished();
 		break;
 
 	default:
@@ -303,6 +305,18 @@ void AGearGameState::Scoreboard_End()
 	}
 }
 
+void AGearGameState::GameFinished()
+{
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			PlayerController->ClientStateGameFinished(LastGameStateTransitionTime);
+		}
+	}
+}
+
 float AGearGameState::GetEstimatedScoreboardLifespan() const
 {	
 	return (CheckpointResults.Num() + 3) * UGameVariablesBFL::GV_ScoreboardTimeStep();
@@ -399,6 +413,26 @@ TArray<AGearPlayerState*> AGearGameState::GetWinningPlayers() const
 bool AGearGameState::IsAnyPlayerWinning() const
 {
 	return GetWinningPlayers().Num() > 0;
+}
+
+TArray<AGearPlayerState*> AGearGameState::GetPlayersPlacement()
+{
+	TArray<AGearPlayerState*> Results;
+
+	for (APlayerState* PlayerState : PlayerArray)
+	{
+		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(PlayerState);
+		check(GearPlayerState);
+
+		Results.Add(GearPlayerState);
+	}
+
+	Results.Sort(
+	[](const AGearPlayerState& p1, const AGearPlayerState& p2){
+		return p1.CurrentScore > p2.CurrentScore;
+	});
+
+	return Results;
 }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)

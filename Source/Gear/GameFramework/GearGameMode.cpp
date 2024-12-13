@@ -119,7 +119,7 @@ void AGearGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 
-	SetGearMatchState(EGearMatchState::Ended);
+	SetGearMatchState(EGearMatchState::GameFinished);
 }
 
 bool AGearGameMode::ShouldAbort()
@@ -542,8 +542,6 @@ void AGearGameMode::StartScoreboard()
 	GetWorld()->GetTimerManager().SetTimer(ScoreboardTimerHandle,
 		FTimerDelegate::CreateUObject(this, &AGearGameMode::ScoreboardLifespanFinished), GearGameState->GetEstimatedScoreboardLifespan(), false);
 
-	UE_LOG(LogTemp, Warning, TEXT("%f"), GearGameState->GetEstimatedScoreboardLifespan());
-
 	UE_LOG(LogTemp, Warning, TEXT("start scoreboard"));
 	SetGearMatchState(EGearMatchState::Scoreboard);
 }
@@ -554,7 +552,6 @@ void AGearGameMode::ScoreboardLifespanFinished()
 
 	if (GearGameState->IsAnyPlayerWinning())
 	{
-		
 		GameFinished();
 	}
 	else
@@ -574,7 +571,10 @@ void AGearGameMode::StartNewRound()
 
 void AGearGameMode::GameFinished()
 {
+	
+
 	UE_LOG(LogTemp, Warning, TEXT("game finished"));
+	SetGearMatchState(EGearMatchState::GameFinished);
 }
 
 void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint)

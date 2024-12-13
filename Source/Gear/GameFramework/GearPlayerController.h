@@ -77,4 +77,5 @@ public:
 	void ClientStateScoreboard_Start(float StateStartTime, const TArray<FCheckpointResult>& RoundResults);
 	void ClientStateScoreboard_End();
 
+	void ClientStateGameFinished(float StateStartTime);
 };
