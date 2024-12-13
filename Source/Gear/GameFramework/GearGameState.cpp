@@ -235,6 +235,9 @@ void AGearGameState::Placing_End()
 
 void AGearGameState::Racing_Start()
 {
+	FurthestReachedDistace = 0;
+	FurthestReachedCheckpoint = 0;
+
 	if (!IsValid(VehicleCamera))
 	{
 		VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
