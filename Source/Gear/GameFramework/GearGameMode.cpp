@@ -16,9 +16,12 @@
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/PlaceableSocket.h"
 #include "Placeable/PlaceableSpawnPoint.h"
+#include "Placeable/SpawnableSocket.h"
 
 #include "Utils/GameVariablesBFL.h"
 #include "kismet/GameplayStatics.h"
+
+#define SPAWNED_ACTOR_TAG "Spawned"
 
 AGearGameMode::AGearGameMode()
 {
@@ -452,6 +455,40 @@ void AGearGameMode::PlaceUnplaced()
 	}
 }
 
+void AGearGameMode::DestroyActors()
+{
+	TArray<AActor*> SpawnedActors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT(SPAWNED_ACTOR_TAG), SpawnedActors);
+
+	for (AActor* Actor : SpawnedActors)
+	{
+		Actor->Destroy();
+	}
+}
+
+void AGearGameMode::SpawnActors()
+{
+	for (AGearRoadModule* RoadModule : GearGameState->RoadModuleStack)
+	{
+		check(IsValid(RoadModule));
+
+		TInlineComponentArray<USpawnableSocket*> Sockets(RoadModule);
+		for (USpawnableSocket* SpawnableSocket : Sockets)
+		{
+			check(IsValid(SpawnableSocket) && IsValid(SpawnableSocket->SpawnClass));
+
+			FTransform SpawnTransform = SpawnableSocket->GetComponentTransform();
+			FActorSpawnParameters SpawnParameter;
+			SpawnParameter.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			AActor* Actor = GetWorld()->SpawnActor<AActor>(SpawnableSocket->SpawnClass->GetAuthoritativeClass(),
+				SpawnTransform.GetLocation(), SpawnTransform.Rotator(), SpawnParameter);
+
+			Actor->Tags.Add(TEXT(SPAWNED_ACTOR_TAG));
+		}
+	}
+}
+
 void AGearGameMode::DestroyPawns()
 {
 	for (APlayerState* Player : GameState->PlayerArray)
@@ -516,6 +553,8 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 		PlaceUnplaced();
 	}
 
+	SpawnActors();
+
 	DestroyPawns();
 	GearGameState->Vehicles.Empty(4);
 	GearGameState->FurthestReachedDistace = 0;
@@ -541,6 +580,8 @@ void AGearGameMode::StartScoreboard()
 {
 	GetWorld()->GetTimerManager().SetTimer(ScoreboardTimerHandle,
 		FTimerDelegate::CreateUObject(this, &AGearGameMode::ScoreboardLifespanFinished), GearGameState->GetEstimatedScoreboardLifespan(), false);
+
+	DestroyActors();
 
 	UE_LOG(LogTemp, Warning, TEXT("start scoreboard"));
 	SetGearMatchState(EGearMatchState::Scoreboard);

@@ -72,6 +72,8 @@ protected:
 
 	bool IsEveryPlayerPlaced();
 	void PlaceUnplaced();
+	void DestroyActors();
+	void SpawnActors();
 	void DestroyPawns();
 	void StartRacingAtCheckpoint(int CheckpointIndex);
 	void StartRacing(bool bEveryPlayerPlaced);
