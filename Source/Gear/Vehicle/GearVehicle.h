@@ -40,6 +40,8 @@ protected:
 
 	virtual void NotifyControllerChanged() override;
 
+	virtual void OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState) override;
+
 	virtual void Destroyed() override;
 
 	bool IsOutsideTrack() const;

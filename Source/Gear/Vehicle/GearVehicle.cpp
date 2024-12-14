@@ -5,6 +5,7 @@
 #include "Vehicle/GearVehicle.h"
 
 #include "GameFramework/GearPlayerController.h"
+#include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
 #include "Vehicle/VehicleCamera.h"
 #include "GameSystems/TrackSpline.h"
@@ -66,6 +67,18 @@ void AGearVehicle::NotifyControllerChanged()
 	{
 		VehicleInputWidget = CreateWidget(GetWorld(), VehicleInputWidgetClass);
 		VehicleInputWidget->AddToViewport();
+	}
+}
+
+void AGearVehicle::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
+{
+	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
+
+	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
+	if (IsValid(GearPlayerState))
+	{
+		UMaterialInstanceDynamic* Material = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
+		Material->SetVectorParameterValue(TEXT("Color"), GearPlayerState->PlayerColor.ReinterpretAsLinear());
 	}
 }
 
