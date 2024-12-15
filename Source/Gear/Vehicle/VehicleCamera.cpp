@@ -7,6 +7,7 @@
 #include "Vehicle/VehicleSpringArm.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 AVehicleCamera::AVehicleCamera()
@@ -31,8 +32,12 @@ void AVehicleCamera::UpdateCamera()
 	{
 		FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(GearGameState->FurthestReachedDistace);
 		
+		FVector TrackTangent = TrackTransform.Rotator().Vector();
+		TrackTangent.Z = 0;
+		FRotator CameraRotation = UKismetMathLibrary::MakeRotFromXZ(TrackTangent, FVector::UpVector);
+
 		SetActorLocation(TrackTransform.GetLocation());
-		SetActorRotation(TrackTransform.Rotator());
+		SetActorRotation(CameraRotation);
 	}
 
 	
