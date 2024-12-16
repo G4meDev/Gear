@@ -31,6 +31,23 @@ void AGearVehicle::BeginPlay()
 {
 	Super::BeginPlay();
 
+#if WITH_EDITOR
+	
+	bInTestMap = GetWorld()->GetName().Equals(VEHICLE_TESTMAP_NAME);
+
+	if (bInTestMap)
+	{
+		AController* CC = GetController();
+		if (IsValid(CC))
+		{
+			NotifyControllerChanged();
+		}
+
+		return;
+	}
+
+#endif
+
 	GearGameState = GetWorld()->GetGameState<AGearGameState>();
 	check(GearGameState);
 
@@ -67,12 +84,34 @@ void AGearVehicle::NotifyControllerChanged()
 	{
 		VehicleInputWidget = CreateWidget(GetWorld(), VehicleInputWidgetClass);
 		VehicleInputWidget->AddToViewport();
+
+#if WITH_EDITOR
+
+		if (bInTestMap)
+		{
+			FTransform SpawnTransform;
+			AActor* SpawnActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), VehicleCameraClass, SpawnTransform);
+
+			AVehicleCamera* VehicleCamera = Cast<AVehicleCamera>(SpawnActor);
+			VehicleCamera->bTestMode = true;
+			VehicleCamera->Vehicle = this;
+			UGameplayStatics::FinishSpawningActor(VehicleCamera, SpawnTransform);
+
+			PC->SetViewTarget(VehicleCamera);
+		}
+
+#endif
 	}
 }
 
 void AGearVehicle::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
 {
 	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
+
+#if WITH_EDITOR
+	if (bInTestMap)
+		return;
+#endif
 
 	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
 	if (IsValid(GearPlayerState))
@@ -85,6 +124,11 @@ void AGearVehicle::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerSta
 void AGearVehicle::Destroyed()
 {
 	Super::Destroyed();
+
+#if WITH_EDITOR
+	if (bInTestMap)
+		return;
+#endif
 
 	if (HasAuthority() && IsValid(GearGameState))
 	{
@@ -102,26 +146,17 @@ void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-#if WITH_EDITOR
-	//bInTestMap = GetWorld()->GetName().Equals(VEHICLE_TESTMAP_NAME);
-	bInTestMap = true;
-#endif
-
 	if (IsLocallyControlled())
 	{
 		UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 		Input->BindAction(SteerActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Steer);
 		Input->BindAction(SteerActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Steer);
-#if WITH_EDITOR
-		if (bInTestMap)
-		{
-			Input->BindAction(ThrottleActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Throttle);
-			Input->BindAction(ThrottleActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Throttle);
 
-			Input->BindAction(BrakeActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Brake);
-			Input->BindAction(BrakeActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Brake);
-		}
-#endif
+		Input->BindAction(ThrottleActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Throttle);
+		Input->BindAction(ThrottleActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Throttle);
+
+		Input->BindAction(BrakeActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Brake);
+		Input->BindAction(BrakeActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Brake);
 	}
 }
 
@@ -130,7 +165,6 @@ void AGearVehicle::Input_Steer(const FInputActionInstance& Instance)
 	SteerValue = Instance.GetValue().Get<float>();
 }
 
-#if WITH_EDITOR
 void AGearVehicle::Input_Throttle(const FInputActionInstance& Instance)
 {
 	ThrottleValue = Instance.GetValue().Get<float>();
@@ -140,7 +174,6 @@ void AGearVehicle::Input_Brake(const FInputActionInstance& Instance)
 {
 	BrakeValue = Instance.GetValue().Get<float>();
 }
-#endif
 
 void AGearVehicle::Tick(float DeltaSeconds)
 {
@@ -152,18 +185,15 @@ void AGearVehicle::Tick(float DeltaSeconds)
 
 		if (CanDrive())
 		{
-			GetVehicleMovementComponent()->SetThrottleInput(1.0f);
-		}
-
-#if WITH_EDITOR
-		if (bInTestMap)
-		{
 			GetVehicleMovementComponent()->SetThrottleInput(ThrottleValue);
 			GetVehicleMovementComponent()->SetBrakeInput(BrakeValue);
 		}
-#endif
 	}
 
+#if WITH_EDITOR
+	if (bInTestMap)
+		return;
+#endif
 
 	UpdateDistanceAlongTrack();
 

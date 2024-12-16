@@ -7,6 +7,7 @@
 #include "GearVehicle.generated.h"
 
 class AGearGameState;
+class AVehicleCamera;
 class UInputAction;
 struct FInputActionInstance;
 
@@ -65,7 +66,6 @@ protected:
 
 	APlayerController* AuthorativeController;
 
-#if WITH_EDITORONLY_DATA
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* ThrottleActionInput;
 
@@ -78,6 +78,10 @@ protected:
 	float ThrottleValue;
 	float BrakeValue;
 
+#if WITH_EDITORONLY_DATA
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AVehicleCamera> VehicleCameraClass;
 
 	bool bInTestMap = false; 
 #endif

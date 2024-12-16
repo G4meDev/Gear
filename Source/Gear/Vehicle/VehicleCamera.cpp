@@ -2,6 +2,7 @@
 
 
 #include "Vehicle/VehicleCamera.h"
+#include "Vehicle/GearVehicle.h"
 #include "GameFramework/GearGameState.h"
 #include "GameSystems/TrackSpline.h"
 #include "Vehicle/VehicleSpringArm.h"
@@ -26,21 +27,48 @@ AVehicleCamera::AVehicleCamera()
 	Camera->SetupAttachment(CameraBoom);
 }
 
+void AVehicleCamera::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GearGameState = GetWorld()->GetGameState<AGearGameState>();
+	UpdateCamera();
+	MarkTeleport();
+}
+
+void AVehicleCamera::BecomeViewTarget(APlayerController* PC)
+{
+	Super::BecomeViewTarget(PC);
+
+	OwnerController = PC;
+	UpdateCameraMatrix();
+}
+
+void AVehicleCamera::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UpdateCamera();
+	UpdateCameraMatrix();
+}
+
 void AVehicleCamera::UpdateCamera()
 {
+#if WITH_EDITOR
+	
+	if (bTestMode)
+	{
+		UpdateCameraWithTransform(Vehicle->GetActorTransform());
+		return;
+	}
+
+#endif
+
 	if (IsValid(GearGameState))
 	{
 		FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(GearGameState->FurthestReachedDistace);
-		
-		FVector TrackTangent = TrackTransform.Rotator().Vector();
-		TrackTangent.Z = 0;
-		FRotator CameraRotation = UKismetMathLibrary::MakeRotFromXZ(TrackTangent, FVector::UpVector);
-
-		SetActorLocation(TrackTransform.GetLocation());
-		SetActorRotation(CameraRotation);
+		UpdateCameraWithTransform(TrackTransform);
 	}
-
-	
 }
 
 void AVehicleCamera::UpdateCameraMatrix()
@@ -78,27 +106,12 @@ bool AVehicleCamera::IsOutsideCameraFrustum(AActor* Target)
 	return false;
 }
 
-void AVehicleCamera::BeginPlay()
+void AVehicleCamera::UpdateCameraWithTransform(const FTransform& Transform)
 {
-	Super::BeginPlay();
-	
-	GearGameState = GetWorld()->GetGameState<AGearGameState>();
- 	UpdateCamera();
-	MarkTeleport();
-}
+	FVector Tangent = Transform.Rotator().Vector();
+	Tangent.Z = 0;
+	FRotator CameraRotation = UKismetMathLibrary::MakeRotFromXZ(Tangent, FVector::UpVector);
 
-void AVehicleCamera::BecomeViewTarget(APlayerController* PC)
-{
-	Super::BecomeViewTarget(PC);
-
-	OwnerController = PC;
-	UpdateCameraMatrix();
-}
-
-void AVehicleCamera::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);	
-
-	UpdateCamera();
-	UpdateCameraMatrix();
+	SetActorLocation(Transform.GetLocation());
+	SetActorRotation(CameraRotation);
 }

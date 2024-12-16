@@ -8,6 +8,7 @@
 
 class AGearGameState;
 class UVehicleSpringArm;
+class AGearVehicle;
 class UCameraComponent;
 
 UCLASS()
@@ -28,10 +29,17 @@ public:
 
 	bool IsOutsideCameraFrustum(AActor* Target);
 
+#if WITH_EDITORONLY_DATA
+	bool bTestMode = false;
+	AGearVehicle* Vehicle;
+#endif
+
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void BecomeViewTarget(APlayerController* PC) override;
+
+	void UpdateCameraWithTransform(const FTransform& Transform);
 
 	APlayerController* OwnerController;
 
