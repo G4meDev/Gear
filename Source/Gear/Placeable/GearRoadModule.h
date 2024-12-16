@@ -60,6 +60,8 @@ public:
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bDirty = false;
+
+	float RotationPivotHeightOffset = -200.0f;
 #endif
 
 protected:

@@ -62,6 +62,18 @@ void AGearRoadModule::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 	{
 		bDirty = false;
 		RoadLength = RoadSpline->GetSplineLength();
+
+		if (IsValid(RoadMesh) && IsValid(SelectionIndicator) && IsValid(PreviewRotationPivot))
+		{
+			FVector MinBound;
+			FVector MaxBound;
+			RoadMesh->GetLocalBounds(MinBound, MaxBound);
+			
+			FVector RotationPivotLocation = (MinBound + MaxBound) / 2.0f;
+			RotationPivotLocation.Z = MinBound.Z + RotationPivotHeightOffset;
+
+			PreviewRotationPivot->SetRelativeLocation(RotationPivotLocation);
+		}
 	}
 }
 #endif
