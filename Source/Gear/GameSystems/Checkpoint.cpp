@@ -7,6 +7,7 @@
 #include "Vehicle/GearVehicle.h"
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
 
 ACheckpoint::ACheckpoint()
 {
@@ -26,6 +27,11 @@ ACheckpoint::ACheckpoint()
 	StartLineMesh->SetupAttachment(Root);
 	StartLineMesh->SetRelativeLocation(FVector::UpVector * 1.0f);
 	StartLineMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	StartPositionMeshes = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("StartPositionMesh"));
+	StartPositionMeshes->SetupAttachment(Root);
+	StartPositionMeshes->SetRelativeLocation(FVector::UpVector * 1.0f);
+	StartPositionMeshes->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	StartPonit_1 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_1"));
 	StartPonit_1->SetupAttachment(Root);
@@ -71,6 +77,8 @@ ACheckpoint::ACheckpoint()
 
 void ACheckpoint::Init(float InWidth, float InHeight, float InLength, float InLateralSeperationRatio, float InLongitudinalSeperation)
 {
+	StartPositionMeshes->ClearInstances();
+
 	Width = InWidth;
 	Height = InHeight;
 	Length = InLength;
@@ -91,7 +99,10 @@ void ACheckpoint::Init(float InWidth, float InHeight, float InLength, float InLa
 		int NumRow = i/2;
 		float Long = (NumRow * LongitudinalSeperation) + (0.5f * LongitudinalSeperation) + (0.5f * Width);
 
-		StartPoints[i]->SetRelativeLocation(FVector(-Long, Lat, 0.0f));
+		FVector InstancePos = FVector(-Long, Lat, 0.0f);
+		StartPoints[i]->SetRelativeLocation(InstancePos);
+		
+		StartPositionMeshes->AddInstance(FTransform(InstancePos));
 	}
 }
 

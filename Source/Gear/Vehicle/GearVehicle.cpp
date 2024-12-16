@@ -198,7 +198,7 @@ void AGearVehicle::UpdateDistanceAlongTrack()
 bool AGearVehicle::IsOutsideTrack() const
 {
 	FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(DistanaceAlongTrack);
-	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -200.0f;
+	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -700.0f;
 }
 
 // on server

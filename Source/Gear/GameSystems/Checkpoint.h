@@ -67,6 +67,9 @@ protected:
 	UStaticMeshComponent* StartLineMesh;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInstancedStaticMeshComponent* StartPositionMeshes;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UVehicleStart* StartPonit_1;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
