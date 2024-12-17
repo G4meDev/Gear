@@ -21,6 +21,8 @@
 AGearVehicle::AGearVehicle()
 {
 	SteerValue = 0.0f;
+	ThrottleValue = 0.0f;
+	BrakeValue = 0.0f;
 
 	bAlwaysRelevant = true;
 	DistanaceAlongTrack = 0;
