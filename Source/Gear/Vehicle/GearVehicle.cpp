@@ -101,7 +101,7 @@ void AGearVehicle::NotifyControllerChanged()
 
 			PC->SetViewTarget(VehicleCamera);
 		}
-
+		GetVehicleMovementComponent()->
 #endif
 	}
 }
