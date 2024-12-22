@@ -33,6 +33,10 @@ ACheckpoint::ACheckpoint()
 	StartPositionMeshes->SetRelativeLocation(FVector::UpVector * 1.0f);
 	StartPositionMeshes->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	StartLamp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StartLamp"));
+	StartLamp->SetupAttachment(Root);
+	StartLamp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	StartPonit_1 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_1"));
 	StartPonit_1->SetupAttachment(Root);
 
