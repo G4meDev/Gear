@@ -70,7 +70,7 @@ protected:
 	UInstancedStaticMeshComponent* StartPositionMeshes;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UStaticMeshComponent* StartLamp;
+	USkeletalMeshComponent* HandMesh;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UVehicleStart* StartPonit_1;
