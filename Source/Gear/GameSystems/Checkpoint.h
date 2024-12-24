@@ -44,11 +44,15 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int CheckpointIndex;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(ReplicatedUsing=OnRep_LastStartTime, BlueprintReadWrite, EditAnywhere)
 	float LastStartTime;
 
-	UFUNCTION(NetMulticast, Reliable)
-	void StartRace_RPC(float StartTime);
+	UFUNCTION()
+	void OnRep_LastStartTime();
+	
+	void StartRace(float StartTime);
+
+
 
 protected:
 

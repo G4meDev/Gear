@@ -544,7 +544,7 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCount
 
 	if (bWithCountDown)
 	{
-		GearGameState->CheckpointsStack[GearGameState->FurthestReachedCheckpoint]->StartRace_RPC(GetWorld()->GetTimeSeconds());
+		GearGameState->CheckpointsStack[GearGameState->FurthestReachedCheckpoint]->StartRace(GetWorld()->GetTimeSeconds());
 	}
 }
 

@@ -8,6 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ACheckpoint::ACheckpoint()
 {
@@ -137,6 +138,13 @@ void ACheckpoint::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 }
 #endif
 
+void ACheckpoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACheckpoint, LastStartTime);
+}
+
 void ACheckpoint::BeginPlay()
 {
 	Super::BeginPlay();
@@ -173,8 +181,12 @@ void ACheckpoint::Tick(float DeltaTime)
 
 }
 
-void ACheckpoint::StartRace_RPC_Implementation(float StartTime)
+void ACheckpoint::OnRep_LastStartTime()
+{
+	
+}
+
+void ACheckpoint::StartRace(float StartTime)
 {
 	LastStartTime = StartTime;
 }
-
