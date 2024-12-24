@@ -8,6 +8,11 @@ float UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay()
 	return 2.0f;
 }
 
+float UGameVariablesBFL::GV_CountDownDuration()
+{
+	return 4.0f;
+}
+
 float UGameVariablesBFL::GV_PieceSelectionTimeLimit()
 {
 	return 10.0f;

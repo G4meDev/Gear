@@ -551,7 +551,7 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCount
 void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 {
 	GetWorld()->GetTimerManager().ClearTimer(PlacingTimerHandle);
-	GetWorld()->GetTimerManager().SetTimer(RacingWaitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::RacingWaitTimeFinished), 3.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(RacingWaitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::RacingWaitTimeFinished), UGameVariablesBFL::GV_CountDownDuration(), false);
 
 	if (!bEveryPlayerPlaced)
 	{
