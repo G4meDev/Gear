@@ -53,6 +53,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AGearGameState, Vehicles);
 	DOREPLIFETIME(AGearGameState, CheckpointResults);
 	DOREPLIFETIME(AGearGameState, RoundNumber);
+	DOREPLIFETIME(AGearGameState, LastCountDownTime);
 }
 
 void AGearGameState::BeginPlay()
@@ -101,9 +102,6 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		Placing_End();
 		break;
 
-	case EGearMatchState::Racing_WaitTime:
-		break;
-
 	case EGearMatchState::Racing:
 		Racing_End();
 		break;
@@ -139,11 +137,8 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		Placing_Start();
 		break;
 
-	case EGearMatchState::Racing_WaitTime:
-		Racing_Start();
-		break;
-
 	case EGearMatchState::Racing:
+		Racing_Start();
 		break;
 
 	case EGearMatchState::Scoreboard:
@@ -433,6 +428,12 @@ TArray<AGearPlayerState*> AGearGameState::GetPlayersPlacement()
 	});
 
 	return Results;
+}
+
+bool AGearGameState::IsCountDown()
+{
+	float Time = GetServerWorldTimeSeconds() - LastCountDownTime;
+	return Time > 0 && Time < UGameVariablesBFL::GV_CountDownDuration();
 }
 
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)

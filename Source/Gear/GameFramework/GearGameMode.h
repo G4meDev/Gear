@@ -77,13 +77,10 @@ protected:
 	void DestroyPawns();
 	void StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCountDown);
 	void StartRacing(bool bEveryPlayerPlaced);
-	FTimerHandle RacingWaitTimerHandle;
 
 	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
 	bool ShouldAddCheckpoint() const;
 	void AddCheckpoint();
-
-	void RacingWaitTimeFinished();
 
 	void StartScoreboard();
 	void ScoreboardLifespanFinished();

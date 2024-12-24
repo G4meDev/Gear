@@ -186,7 +186,7 @@ void ACheckpoint::OnRep_LastStartTime()
 	
 }
 
-void ACheckpoint::StartRace(float StartTime)
+void ACheckpoint::StartCountDown(float StartTime)
 {
 	LastStartTime = StartTime;
 }

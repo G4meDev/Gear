@@ -69,6 +69,10 @@ public:
 	UFUNCTION(BlueprintPure)
 	TArray<AGearPlayerState*> GetPlayersPlacement();
 
+
+	UFUNCTION(BlueprintPure)
+	bool IsCountDown();
+
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
 
@@ -95,6 +99,9 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
 	int32 RoundNumber;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
+	float LastCountDownTime;
 
 	int LastPlacedCheckpointModuleStackIndex;
 

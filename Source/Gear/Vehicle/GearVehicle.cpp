@@ -216,7 +216,7 @@ bool AGearVehicle::CanDrive()
 
 //	return false;
 
-	bool bRaceStarted = IsValid(GearGameState) ? GearGameState->GearMatchState == EGearMatchState::Racing : false;
+	bool bRaceStarted = IsValid(GearGameState) ? !GearGameState->IsCountDown() : false;
 
 	return bRaceStarted;
 }

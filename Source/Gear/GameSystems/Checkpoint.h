@@ -50,7 +50,7 @@ public:
 	UFUNCTION()
 	void OnRep_LastStartTime();
 	
-	void StartRace(float StartTime);
+	void StartCountDown(float StartTime);
 
 
 

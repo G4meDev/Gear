@@ -507,6 +507,14 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCount
 
 	GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
 
+	if (bWithCountDown)
+	{
+		GearGameState->LastCountDownTime = GetWorld()->GetTimeSeconds();
+		Checkpoint->StartCountDown(GetWorld()->GetTimeSeconds());
+
+		UE_LOG(LogTemp, Warning, TEXT("start count down"));
+	}
+
 	bool bEveryPlayerEliminated = true;
 
 	int i = 0;
@@ -541,17 +549,11 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCount
 		GearGameState->VehicleCamera->MarkTeleport();
 		GearGameState->VehicleCamera->UpdateCameraMatrix();
 	}
-
-	if (bWithCountDown)
-	{
-		GearGameState->CheckpointsStack[GearGameState->FurthestReachedCheckpoint]->StartRace(GetWorld()->GetTimeSeconds());
-	}
 }
 
 void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 {
 	GetWorld()->GetTimerManager().ClearTimer(PlacingTimerHandle);
-	GetWorld()->GetTimerManager().SetTimer(RacingWaitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::RacingWaitTimeFinished), UGameVariablesBFL::GV_CountDownDuration(), false);
 
 	if (!bEveryPlayerPlaced)
 	{
@@ -568,17 +570,8 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 
 	StartRacingAtCheckpoint(0, true);
 
-	UE_LOG(LogTemp, Warning, TEXT("start racing"));
-	SetGearMatchState(EGearMatchState::Racing_WaitTime);
-}
-
-void AGearGameMode::RacingWaitTimeFinished()
-{
-	GetWorld()->GetTimerManager().ClearTimer(RacingWaitTimerHandle);
-
-
-
 	SetGearMatchState(EGearMatchState::Racing);
+	UE_LOG(LogTemp, Warning, TEXT("start racing"));
 }
 
 void AGearGameMode::StartScoreboard()
