@@ -8,6 +8,7 @@
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
+#include "GameFramework/GearGameMode.h"
 #include "Vehicle/VehicleCamera.h"
 #include "GameSystems/TrackSpline.h"
 #include "ChaosVehicleMovementComponent.h"
@@ -125,23 +126,20 @@ void AGearVehicle::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerSta
 
 void AGearVehicle::Destroyed()
 {
-	Super::Destroyed();
+	UE_LOG(LogTemp, Warning, TEXT("%s Killed"), *GetName());
 
 #if WITH_EDITOR
 	if (bInTestMap)
 		return;
 #endif
 
-	if (HasAuthority() && IsValid(GearGameState))
-	{
-		GearGameState->Vehicles.Remove(this);
-	}
-
 	if (IsValid(VehicleInputWidget))
 	{
 		VehicleInputWidget->RemoveFromParent();
 		VehicleInputWidget = nullptr;
 	}
+
+	Super::Destroyed();
 }
 
 void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -198,15 +196,6 @@ void AGearVehicle::Tick(float DeltaSeconds)
 #endif
 
 	UpdateDistanceAlongTrack();
-
-	if (HasAuthority())
-	{
-		const bool bOutsideCameraFrustom = GearGameState->VehicleCamera ? GearGameState->VehicleCamera->IsOutsideCameraFrustum(this) : false;
-		if (IsOutsideTrack() || bOutsideCameraFrustom)
-		{
-			Killed();
-		}
-	}
 }
 
 bool AGearVehicle::CanDrive()
@@ -215,10 +204,7 @@ bool AGearVehicle::CanDrive()
 	if (bInTestMap) return true;
 #endif
 
-//	return false;
-
 	bool bRaceStarted = IsValid(GearGameState) ? !GearGameState->IsCountDown() : false;
-
 	return bRaceStarted;
 }
 
@@ -257,12 +243,4 @@ bool AGearVehicle::IsOutsideTrack() const
 {
 	FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(DistanaceAlongTrack);
 	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -700.0f;
-}
-
-// on server
-void AGearVehicle::Killed()
-{
-	UE_LOG(LogTemp, Warning, TEXT("%s Killed"), *GetName());
-
-	Destroy();
 }

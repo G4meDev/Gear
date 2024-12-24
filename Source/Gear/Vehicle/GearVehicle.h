@@ -32,6 +32,8 @@ public:
 
 	void UpdateStateToVehicle(AGearVehicle* TargetVehicle);
 
+	bool IsOutsideTrack() const;
+
 	UFUNCTION(BlueprintPure)
 	UChaosWheeledVehicleMovementComponent* GetChaosMovementComponent();
 
@@ -51,9 +53,7 @@ protected:
 
 	virtual void Destroyed() override;
 
-	bool IsOutsideTrack() const;
 
-	void Killed();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* SteerActionInput;

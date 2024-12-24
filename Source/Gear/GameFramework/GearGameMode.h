@@ -96,6 +96,11 @@ protected:
 	bool LoadPlaceables();
 	bool LoadPlaceableSpawnPoints();
 	
+	// --------------------------------------------------------------------------
+
+	bool ShouldVehicleDie(AGearVehicle* Vehicle) const;
+	void DestroyVehicle(AGearVehicle* Vehicle);
+
 	EGearMatchState GearMatchState;
 
 	TArray<AGearPlaceable*> PreviewPlaceables;

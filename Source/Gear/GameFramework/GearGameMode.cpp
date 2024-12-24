@@ -97,16 +97,14 @@ void AGearGameMode::Tick(float DeltaSeconds)
 
 	else if (GearMatchState == EGearMatchState::Racing)
 	{
-		if (GearGameState->Vehicles.Num() == 0)
+		for (AGearVehicle* Vehicle : GearGameState->Vehicles)
 		{
-			if (GearGameState->FurthestReachedCheckpoint < GearGameState->CheckpointsStack.Num() - 2)
+			if (IsValid(Vehicle))
 			{
-				StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1, nullptr);
-			}
-
-			else
-			{
-				StartScoreboard();
+				if (ShouldVehicleDie(Vehicle))
+				{
+					DestroyVehicle(Vehicle);
+				}
 			}
 		}
 	}
@@ -214,6 +212,31 @@ bool AGearGameMode::LoadPlaceableSpawnPoints()
 	}
 
 	return HazardPreviewSpawnPoints.Num() == 5;
+}
+
+bool AGearGameMode::ShouldVehicleDie(AGearVehicle* Vehicle) const
+{
+	const bool bOutsideCameraFrustom = GearGameState->VehicleCamera ? GearGameState->VehicleCamera->IsOutsideCameraFrustum(Vehicle) : false;
+	return Vehicle->IsOutsideTrack() || bOutsideCameraFrustom;
+}
+
+void AGearGameMode::DestroyVehicle(AGearVehicle* Vehicle)
+{	
+	GearGameState->Vehicles.Remove(Vehicle);
+	Vehicle->Destroy();
+
+	if (GearGameState->Vehicles.Num() == 0)
+	{
+		if (GearGameState->FurthestReachedCheckpoint < GearGameState->CheckpointsStack.Num() - 2)
+		{
+			StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1, nullptr);
+		}
+
+		else
+		{
+			StartScoreboard();
+		}
+	}
 }
 
 void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearBuilderPawn* Player)
