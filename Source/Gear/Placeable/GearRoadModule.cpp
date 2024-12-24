@@ -13,6 +13,7 @@ AGearRoadModule::AGearRoadModule()
 
 	RoadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RoadMesh"));
 	RoadMesh->SetupAttachment(Root);
+	RoadMesh->SetCollisionProfileName(TEXT("BlockAll"));
 
 	RoadStartSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("StartSocket"));
 	RoadStartSocket->SetupAttachment(Root);

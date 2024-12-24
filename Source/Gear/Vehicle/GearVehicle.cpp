@@ -281,9 +281,19 @@ bool AGearVehicle::HasInvincibility() const
 	return bGrantedInvincibility;
 }
 
-bool AGearVehicle::CanRemoveInvincibility() const
+bool AGearVehicle::CanRemoveInvincibility()
 {
-	return true;
+	FBoxSphereBounds3d Bounds = GetMesh()->Bounds;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQuery;
+	ObjectTypeQuery.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	TArray<AActor*> OutActors;
+
+	const bool bHasOccluders = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), Bounds.GetSphere().Center, Bounds.SphereRadius, ObjectTypeQuery, nullptr, ActorsToIgnore, OutActors);
+	DrawDebugSphere(GetWorld(), Bounds.GetSphere().Center, Bounds.SphereRadius, 8, bHasOccluders ? FColor::Red : FColor::Blue, false, 0.1f);
+
+	return !bHasOccluders;
 }
 
 void AGearVehicle::OnRep_GrantedInvincibility()

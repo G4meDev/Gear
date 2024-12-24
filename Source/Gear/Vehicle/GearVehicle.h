@@ -42,7 +42,7 @@ public:
 	void GrantInvincibility();
 	void RemoveInvincibility();
 	bool HasInvincibility() const;
-	bool CanRemoveInvincibility() const;
+	bool CanRemoveInvincibility();
 
 	UFUNCTION()
 	void OnRep_GrantedInvincibility();
