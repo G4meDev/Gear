@@ -37,6 +37,16 @@ public:
 	UFUNCTION(BlueprintPure)
 	UChaosWheeledVehicleMovementComponent* GetChaosMovementComponent();
 
+	UMaterialInstanceDynamic* GetVehicleMaterial();
+
+	void GrantInvincibility();
+	void RemoveInvincibility();
+	bool HasInvincibility() const;
+	bool CanRemoveInvincibility() const;
+
+	UFUNCTION()
+	void OnRep_GrantedInvincibility();
+
 	float DistanaceAlongTrack;
 
 	int TargetCheckpoint;
@@ -80,11 +90,27 @@ protected:
 
 	UChaosWheeledVehicleMovementComponent* ChaosMovementComponent;
 
+	UPROPERTY()
+	UMaterialInstanceDynamic* VehicleMaterial;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMaterialInterface* VehicleMaterialParent_Opaque;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMaterialInterface* VehicleMaterialParent_Transparent;
+
 	void Input_Throttle(const FInputActionInstance& Instance);
 	void Input_Brake(const FInputActionInstance& Instance);
 
 	float ThrottleValue;
 	float BrakeValue;
+
+
+	UPROPERTY(ReplicatedUsing=OnRep_GrantedInvincibility)
+	bool bGrantedInvincibility;
+
+	float InvincibilityStartTime;
+
 
 #if WITH_EDITORONLY_DATA
 

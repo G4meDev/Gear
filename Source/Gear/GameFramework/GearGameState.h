@@ -103,6 +103,8 @@ public:
 	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
 	float LastCountDownTime;
 
+	float LastCheckpointStartTime;
+
 	int LastPlacedCheckpointModuleStackIndex;
 
 	float FurthestReachedDistace;

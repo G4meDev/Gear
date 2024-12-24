@@ -16,6 +16,7 @@
 #include "InputAction.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
+#include "Net/UnrealNetwork.h"
 
 #define VEHICLE_TESTMAP_NAME "VehicleTestMap"
 
@@ -29,6 +30,15 @@ AGearVehicle::AGearVehicle()
 	bAlwaysRelevant = true;
 	DistanaceAlongTrack = 0;
 	TargetCheckpoint = 1;
+
+	bGrantedInvincibility = false;
+}
+
+void AGearVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGearVehicle, bGrantedInvincibility);
 }
 
 void AGearVehicle::BeginPlay()
@@ -117,10 +127,9 @@ void AGearVehicle::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerSta
 #endif
 
 	AGearPlayerState* GearPlayerState = GetPlayerState<AGearPlayerState>();
-	if (IsValid(GearPlayerState))
+	if (IsValid(GearPlayerState) && IsValid(GetVehicleMaterial()))
 	{
-		UMaterialInstanceDynamic* Material = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
-		Material->SetVectorParameterValue(TEXT("Color"), GearPlayerState->PlayerColor.ReinterpretAsLinear());
+		VehicleMaterial->SetVectorParameterValue(TEXT("Color"), GearPlayerState->PlayerColor.ReinterpretAsLinear());
 	}
 }
 
@@ -237,6 +246,63 @@ UChaosWheeledVehicleMovementComponent* AGearVehicle::GetChaosMovementComponent()
 
 	ChaosMovementComponent = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovementComponent());
 	return ChaosMovementComponent;
+}
+
+UMaterialInstanceDynamic* AGearVehicle::GetVehicleMaterial()
+{
+	if (IsValid(VehicleMaterial))
+	{
+		return VehicleMaterial;
+	}
+
+	VehicleMaterial = GetMesh()->CreateDynamicMaterialInstance(0, VehicleMaterialParent_Opaque);
+	return VehicleMaterial;
+}
+
+void AGearVehicle::GrantInvincibility()
+{
+	if (HasAuthority())
+	{
+		bGrantedInvincibility = true;
+		InvincibilityStartTime = GetWorld()->GetTimeSeconds();
+	}
+}
+
+void AGearVehicle::RemoveInvincibility()
+{
+	if (HasAuthority())
+	{
+		bGrantedInvincibility = false;
+	}
+}
+
+bool AGearVehicle::HasInvincibility() const
+{
+	return bGrantedInvincibility;
+}
+
+bool AGearVehicle::CanRemoveInvincibility() const
+{
+	return true;
+}
+
+void AGearVehicle::OnRep_GrantedInvincibility()
+{
+	if (HasInvincibility())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("granted invincibility to %s"), *GetName());
+
+		VehicleMaterial = GetMesh()->CreateDynamicMaterialInstance(0, VehicleMaterialParent_Transparent);
+		GetMesh()->SetCollisionProfileName(TEXT("InvincibleVehicle"));
+	}
+
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("removed invincibility from %s"), *GetName());
+
+		VehicleMaterial = GetMesh()->CreateDynamicMaterialInstance(0, VehicleMaterialParent_Opaque);
+		GetMesh()->SetCollisionProfileName(TEXT("Vehicle"));
+	}
 }
 
 bool AGearVehicle::IsOutsideTrack() const

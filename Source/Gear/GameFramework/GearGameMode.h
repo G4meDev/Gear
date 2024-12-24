@@ -31,6 +31,8 @@ public:
 	AGearGameMode();
 
 	void Tick(float DeltaSeconds) override;
+
+	void RacingTick(float DeltaSeconds);
 	
 	void RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearBuilderPawn* Player);
 

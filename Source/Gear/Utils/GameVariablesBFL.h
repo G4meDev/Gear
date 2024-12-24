@@ -22,6 +22,9 @@ public:
 	static float GV_CountDownDuration();
 
 	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static float GV_InvincibilityDuration();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
 	static float GV_PieceSelectionTimeLimit();
 
 	UFUNCTION(BlueprintPure, Category = GameVariables)

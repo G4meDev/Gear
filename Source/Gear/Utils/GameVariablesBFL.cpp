@@ -13,6 +13,11 @@ float UGameVariablesBFL::GV_CountDownDuration()
 	return 4.0f;
 }
 
+float UGameVariablesBFL::GV_InvincibilityDuration()
+{
+	return 3.0f;
+}
+
 float UGameVariablesBFL::GV_PieceSelectionTimeLimit()
 {
 	return 10.0f;

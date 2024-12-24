@@ -97,16 +97,7 @@ void AGearGameMode::Tick(float DeltaSeconds)
 
 	else if (GearMatchState == EGearMatchState::Racing)
 	{
-		for (AGearVehicle* Vehicle : GearGameState->Vehicles)
-		{
-			if (IsValid(Vehicle))
-			{
-				if (ShouldVehicleDie(Vehicle))
-				{
-					DestroyVehicle(Vehicle);
-				}
-			}
-		}
+		RacingTick(DeltaSeconds);
 	}
 
 	if (ShouldAbort())
@@ -115,6 +106,28 @@ void AGearGameMode::Tick(float DeltaSeconds)
 	}
 }
 
+
+void AGearGameMode::RacingTick(float DeltaSeconds)
+{
+	const bool bInvincibilityFinished = GetWorld()->GetTimeSeconds() - GearGameState->LastCheckpointStartTime > UGameVariablesBFL::GV_InvincibilityDuration();
+
+	for (AGearVehicle* Vehicle : GearGameState->Vehicles)
+	{
+		if (IsValid(Vehicle))
+		{
+			if (ShouldVehicleDie(Vehicle))
+			{
+				DestroyVehicle(Vehicle);
+			}
+
+			else if (bInvincibilityFinished && Vehicle->HasInvincibility() && Vehicle->CanRemoveInvincibility())
+			{
+				Vehicle->RemoveInvincibility();
+				Vehicle->OnRep_GrantedInvincibility();
+			}
+		}
+	}
+}
 
 void AGearGameMode::HandleMatchHasEnded()
 {
@@ -525,13 +538,15 @@ void AGearGameMode::DestroyPawns()
 
 void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, AGearVehicle* InstgatorVehicle)
 {
+	const bool bNeedsCountDown = !IsValid(InstgatorVehicle);
+
 	ACheckpoint* Checkpoint = GearGameState->GetCheckPointAtIndex(CheckpointIndex);
 	check(IsValid(Checkpoint));
 
 	GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
 
 	// if there was no vehicle reached to checkpoint start with countdown
-	if (!IsValid(InstgatorVehicle))
+	if (bNeedsCountDown)
 	{
 		GearGameState->LastCountDownTime = GetWorld()->GetTimeSeconds();
 		Checkpoint->StartCountDown(GetWorld()->GetTimeSeconds());
@@ -556,9 +571,11 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, AGearVehicle* I
 			AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
 			GearPlayerState->GetPlayerController()->Possess(GearVehicle);
 			
-			if (IsValid(InstgatorVehicle))
+			if (!bNeedsCountDown)
 			{
 				GearVehicle->UpdateStateToVehicle(InstgatorVehicle);
+				GearVehicle->GrantInvincibility();
+				GearVehicle->OnRep_GrantedInvincibility();
 			}
 
 			GearGameState->RegisterVehicleAtCheckpoint(GearVehicle, CheckpointIndex);
@@ -578,6 +595,8 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, AGearVehicle* I
 		GearGameState->VehicleCamera->MarkTeleport();
 		GearGameState->VehicleCamera->UpdateCameraMatrix();
 	}
+
+	GearGameState->LastCheckpointStartTime = GetWorld()->GetTimeSeconds();
 }
 
 void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
