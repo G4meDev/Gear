@@ -75,7 +75,7 @@ protected:
 	void DestroyActors();
 	void SpawnActors();
 	void DestroyPawns();
-	void StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCountDown);
+	void StartRacingAtCheckpoint(int CheckpointIndex, AGearVehicle* InstgatorVehicle);
 	void StartRacing(bool bEveryPlayerPlaced);
 
 	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);

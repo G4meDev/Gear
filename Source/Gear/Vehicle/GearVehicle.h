@@ -6,6 +6,7 @@
 #include "WheeledVehiclePawn.h"
 #include "GearVehicle.generated.h"
 
+class UChaosWheeledVehicleMovementComponent;
 class AGearGameState;
 class AVehicleCamera;
 class UInputAction;
@@ -28,6 +29,11 @@ public:
 	bool CanDrive();
 
 	void UpdateDistanceAlongTrack();
+
+	void UpdateStateToVehicle(AGearVehicle* TargetVehicle);
+
+	UFUNCTION(BlueprintPure)
+	UChaosWheeledVehicleMovementComponent* GetChaosMovementComponent();
 
 	float DistanaceAlongTrack;
 
@@ -71,6 +77,8 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* BrakeActionInput;
+
+	UChaosWheeledVehicleMovementComponent* ChaosMovementComponent;
 
 	void Input_Throttle(const FInputActionInstance& Instance);
 	void Input_Brake(const FInputActionInstance& Instance);

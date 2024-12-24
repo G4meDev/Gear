@@ -101,7 +101,7 @@ void AGearGameMode::Tick(float DeltaSeconds)
 		{
 			if (GearGameState->FurthestReachedCheckpoint < GearGameState->CheckpointsStack.Num() - 2)
 			{
-				StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1, true);
+				StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1, nullptr);
 			}
 
 			else
@@ -500,14 +500,15 @@ void AGearGameMode::DestroyPawns()
 	}
 }
 
-void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCountDown)
+void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, AGearVehicle* InstgatorVehicle)
 {
 	ACheckpoint* Checkpoint = GearGameState->GetCheckPointAtIndex(CheckpointIndex);
 	check(IsValid(Checkpoint));
 
 	GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
 
-	if (bWithCountDown)
+	// if there was no vehicle reached to checkpoint start with countdown
+	if (!IsValid(InstgatorVehicle))
 	{
 		GearGameState->LastCountDownTime = GetWorld()->GetTimeSeconds();
 		Checkpoint->StartCountDown(GetWorld()->GetTimeSeconds());
@@ -531,6 +532,11 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCount
 
 			AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
 			GearPlayerState->GetPlayerController()->Possess(GearVehicle);
+			
+			if (IsValid(InstgatorVehicle))
+			{
+				GearVehicle->UpdateStateToVehicle(InstgatorVehicle);
+			}
 
 			GearGameState->RegisterVehicleAtCheckpoint(GearVehicle, CheckpointIndex);
 
@@ -568,7 +574,7 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 	GearGameState->FurthestReachedCheckpoint = 0;
 	GearGameState->ClearCheckpointResults();
 
-	StartRacingAtCheckpoint(0, true);
+	StartRacingAtCheckpoint(0, nullptr);
 
 	SetGearMatchState(EGearMatchState::Racing);
 	UE_LOG(LogTemp, Warning, TEXT("start racing"));
@@ -636,7 +642,7 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 			GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
 			if (GearGameState->CheckpointsStack.Top() != TargetCheckpoint)
 			{
-				StartRacingAtCheckpoint(TargetCheckpoint->CheckpointIndex, false);
+				StartRacingAtCheckpoint(TargetCheckpoint->CheckpointIndex, Vehicle);
 			}
 		}
 

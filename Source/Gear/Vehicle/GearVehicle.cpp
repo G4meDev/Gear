@@ -3,6 +3,7 @@
 
 
 #include "Vehicle/GearVehicle.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearPlayerState.h"
@@ -224,6 +225,32 @@ bool AGearVehicle::CanDrive()
 void AGearVehicle::UpdateDistanceAlongTrack()
 {
 	DistanaceAlongTrack = GearGameState->TrackSpline->GetTrackDistanceAtPosition(GetActorLocation());
+}
+
+void AGearVehicle::UpdateStateToVehicle(AGearVehicle* TargetVehicle)
+{
+	if (IsValid(TargetVehicle) && IsValid(TargetVehicle->GetChaosMovementComponent()) && IsValid(GetChaosMovementComponent()))
+	{
+		FWheeledSnaphotData SnapshotData = TargetVehicle->GetChaosMovementComponent()->GetSnapshot();
+		SnapshotData.Transform = GetActorTransform();
+		for (FWheelSnapshot WheelSnapshot : SnapshotData.WheelSnapshots)
+		{
+			WheelSnapshot.SteeringAngle = 0.0f;
+		}
+
+		ChaosMovementComponent->SetSnapshot(SnapshotData);
+	}
+}
+
+UChaosWheeledVehicleMovementComponent* AGearVehicle::GetChaosMovementComponent()
+{
+	if (IsValid(ChaosMovementComponent))
+	{
+		return ChaosMovementComponent;
+	}
+
+	ChaosMovementComponent = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovementComponent());
+	return ChaosMovementComponent;
 }
 
 bool AGearVehicle::IsOutsideTrack() const
