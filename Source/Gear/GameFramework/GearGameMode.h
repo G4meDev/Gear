@@ -75,7 +75,7 @@ protected:
 	void DestroyActors();
 	void SpawnActors();
 	void DestroyPawns();
-	void StartRacingAtCheckpoint(int CheckpointIndex);
+	void StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCountDown);
 	void StartRacing(bool bEveryPlayerPlaced);
 	FTimerHandle RacingWaitTimerHandle;
 

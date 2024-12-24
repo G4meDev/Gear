@@ -49,6 +49,8 @@ ACheckpoint::ACheckpoint()
 	StartPonit_4 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_4"));
 	StartPonit_4->SetupAttachment(Root);
 
+	LastStartTime = FLT_MAX;
+
 #if WITH_EDITORONLY_DATA
 	
 	StartPoint_1_Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("StartPoint_1_Arrow"));
@@ -170,3 +172,9 @@ void ACheckpoint::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+void ACheckpoint::StartRace_RPC_Implementation(float StartTime)
+{
+	LastStartTime = StartTime;
+}
+

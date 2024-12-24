@@ -44,6 +44,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int CheckpointIndex;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float LastStartTime;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void StartRace_RPC(float StartTime);
+
 protected:
 
 #if WITH_EDITOR

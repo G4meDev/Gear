@@ -101,7 +101,7 @@ void AGearGameMode::Tick(float DeltaSeconds)
 		{
 			if (GearGameState->FurthestReachedCheckpoint < GearGameState->CheckpointsStack.Num() - 2)
 			{
-				StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1);
+				StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1, true);
 			}
 
 			else
@@ -500,7 +500,7 @@ void AGearGameMode::DestroyPawns()
 	}
 }
 
-void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
+void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, bool bWithCountDown)
 {
 	ACheckpoint* Checkpoint = GearGameState->GetCheckPointAtIndex(CheckpointIndex);
 	check(IsValid(Checkpoint));
@@ -541,6 +541,11 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex)
 		GearGameState->VehicleCamera->MarkTeleport();
 		GearGameState->VehicleCamera->UpdateCameraMatrix();
 	}
+
+	if (bWithCountDown)
+	{
+		GearGameState->CheckpointsStack[GearGameState->FurthestReachedCheckpoint]->StartRace_RPC(GetWorld()->GetTimeSeconds());
+	}
 }
 
 void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
@@ -561,7 +566,7 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 	GearGameState->FurthestReachedCheckpoint = 0;
 	GearGameState->ClearCheckpointResults();
 
-	StartRacingAtCheckpoint(0);
+	StartRacingAtCheckpoint(0, true);
 
 	UE_LOG(LogTemp, Warning, TEXT("start racing"));
 	SetGearMatchState(EGearMatchState::Racing_WaitTime);
@@ -638,7 +643,7 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 			GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
 			if (GearGameState->CheckpointsStack.Top() != TargetCheckpoint)
 			{
-				StartRacingAtCheckpoint(TargetCheckpoint->CheckpointIndex);
+				StartRacingAtCheckpoint(TargetCheckpoint->CheckpointIndex, false);
 			}
 		}
 
