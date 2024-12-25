@@ -190,3 +190,25 @@ void ACheckpoint::StartCountDown(float StartTime)
 {
 	LastStartTime = StartTime;
 }
+
+UVehicleStart* ACheckpoint::GetVehicleStart()
+{
+	for (UVehicleStart* VehicleStart : StartPoints)
+	{
+		if (!VehicleStart->IsOccupied())
+		{
+			VehicleStart->MarkOccupied();
+			return VehicleStart;
+		}
+	}
+
+	return nullptr;
+}
+
+void ACheckpoint::ClearOccupied()
+{
+	for (UVehicleStart* VehicleStart : StartPoints)
+	{
+		VehicleStart->ClearOccupied();
+	}
+}

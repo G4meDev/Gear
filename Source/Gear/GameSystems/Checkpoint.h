@@ -52,6 +52,10 @@ public:
 	
 	void StartCountDown(float StartTime);
 
+	UVehicleStart* GetVehicleStart();
+
+	void ClearOccupied();
+
 
 
 protected:

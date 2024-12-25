@@ -137,13 +137,15 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 		for (int i = GearGameState->Vehicles.Num() - 1; i >= 0; i--)
 		{
 			AGearVehicle* Vehicle = GearGameState->Vehicles[i];
-			DestroyVehicle(Vehicle);
+			Vehicle->Destroy();
 		}
+		GearGameState->Vehicles.Empty(4);
 
 		ACheckpoint* NextCheckpoint = GearGameState->GetNextFurthestReachedCheckpoint();
 
 		if (IsValid(NextCheckpoint))
 		{
+			GearGameState->ClearOccupiedVehicleStarts();
 			StartRacingAtCheckpoint(NextCheckpoint, nullptr);
 		}
 
@@ -573,21 +575,27 @@ void AGearGameMode::DestroyPawns()
 
 void AGearGameMode::SpawnVehicleAtCheckpoint(AGearPlayerState* Player, ACheckpoint* Checkpoint, bool GrantInvincibility)
 {
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	FVector SpawnLocation = Checkpoint->StartPoints[0]->GetComponentLocation();
-	FRotator SpawnRotation = Checkpoint->StartPoints[0]->GetComponentRotation();
-
-	AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(Player->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
-	Player->GetPlayerController()->Possess(GearVehicle);
-
-	if (GrantInvincibility)
+	UVehicleStart* VehicleStart = IsValid(Checkpoint) ? Checkpoint->GetVehicleStart() : nullptr;
+	if (IsValid(VehicleStart))
 	{
-		GearVehicle->GrantInvincibility();
-		GearVehicle->OnRep_GrantedInvincibility();
-	}
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+ 		FVector SpawnLocation = VehicleStart->GetComponentLocation();
+ 		FRotator SpawnRotation = VehicleStart->GetComponentRotation();
 
-	GearGameState->RegisterVehicleAtCheckpoint(GearVehicle, Checkpoint);
+		AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(Player->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
+		Player->GetPlayerController()->Possess(GearVehicle);
+
+		if (GrantInvincibility)
+		{
+			GearVehicle->GrantInvincibility();
+			GearVehicle->OnRep_GrantedInvincibility();
+		}
+
+		GearGameState->RegisterVehicleAtCheckpoint(GearVehicle, Checkpoint);
+
+		UE_LOG(LogTemp, Warning, TEXT("spawned %s %s"), *GetName(), GrantInvincibility ? TEXT("with invincibility") : TEXT(""));
+	}
 }
 
 void AGearGameMode::StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicle* InstgatorVehicle)
@@ -653,6 +661,7 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 	GearGameState->FurthestReachedDistace = 0;
 	GearGameState->FurthestReachedCheckpoint = 0;
 	GearGameState->ClearCheckpointResults();
+	GearGameState->ClearOccupiedVehicleStarts();
 
 	StartRacingAtCheckpoint(GearGameState->GetCheckPointAtIndex(0), nullptr);
 

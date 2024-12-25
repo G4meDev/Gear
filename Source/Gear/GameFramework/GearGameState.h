@@ -63,6 +63,7 @@ public:
 	ACheckpoint* GetNextFurthestReachedCheckpoint() const;
 
 
+	void ClearOccupiedVehicleStarts();
 	void ClearCheckpointResults();
 
 	void RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, ACheckpoint* Checkpoint);

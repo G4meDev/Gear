@@ -381,6 +381,16 @@ ACheckpoint* AGearGameState::GetNextFurthestReachedCheckpoint() const
 	return FurthestReachedCheckpoint < CheckpointsStack.Num() - 2 ? CheckpointsStack[FurthestReachedCheckpoint + 1] : nullptr;
 }
 
+void AGearGameState::ClearOccupiedVehicleStarts()
+{
+	UE_LOG(LogTemp, Warning, TEXT("cleared occupied vehicle starts"));
+
+	for (ACheckpoint* Checkpoint : CheckpointsStack)
+	{
+		Checkpoint->ClearOccupied();
+	}
+}
+
 void AGearGameState::ClearCheckpointResults()
 {
 	const int AvaliableCheckpointNum = CheckpointsStack.Num() - 1;

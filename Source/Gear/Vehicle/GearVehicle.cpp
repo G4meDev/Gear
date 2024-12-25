@@ -314,8 +314,6 @@ void AGearVehicle::OnRep_GrantedInvincibility()
 {
 	if (HasInvincibility())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("granted invincibility to %s"), *GetName());
-
 		VehicleMaterial = GetMesh()->CreateDynamicMaterialInstance(0, VehicleMaterialParent_Transparent);
 		GetMesh()->SetCollisionProfileName(TEXT("InvincibleVehicle"));
 	}
