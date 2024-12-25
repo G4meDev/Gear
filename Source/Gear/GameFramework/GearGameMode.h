@@ -77,7 +77,8 @@ protected:
 	void DestroyActors();
 	void SpawnActors();
 	void DestroyPawns();
-	void StartRacingAtCheckpoint(int CheckpointIndex, AGearVehicle* InstgatorVehicle);
+	void SpawnVehicleAtCheckpoint(AGearPlayerState* Player, ACheckpoint* Checkpoint, bool GrantInvincibility);
+	void StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicle* InstgatorVehicle);
 	void StartRacing(bool bEveryPlayerPlaced);
 
 	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
@@ -100,6 +101,7 @@ protected:
 	
 	// --------------------------------------------------------------------------
 
+	bool IsEveryPlayerEliminated() const;
 	bool ShouldVehicleDie(AGearVehicle* Vehicle) const;
 	void DestroyVehicle(AGearVehicle* Vehicle);
 

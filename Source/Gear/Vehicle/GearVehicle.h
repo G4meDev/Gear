@@ -26,6 +26,8 @@ public:
 	void Tick(float DeltaSeconds) override;
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	AGearGameState* GetGearGameState();
+
 	bool CanDrive();
 
 	void UpdateDistanceAlongTrack();
@@ -44,12 +46,17 @@ public:
 	bool HasInvincibility() const;
 	bool CanRemoveInvincibility();
 
+	bool IsSpectating();
+
+
+
 	UFUNCTION()
 	void OnRep_GrantedInvincibility();
 
 	float DistanaceAlongTrack;
 
-	int TargetCheckpoint;
+	UPROPERTY(Replicated)
+	int32 TargetCheckpoint;
 
 protected:
 

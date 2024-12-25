@@ -111,8 +111,10 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 {
 	const bool bInvincibilityFinished = GetWorld()->GetTimeSeconds() - GearGameState->LastCheckpointStartTime > UGameVariablesBFL::GV_InvincibilityDuration();
 
-	for (AGearVehicle* Vehicle : GearGameState->Vehicles)
+	for (int i = GearGameState->Vehicles.Num() - 1; i >= 0; i--)
 	{
+		AGearVehicle* Vehicle = GearGameState->Vehicles[i];
+
 		if (IsValid(Vehicle))
 		{
 			if (ShouldVehicleDie(Vehicle))
@@ -120,11 +122,34 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 				DestroyVehicle(Vehicle);
 			}
 
-			else if (bInvincibilityFinished && Vehicle->HasInvincibility() && Vehicle->CanRemoveInvincibility())
+			else if (bInvincibilityFinished && Vehicle->HasInvincibility() && !Vehicle->IsSpectating() && Vehicle->CanRemoveInvincibility())
 			{
 				Vehicle->RemoveInvincibility();
 				Vehicle->OnRep_GrantedInvincibility();
 			}
+		}
+	}
+
+	bool bEveryPlayerEliminated = IsEveryPlayerEliminated();
+
+	if (bEveryPlayerEliminated)
+	{
+		for (int i = GearGameState->Vehicles.Num() - 1; i >= 0; i--)
+		{
+			AGearVehicle* Vehicle = GearGameState->Vehicles[i];
+			DestroyVehicle(Vehicle);
+		}
+
+		ACheckpoint* NextCheckpoint = GearGameState->GetNextFurthestReachedCheckpoint();
+
+		if (IsValid(NextCheckpoint))
+		{
+			StartRacingAtCheckpoint(NextCheckpoint, nullptr);
+		}
+
+		else
+		{
+			StartScoreboard();
 		}
 	}
 }
@@ -227,28 +252,38 @@ bool AGearGameMode::LoadPlaceableSpawnPoints()
 	return HazardPreviewSpawnPoints.Num() == 5;
 }
 
+bool AGearGameMode::IsEveryPlayerEliminated() const
+{
+	bool bEveryPlayerEliminated = true;
+	for (AGearVehicle* V : GearGameState->Vehicles)
+	{
+		if (IsValid(V) && !V->IsSpectating())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool AGearGameMode::ShouldVehicleDie(AGearVehicle* Vehicle) const
 {
 	const bool bOutsideCameraFrustom = GearGameState->VehicleCamera ? GearGameState->VehicleCamera->IsOutsideCameraFrustum(Vehicle) : false;
-	return Vehicle->IsOutsideTrack() || bOutsideCameraFrustom;
+	return !Vehicle->IsSpectating() && (Vehicle->IsOutsideTrack() || bOutsideCameraFrustom);
 }
 
 void AGearGameMode::DestroyVehicle(AGearVehicle* Vehicle)
 {	
+	AGearPlayerState* Player = Vehicle->GetPlayerState<AGearPlayerState>();
+
 	GearGameState->Vehicles.Remove(Vehicle);
 	Vehicle->Destroy();
 
-	if (GearGameState->Vehicles.Num() == 0)
-	{
-		if (GearGameState->FurthestReachedCheckpoint < GearGameState->CheckpointsStack.Num() - 2)
-		{
-			StartRacingAtCheckpoint(GearGameState->FurthestReachedCheckpoint + 1, nullptr);
-		}
+	ACheckpoint* NextCheckpoint = GearGameState->GetNextFurthestReachedCheckpoint();
 
-		else
-		{
-			StartScoreboard();
-		}
+	if (IsValid(NextCheckpoint))
+	{
+		SpawnVehicleAtCheckpoint(Player, NextCheckpoint, true);
 	}
 }
 
@@ -536,14 +571,32 @@ void AGearGameMode::DestroyPawns()
 	}
 }
 
-void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, AGearVehicle* InstgatorVehicle)
+void AGearGameMode::SpawnVehicleAtCheckpoint(AGearPlayerState* Player, ACheckpoint* Checkpoint, bool GrantInvincibility)
 {
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FVector SpawnLocation = Checkpoint->StartPoints[0]->GetComponentLocation();
+	FRotator SpawnRotation = Checkpoint->StartPoints[0]->GetComponentRotation();
+
+	AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(Player->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
+	Player->GetPlayerController()->Possess(GearVehicle);
+
+	if (GrantInvincibility)
+	{
+		GearVehicle->GrantInvincibility();
+		GearVehicle->OnRep_GrantedInvincibility();
+	}
+
+	GearGameState->RegisterVehicleAtCheckpoint(GearVehicle, Checkpoint);
+}
+
+void AGearGameMode::StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicle* InstgatorVehicle)
+{
+	check(IsValid(Checkpoint));
+	
 	const bool bNeedsCountDown = !IsValid(InstgatorVehicle);
 
-	ACheckpoint* Checkpoint = GearGameState->GetCheckPointAtIndex(CheckpointIndex);
-	check(IsValid(Checkpoint));
-
-	GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
+	GearGameState->FurthestReachedCheckpoint = Checkpoint->CheckpointIndex;
 
 	// if there was no vehicle reached to checkpoint start with countdown
 	if (bNeedsCountDown)
@@ -556,36 +609,21 @@ void AGearGameMode::StartRacingAtCheckpoint(int CheckpointIndex, AGearVehicle* I
 
 	bool bEveryPlayerEliminated = true;
 
-	int i = 0;
 	for (APlayerState* PlayerState : GearGameState->PlayerArray)
 	{
 		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(PlayerState);
+		AGearVehicle* GearVehicle = Cast<AGearVehicle>(GearPlayerState->GetPawn());
 
-		if (!IsValid(GearPlayerState->GetPawn()))
+		if (IsValid(GearVehicle))
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			FVector SpawnLocation = Checkpoint->StartPoints[i]->GetComponentLocation();
-			FRotator SpawnRotation = Checkpoint->StartPoints[i]->GetComponentRotation();
+			GearVehicle->UpdateStateToVehicle(InstgatorVehicle);
 
-			AGearVehicle* GearVehicle = GetWorld()->SpawnActor<AGearVehicle>(GearPlayerState->VehicleClass->GetAuthoritativeClass(), SpawnLocation, SpawnRotation, SpawnParams);
-			GearPlayerState->GetPlayerController()->Possess(GearVehicle);
-			
-			if (!bNeedsCountDown)
-			{
-				GearVehicle->UpdateStateToVehicle(InstgatorVehicle);
-				GearVehicle->GrantInvincibility();
-				GearVehicle->OnRep_GrantedInvincibility();
-			}
-
-			GearGameState->RegisterVehicleAtCheckpoint(GearVehicle, CheckpointIndex);
-
-			i++;
+			bEveryPlayerEliminated = false;
 		}
 
 		else
 		{
-			bEveryPlayerEliminated = false;
+			SpawnVehicleAtCheckpoint(GearPlayerState, Checkpoint, false);
 		}
 	}
 
@@ -616,7 +654,7 @@ void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
 	GearGameState->FurthestReachedCheckpoint = 0;
 	GearGameState->ClearCheckpointResults();
 
-	StartRacingAtCheckpoint(0, nullptr);
+	StartRacingAtCheckpoint(GearGameState->GetCheckPointAtIndex(0), nullptr);
 
 	SetGearMatchState(EGearMatchState::Racing);
 	UE_LOG(LogTemp, Warning, TEXT("start racing"));
@@ -684,7 +722,7 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 			GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
 			if (GearGameState->CheckpointsStack.Top() != TargetCheckpoint)
 			{
-				StartRacingAtCheckpoint(TargetCheckpoint->CheckpointIndex, Vehicle);
+				StartRacingAtCheckpoint(TargetCheckpoint, Vehicle);
 			}
 		}
 

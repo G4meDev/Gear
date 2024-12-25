@@ -39,6 +39,7 @@ void AGearVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGearVehicle, bGrantedInvincibility);
+	DOREPLIFETIME(AGearVehicle, TargetCheckpoint);
 }
 
 void AGearVehicle::BeginPlay()
@@ -61,9 +62,6 @@ void AGearVehicle::BeginPlay()
 	}
 
 #endif
-
-	GearGameState = GetWorld()->GetGameState<AGearGameState>();
-	check(GearGameState);
 
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
@@ -169,6 +167,17 @@ void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	}
 }
 
+AGearGameState* AGearVehicle::GetGearGameState()
+{
+	if (IsValid(GearGameState))
+	{
+		return GearGameState;
+	}
+
+	GearGameState = GetWorld()->GetGameState<AGearGameState>();
+	return GearGameState;
+}
+
 void AGearVehicle::Input_Steer(const FInputActionInstance& Instance)
 {
 	SteerValue = Instance.GetValue().Get<float>();
@@ -213,13 +222,13 @@ bool AGearVehicle::CanDrive()
 	if (bInTestMap) return true;
 #endif
 
-	bool bRaceStarted = IsValid(GearGameState) ? !GearGameState->IsCountDown() : false;
-	return bRaceStarted;
+	bool bRaceStarted = IsValid(GetGearGameState()) ? !GearGameState->IsCountDown() : false;
+	return bRaceStarted && !IsSpectating();
 }
 
 void AGearVehicle::UpdateDistanceAlongTrack()
 {
-	DistanaceAlongTrack = GearGameState->TrackSpline->GetTrackDistanceAtPosition(GetActorLocation());
+	DistanaceAlongTrack = GetGearGameState()->TrackSpline->GetTrackDistanceAtPosition(GetActorLocation());
 }
 
 void AGearVehicle::UpdateStateToVehicle(AGearVehicle* TargetVehicle)
@@ -294,6 +303,11 @@ bool AGearVehicle::CanRemoveInvincibility()
 	//DrawDebugSphere(GetWorld(), Bounds.GetSphere().Center, Bounds.SphereRadius, 8, bHasOccluders ? FColor::Red : FColor::Blue, false, 0.1f);
 
 	return !bHasOccluders;
+}
+
+bool AGearVehicle::IsSpectating()
+{
+	return IsValid(GetGearGameState()) ? GearGameState->FurthestReachedCheckpoint + 1 != TargetCheckpoint : true;
 }
 
 void AGearVehicle::OnRep_GrantedInvincibility()

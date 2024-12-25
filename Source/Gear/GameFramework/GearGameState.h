@@ -59,9 +59,13 @@ public:
 
 	ACheckpoint* GetCheckPointAtIndex(int Index);
 
+	ACheckpoint* GetFurthestReachedCheckpoint() const;
+	ACheckpoint* GetNextFurthestReachedCheckpoint() const;
+
+
 	void ClearCheckpointResults();
 
-	void RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, int CheckpointIndex);
+	void RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, ACheckpoint* Checkpoint);
 
 	TArray<AGearPlayerState*> GetWinningPlayers() const;
 	bool IsAnyPlayerWinning() const;
@@ -108,6 +112,8 @@ public:
 	int LastPlacedCheckpointModuleStackIndex;
 
 	float FurthestReachedDistace;
+
+	UPROPERTY(Replicated)
 	int FurthestReachedCheckpoint;
 
 protected:

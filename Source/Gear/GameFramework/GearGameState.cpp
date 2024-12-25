@@ -38,7 +38,10 @@ void AGearGameState::Tick(float DeltaSeconds)
 	
 	for (AGearVehicle* Vehicle : Vehicles)
 	{
-		UpdateFurthestDistanceWithVehicle(Vehicle);
+		if (IsValid(Vehicle) && !Vehicle->IsSpectating())
+		{
+			UpdateFurthestDistanceWithVehicle(Vehicle);
+		}
 	}
 }
 
@@ -54,6 +57,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AGearGameState, CheckpointResults);
 	DOREPLIFETIME(AGearGameState, RoundNumber);
 	DOREPLIFETIME(AGearGameState, LastCountDownTime);
+	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpoint);
 }
 
 void AGearGameState::BeginPlay()
@@ -367,6 +371,16 @@ ACheckpoint* AGearGameState::GetCheckPointAtIndex(int Index)
 	return CheckpointsStack[Index];
 }
 
+ACheckpoint* AGearGameState::GetFurthestReachedCheckpoint() const
+{
+	return FurthestReachedCheckpoint < CheckpointsStack.Num() - 1 ? CheckpointsStack[FurthestReachedCheckpoint] : nullptr;
+}
+
+ACheckpoint* AGearGameState::GetNextFurthestReachedCheckpoint() const
+{
+	return FurthestReachedCheckpoint < CheckpointsStack.Num() - 2 ? CheckpointsStack[FurthestReachedCheckpoint + 1] : nullptr;
+}
+
 void AGearGameState::ClearCheckpointResults()
 {
 	const int AvaliableCheckpointNum = CheckpointsStack.Num() - 1;
@@ -378,11 +392,15 @@ void AGearGameState::ClearCheckpointResults()
 	}
 }
 
-void AGearGameState::RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, int CheckpointIndex)
+void AGearGameState::RegisterVehicleAtCheckpoint(AGearVehicle* Vehicle, ACheckpoint* Checkpoint)
 {
-	Vehicle->TargetCheckpoint = CheckpointIndex + 1;
+	Vehicle->TargetCheckpoint = Checkpoint->CheckpointIndex + 1;
 	Vehicle->UpdateDistanceAlongTrack();
-	UpdateFurthestDistanceWithVehicle(Vehicle);
+
+	if (!Vehicle->IsSpectating())
+	{
+		UpdateFurthestDistanceWithVehicle(Vehicle);
+	}
 
 	Vehicles.Add(Vehicle);
 }
