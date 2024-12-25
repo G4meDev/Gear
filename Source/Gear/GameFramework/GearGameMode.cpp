@@ -691,7 +691,7 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 		if (GearGameState->CheckpointsStack.Top() == TargetCheckpoint)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s finished race"), *GearPlayerState->GetName());
-			Vehicle->Destroy();
+			DestroyVehicle(Vehicle);
 		}
 	}
 }

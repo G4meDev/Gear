@@ -291,7 +291,7 @@ bool AGearVehicle::CanRemoveInvincibility()
 	TArray<AActor*> OutActors;
 
 	const bool bHasOccluders = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), Bounds.GetSphere().Center, Bounds.SphereRadius, ObjectTypeQuery, nullptr, ActorsToIgnore, OutActors);
-	DrawDebugSphere(GetWorld(), Bounds.GetSphere().Center, Bounds.SphereRadius, 8, bHasOccluders ? FColor::Red : FColor::Blue, false, 0.1f);
+	//DrawDebugSphere(GetWorld(), Bounds.GetSphere().Center, Bounds.SphereRadius, 8, bHasOccluders ? FColor::Red : FColor::Blue, false, 0.1f);
 
 	return !bHasOccluders;
 }
