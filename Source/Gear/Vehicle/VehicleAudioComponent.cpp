@@ -10,8 +10,13 @@ constexpr auto WheelRotationPerSecondsParameter = TEXT("WheelRotationPerSeconds"
 constexpr auto WheelRotationParameter			= TEXT("WheelRotation");
 
 UVehicleAudioComponent::UVehicleAudioComponent()
+	: OwningVehicle(nullptr)
+	, LocalVehicleVolumeMultiplier(1.0f)
+	, RemoteVehicleVolumeMultiplier(0.2f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+
 }
 
 void UVehicleAudioComponent::BeginPlay()
@@ -25,6 +30,8 @@ void UVehicleAudioComponent::BeginPlay()
 void UVehicleAudioComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	SetVolumeMultiplier(OwningVehicle->IsLocallyControlled() ? LocalVehicleVolumeMultiplier : RemoteVehicleVolumeMultiplier);
 
 	SetFloatParameter(ForwardSpeedParameter				, OwningVehicle->GetChaosMovementComponent()->GetForwardSpeed() * 0.036f);
 	SetFloatParameter(WheelRotationPerSecondsParameter	, FMath::Abs(OwningVehicle->GetWheelRotationSpeed(0)) / 360.0f);

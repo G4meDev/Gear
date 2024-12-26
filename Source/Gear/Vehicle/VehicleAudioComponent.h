@@ -26,4 +26,10 @@ public:
 protected:
 
 	AGearVehicle* OwningVehicle;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float LocalVehicleVolumeMultiplier;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float RemoteVehicleVolumeMultiplier;
 };
