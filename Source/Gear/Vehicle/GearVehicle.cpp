@@ -4,6 +4,7 @@
 
 #include "Vehicle/GearVehicle.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
+#include "Vehicle/VehicleAudioComponent.h"
 
 #include "GameFramework/GearPlayerController.h"
 #include "GameFramework/GearPlayerState.h"
@@ -23,6 +24,9 @@
 
 AGearVehicle::AGearVehicle()
 {
+	VehicleAudioComponent = CreateDefaultSubobject<UVehicleAudioComponent>(TEXT("VehicleAudioComponent"));
+	VehicleAudioComponent->SetupAttachment(GetRootComponent());
+
 	SteerValue = 0.0f;
 	ThrottleValue = 0.0f;
 	BrakeValue = 0.0f;

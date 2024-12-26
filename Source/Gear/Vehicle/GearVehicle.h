@@ -102,6 +102,8 @@ public:
 	UPROPERTY(Replicated)
 	int32 TargetCheckpoint;
 
+	class UVehicleAudioComponent* GetVehicleAudioComponent() const { return VehicleAudioComponent; }
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -178,4 +180,7 @@ protected:
 #endif
 
 private:
+
+	UPROPERTY(Category = Vehicle, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UVehicleAudioComponent> VehicleAudioComponent;
 };
