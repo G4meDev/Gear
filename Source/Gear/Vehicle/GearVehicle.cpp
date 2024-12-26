@@ -44,46 +44,9 @@ void AGearVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 	DOREPLIFETIME(AGearVehicle, bGrantedInvincibility);
 	DOREPLIFETIME(AGearVehicle, TargetCheckpoint);
-	DOREPLIFETIME_CONDITION(AGearVehicle, VehicleInputCompressed, COND_SkipOwner)
 }
 
-void FVehicleInput::Decompress(const FVehicleInputCompressed& CompressedInput)
-{
-	ThrottleInput = CompressedInput.ThrottleInput;
-	BrakeInput = CompressedInput.BrakeInput;
 
-	if (CompressedInput.SteerInput == 0)
-	{
-		SteerInput = 0;
-	}
-	else if (CompressedInput.SteerInput == 1)
-	{
-		SteerInput = 1;
-	}
-	else
-	{
-		SteerInput = 2;
-	}
-}
-
-void FVehicleInputCompressed::Compress(const FVehicleInput& VehicleInput)
-{
-	ThrottleInput = VehicleInput.ThrottleInput > 0;
-	BrakeInput = VehicleInput.BrakeInput > 0;
-
-	if (VehicleInput.SteerInput == 0)
-	{
-		SteerInput = 0;
-	}
-	else if (VehicleInput.SteerInput > 0)
-	{
-		SteerInput = 1;
-	}
-	else
-	{
-		SteerInput = 2;
-	}
-}
 
 
 void AGearVehicle::BeginPlay()
@@ -237,28 +200,14 @@ void AGearVehicle::Input_Brake(const FInputActionInstance& Instance)
 	BrakeValue = Instance.GetValue().Get<float>();
 }
 
-void AGearVehicle::SendInputToServer_Implementation(FVehicleInputCompressed CompressedInput)
-{
-	VehicleInputCompressed = CompressedInput;
-	OnRep_VehicleInputCompressed();
-}
-
 void AGearVehicle::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
 	if (IsLocallyControlled())
 	{
-		VehicleInput.UpdateData(ThrottleValue, BrakeValue, SteerValue);
-		VehicleInputCompressed.Compress(VehicleInput);
-
-		if (!HasAuthority())
-		{
-			SendInputToServer(VehicleInputCompressed);
-		}
+		UpdateVehicleInputs();
 	}
-
-	UpdateVehicleInputs();
 
 #if WITH_EDITOR
 	if (bInTestMap)
@@ -270,12 +219,12 @@ void AGearVehicle::Tick(float DeltaSeconds)
 
 void AGearVehicle::UpdateVehicleInputs()
 {
-	GetVehicleMovementComponent()->SetSteeringInput(VehicleInput.SteerInput);
+	GetVehicleMovementComponent()->SetSteeringInput(SteerValue);
 
 	if (CanDrive())
 	{
-		GetVehicleMovementComponent()->SetThrottleInput(VehicleInput.ThrottleInput);
-		GetVehicleMovementComponent()->SetBrakeInput(VehicleInput.BrakeInput);
+		GetVehicleMovementComponent()->SetThrottleInput(ThrottleValue);
+		GetVehicleMovementComponent()->SetBrakeInput(BrakeValue);
 	}
 }
 
@@ -388,11 +337,6 @@ void AGearVehicle::OnRep_GrantedInvincibility()
 		VehicleMaterial = GetMesh()->CreateDynamicMaterialInstance(0, VehicleMaterialParent_Opaque);
 		GetMesh()->SetCollisionProfileName(TEXT("Vehicle"));
 	}
-}
-
-void AGearVehicle::OnRep_VehicleInputCompressed()
-{
-	VehicleInput.Decompress(VehicleInputCompressed);
 }
 
 bool AGearVehicle::IsOutsideTrack() const

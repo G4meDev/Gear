@@ -12,50 +12,6 @@ class AVehicleCamera;
 class UInputAction;
 struct FInputActionInstance;
 
-USTRUCT()
-struct FVehicleInput
-{
-	GENERATED_BODY()
-
-public:
-	FVehicleInput(float InThrottle, float InBrake, float InSteer)
-		: ThrottleInput(InThrottle)
-		, BrakeInput(InBrake)
-		, SteerInput(InSteer)
-	{ }
-
-	FVehicleInput() : FVehicleInput(0, 0, 0)
-	{ }
-
-	void UpdateData(float InThrottle, float InBrake, float InSteer)
-	{
-		ThrottleInput = InThrottle;
-		BrakeInput = InBrake;
-		SteerInput = InSteer;
-	}
-
-	void Decompress(const FVehicleInputCompressed& CompressedInput);
-
-	float ThrottleInput;
-	float BrakeInput;
-	float SteerInput;
-};
-
-USTRUCT()
-struct FVehicleInputCompressed
-{
-	GENERATED_BODY()
-
-public:
-	void Compress(const FVehicleInput& VehicleInput);
-	
-	uint8 ThrottleInput : 1;
-	uint8 BrakeInput : 1;
-	uint8 SteerInput : 2;
-};
-
-
-
 UCLASS()
 class GEAR_API AGearVehicle : public AWheeledVehiclePawn
 {
@@ -93,9 +49,6 @@ public:
 
 	UFUNCTION()
 	void OnRep_GrantedInvincibility();
-
-	UFUNCTION()
-	void OnRep_VehicleInputCompressed();
 
 	float DistanaceAlongTrack;
 
@@ -167,18 +120,12 @@ protected:
 	float ThrottleValue;
 	float BrakeValue;
 
-	UFUNCTION(Server, Reliable)
-	void SendInputToServer(FVehicleInputCompressed CompressedInput);
-
 	UPROPERTY(ReplicatedUsing=OnRep_GrantedInvincibility)
 	bool bGrantedInvincibility;
 
 	float InvincibilityStartTime;
 
-	UPROPERTY(ReplicatedUsing=OnRep_VehicleInputCompressed)
-	FVehicleInputCompressed VehicleInputCompressed;
 
-	FVehicleInput VehicleInput;
 
 #if WITH_EDITORONLY_DATA
 
