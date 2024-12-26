@@ -400,3 +400,23 @@ bool AGearVehicle::IsOutsideTrack() const
 	FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(DistanaceAlongTrack);
 	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -700.0f;
 }
+
+// ---------------------------------------------------------------------------
+
+float AGearVehicle::GetWheelSteerAngle(int32 Index)
+{
+	check(Index >= 0 && Index < GetChaosMovementComponent()->Wheels.Num() && IsValid(ChaosMovementComponent->Wheels[Index]));
+	return ChaosMovementComponent->Wheels[Index]->GetSteerAngle();
+}
+
+float AGearVehicle::GetWheelRotation(int32 Index)
+{
+	check(Index >= 0 && Index < GetChaosMovementComponent()->Wheels.Num() && IsValid(ChaosMovementComponent->Wheels[Index]));
+	return ChaosMovementComponent->Wheels[Index]->GetRotationAngle();
+}
+
+float AGearVehicle::GetWheelRotationSpeed(int32 Index)
+{
+	check(Index >= 0 && Index < GetChaosMovementComponent()->Wheels.Num() && IsValid(ChaosMovementComponent->Wheels[Index]));
+	return ChaosMovementComponent->Wheels[Index]->GetRotationAngularVelocity();
+}

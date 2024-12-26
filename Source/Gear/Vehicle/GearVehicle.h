@@ -104,6 +104,15 @@ public:
 
 	class UVehicleAudioComponent* GetVehicleAudioComponent() const { return VehicleAudioComponent; }
 
+	UFUNCTION(BlueprintPure)
+	float GetWheelSteerAngle(int32 Index);
+
+	UFUNCTION(BlueprintPure)
+	float GetWheelRotation(int32 Index);
+
+	UFUNCTION(BlueprintPure)
+	float GetWheelRotationSpeed(int32 Index);
+
 protected:
 
 	virtual void BeginPlay() override;
