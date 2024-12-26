@@ -23,19 +23,18 @@
 
 
 AGearVehicle::AGearVehicle()
+	: SteerAngle(0.0f)
+	, SteerValue(0.0f)
+	, ThrottleValue(0.0f)
+	, BrakeValue(0.0f)
+	, DistanaceAlongTrack(0.0f)
+	, TargetCheckpoint(1)
+	, bGrantedInvincibility(false)
 {
 	VehicleAudioComponent = CreateDefaultSubobject<UVehicleAudioComponent>(TEXT("VehicleAudioComponent"));
 	VehicleAudioComponent->SetupAttachment(GetRootComponent());
 
-	SteerValue = 0.0f;
-	ThrottleValue = 0.0f;
-	BrakeValue = 0.0f;
-
 	bAlwaysRelevant = true;
-	DistanaceAlongTrack = 0;
-	TargetCheckpoint = 1;
-
-	bGrantedInvincibility = false;
 }
 
 void AGearVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -44,10 +43,8 @@ void AGearVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 	DOREPLIFETIME(AGearVehicle, bGrantedInvincibility);
 	DOREPLIFETIME(AGearVehicle, TargetCheckpoint);
+	DOREPLIFETIME_CONDITION(AGearVehicle, SteerAngle, COND_SkipOwner);
 }
-
-
-
 
 void AGearVehicle::BeginPlay()
 {
@@ -209,6 +206,11 @@ void AGearVehicle::Tick(float DeltaSeconds)
 		UpdateVehicleInputs();
 	}
 
+	if (HasAuthority() || IsLocallyControlled())
+	{
+		SteerAngle = GetWheelSteerAngle(0);
+	}
+
 #if WITH_EDITOR
 	if (bInTestMap)
 		return;
@@ -363,4 +365,9 @@ float AGearVehicle::GetWheelRotationSpeed(int32 Index)
 {
 	check(Index >= 0 && Index < GetChaosMovementComponent()->Wheels.Num() && IsValid(ChaosMovementComponent->Wheels[Index]));
 	return ChaosMovementComponent->Wheels[Index]->GetRotationAngularVelocity();
+}
+
+float AGearVehicle::GetSteerAngle()
+{
+	return SteerAngle;
 }

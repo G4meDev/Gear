@@ -66,6 +66,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetWheelRotationSpeed(int32 Index);
 
+	UFUNCTION(BlueprintPure)
+	float GetSteerAngle();
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -125,6 +128,8 @@ protected:
 
 	float InvincibilityStartTime;
 
+	UPROPERTY(Replicated)
+	float SteerAngle;
 
 
 #if WITH_EDITORONLY_DATA
