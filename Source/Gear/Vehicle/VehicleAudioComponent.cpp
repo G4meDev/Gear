@@ -5,7 +5,9 @@
 #include "Vehicle/GearVehicle.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 
-constexpr auto VehicleForwardSpeedParameter = TEXT("VehicleForwardSpeed");
+constexpr auto ForwardSpeedParameter			= TEXT("ForwardSpeed");
+constexpr auto WheelRotationPerSecondsParameter = TEXT("WheelRotationPerSeconds");
+constexpr auto WheelRotationParameter			= TEXT("WheelRotation");
 
 UVehicleAudioComponent::UVehicleAudioComponent()
 {
@@ -24,5 +26,7 @@ void UVehicleAudioComponent::TickComponent(float DeltaTime, enum ELevelTick Tick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	SetFloatParameter(VehicleForwardSpeedParameter, OwningVehicle->GetChaosMovementComponent()->GetForwardSpeed() * 0.036f);
+	SetFloatParameter(ForwardSpeedParameter				, OwningVehicle->GetChaosMovementComponent()->GetForwardSpeed() * 0.036f);
+	SetFloatParameter(WheelRotationPerSecondsParameter	, FMath::Abs(OwningVehicle->GetWheelRotationSpeed(0)) / 360.0f);
+	SetFloatParameter(WheelRotationParameter			, FMath::Abs(OwningVehicle->GetWheelRotation(0)));
 }
