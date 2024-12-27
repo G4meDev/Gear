@@ -42,6 +42,12 @@ public:
 	USplineComponent* RoadSpline;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UBoxComponent* MainCollider;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UBoxComponent* ExtentCollider;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> RoadModuleMirroredClass;
 
 	UPlaceableSocket* GetAttachableSocket();
@@ -53,10 +59,21 @@ public:
 	float RoadLength;
 
 #if WITH_EDITORONLY_DATA
+	void UpdateSplineParameters();
+
+	void UpdateColliders();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bDirty = false;
 
 	float RotationPivotHeightOffset = -200.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector MainColliderPadding = FVector(-100.0f, 200.0f, 500.0f);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector ExtentColliderSize = FVector(3000.0f, 1000.0f, 500.0f);
+
 #endif
 
 protected:

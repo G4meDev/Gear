@@ -5,6 +5,7 @@
 #include "GameFramework/GearGameState.h"
 #include "Placeable/PlaceableSocket.h"
 #include "Components/SplineComponent.h"
+#include "Components/BoxComponent.h"
 #include "Net/UnrealNetwork.h"
 
 AGearRoadModule::AGearRoadModule()
@@ -23,6 +24,14 @@ AGearRoadModule::AGearRoadModule()
 
 	RoadSpline = CreateDefaultSubobject<USplineComponent>(TEXT("RoadSpline"));
 	RoadSpline->SetupAttachment(Root);
+
+	MainCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("MainCollider"));
+	MainCollider->SetupAttachment(Root);
+	MainCollider->ShapeColor = FColor::Blue;
+
+	ExtentCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("ExtentCollider"));
+	ExtentCollider->SetupAttachment(Root);
+	ExtentCollider->ShapeColor = FColor::Yellow;
 
 	PreviewScale = 0.3f;
 	bMirrorX = false;
@@ -49,6 +58,7 @@ void AGearRoadModule::BeginPlay()
 }
 
 #if WITH_EDITOR
+
 void AGearRoadModule::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -58,21 +68,56 @@ void AGearRoadModule::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 	if (ProperyName == GET_MEMBER_NAME_CHECKED(AGearRoadModule, bDirty))
 	{
 		bDirty = false;
-		RoadLength = RoadSpline->GetSplineLength();
 
-		if (IsValid(RoadMesh) && IsValid(SelectionIndicator) && IsValid(PreviewRotationPivot))
-		{
-			FVector MinBound;
-			FVector MaxBound;
-			RoadMesh->GetLocalBounds(MinBound, MaxBound);
-			
-			FVector RotationPivotLocation = (MinBound + MaxBound) / 2.0f;
-			RotationPivotLocation.Z = MinBound.Z + RotationPivotHeightOffset;
-
-			PreviewRotationPivot->SetRelativeLocation(RotationPivotLocation);
-		}
+		UpdateSplineParameters();
+		UpdateColliders();
 	}
 }
+
+void AGearRoadModule::UpdateSplineParameters()
+{
+	RoadLength = RoadSpline->GetSplineLength();
+
+	if (IsValid(RoadMesh) && IsValid(SelectionIndicator) && IsValid(PreviewRotationPivot))
+	{
+		FVector MinBound;
+		FVector MaxBound;
+		RoadMesh->GetLocalBounds(MinBound, MaxBound);
+
+		FVector RotationPivotLocation = (MinBound + MaxBound) / 2.0f;
+		RotationPivotLocation.Z = MinBound.Z + RotationPivotHeightOffset;
+
+		PreviewRotationPivot->SetRelativeLocation(RotationPivotLocation);
+	}
+}
+
+void AGearRoadModule::UpdateColliders()
+{
+	if (IsValid(RoadMesh) && IsValid(MainCollider) && IsValid(ExtentCollider))
+	{
+		FVector MinBound;
+		FVector MaxBound;
+		RoadMesh->GetLocalBounds(MinBound, MaxBound);
+
+		FVector BoundOrigin = (MinBound + MaxBound) / 2;
+		BoundOrigin *= RoadMesh->GetRelativeScale3D();
+		FVector BoundExtent = (MaxBound - MinBound) / 2;
+		BoundExtent += MainColliderPadding;
+
+		MainCollider->SetRelativeLocation(BoundOrigin);
+		MainCollider->SetBoxExtent(BoundExtent);
+
+
+		BoundOrigin = RoadEndSocket->GetRelativeTransform().TransformPosition(FVector(ExtentColliderSize.X, 0, 0));
+		BoundExtent = ExtentColliderSize;
+
+		ExtentCollider->SetRelativeLocation(BoundOrigin);
+		ExtentCollider->SetRelativeRotation(RoadEndSocket->GetRelativeRotation());
+		ExtentCollider->SetBoxExtent(BoundExtent);
+	}
+
+}
+
 #endif
 
 void AGearRoadModule::PostNetInit()
