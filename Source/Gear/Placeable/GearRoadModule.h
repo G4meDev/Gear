@@ -50,6 +50,18 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> RoadModuleMirroredClass;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AGearRoadModule> RoadModuleClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AGearRoadModule> RoadModuleClass_MirrorX;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AGearRoadModule> RoadModuleClass_MirrorY;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AGearRoadModule> RoadModuleClass_MirrorX_MirrorY;
+
 	UPlaceableSocket* GetAttachableSocket();
 
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
