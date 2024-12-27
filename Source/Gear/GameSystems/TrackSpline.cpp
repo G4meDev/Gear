@@ -35,7 +35,7 @@ void ATrackSpline::RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadMod
 	check(!RoadModulesStack.IsEmpty());
 
 	FSplinePoint SplinePoint;
-	auto AddSplinePoint = [&](int StackIndex, int SplinePointIndex, bool bMirrored) 
+	auto AddSplinePoint = [&](int StackIndex, int SplinePointIndex) 
 	{
 		SplinePoint = RoadModulesStack[StackIndex]->RoadSpline->GetSplinePointAt(SplinePointIndex, ESplineCoordinateSpace::World);
 		SplinePoint.Position = RoadModulesStack[StackIndex]->RoadSpline->GetLocationAtSplineInputKey(SplinePointIndex, ESplineCoordinateSpace::World);
@@ -44,38 +44,19 @@ void ATrackSpline::RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadMod
 		SplinePoint.Rotation = RoadModulesStack[StackIndex]->RoadSpline->GetRotationAtSplineInputKey(SplinePointIndex, ESplineCoordinateSpace::World);
 		SplinePoint.InputKey = Spline->GetNumberOfSplinePoints();
 
-		if (bMirrored)
-		{
-			FVector UpVector = RoadModulesStack[StackIndex]->RoadSpline->GetUpVectorAtSplineInputKey(SplinePointIndex, ESplineCoordinateSpace::World);
-
-			SplinePoint.ArriveTangent = SplinePoint.ArriveTangent.RotateAngleAxis(180.0f, UpVector);
-			SplinePoint.LeaveTangent = SplinePoint.LeaveTangent.RotateAngleAxis(180.0f, UpVector);
-			SplinePoint.Rotation = SplinePoint.Rotation + FRotator(0, 180.0f, 0);
-		}
-
 		Spline->AddPoint(SplinePoint, false);
 	};
 
-	AddSplinePoint(0, 0, false);
+	AddSplinePoint(0, 0);
 
 	for (int i = 0; i < RoadModulesStack.Num(); i++)
 	{
 		AGearRoadModule* RoadModule = RoadModulesStack[i];
 		check(IsValid(RoadModule));
 
-		if (RoadModule->bMirrorX)
+		for (int j = 1; j < RoadModule->RoadSpline->GetNumberOfSplinePoints(); j++)
 		{
-			for (int j = RoadModule->RoadSpline->GetNumberOfSplinePoints() - 2; j >= 0 ; j--)
-			{
-				AddSplinePoint(i, j, true);
-			}
-		}
-		else
-		{
-			for (int j = 1; j < RoadModule->RoadSpline->GetNumberOfSplinePoints(); j++)
-			{
-				AddSplinePoint(i, j, false);
-			}
+			AddSplinePoint(i, j);
 		}
 	}
 

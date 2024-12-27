@@ -81,7 +81,7 @@ protected:
 	void StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicle* InstgatorVehicle);
 	void StartRacing(bool bEveryPlayerPlaced);
 
-	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
+	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule);
 	bool ShouldAddCheckpoint() const;
 	void AddCheckpoint();
 

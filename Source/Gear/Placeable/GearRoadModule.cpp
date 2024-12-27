@@ -16,9 +16,6 @@ AGearRoadModule::AGearRoadModule()
 	RoadMesh->SetupAttachment(Root);
 	RoadMesh->SetCollisionProfileName(TEXT("BlockAll"));
 
-	RoadStartSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("StartSocket"));
-	RoadStartSocket->SetupAttachment(Root);
-
 	RoadEndSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("EndSocket"));
 	RoadEndSocket->SetupAttachment(Root);
 
@@ -36,15 +33,13 @@ AGearRoadModule::AGearRoadModule()
 	ExtentCollider->ShapeColor = FColor::Yellow;
 
 	PreviewScale = 0.3f;
-	bMirrorX = false;
 }
 
-void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(AGearRoadModule, bMirrorX, COND_InitialOnly);
-}
+// void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+// {
+// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+// 
+// }
 
 void AGearRoadModule::PostInitializeComponents()
 {
@@ -102,7 +97,6 @@ void AGearRoadModule::UpdateColliders()
 		RoadMesh->GetLocalBounds(MinBound, MaxBound);
 
 		FVector BoundOrigin = (MinBound + MaxBound) / 2;
-		//BoundOrigin *= RoadMesh->GetRelativeScale3D();
 		BoundOrigin = RoadMesh->GetRelativeTransform().TransformPosition(BoundOrigin);
 
 		FVector BoundExtent = (MaxBound - MinBound) / 2;
@@ -147,30 +141,14 @@ void AGearRoadModule::SetSelectedBy(AGearBuilderPawn* Player)
 	Super::SetSelectedBy(Player);
 }
 
-void AGearRoadModule::MoveToSocket(const FTransform& TargetSocket, bool InMirrorX)
+void AGearRoadModule::MoveToSocketTransform(const FTransform& TargetSocket)
 {
-	bMirrorX = InMirrorX;
-
-	FVector TargetLocation = TargetSocket.GetLocation();
-	FRotator TargetRotation = TargetSocket.Rotator();
-
-	FVector DebugStart = TargetLocation + FVector::UpVector * 20;
-		
-	if (bMirrorX)
-	{
-		FRotator DeltaRotator = FRotator(0, 180, 0) - RoadEndSocket->GetRelativeRotation();
-		TargetRotation = TargetSocket.TransformRotation(DeltaRotator.Quaternion()).Rotator();
-
-		FVector DeltaLocation = DeltaRotator.RotateVector(RoadEndSocket->GetRelativeTransform().GetLocation());
-		TargetLocation = TargetSocket.TransformPositionNoScale(-DeltaLocation);
-	}
-
-	SetActorLocationAndRotation(TargetLocation, TargetRotation);
+	SetActorLocationAndRotation(TargetSocket.GetLocation(), TargetSocket.Rotator());
 }
 
 UPlaceableSocket* AGearRoadModule::GetAttachableSocket()
 {
-	return bMirrorX ? RoadStartSocket : RoadEndSocket;
+	return RoadEndSocket;
 }
 
 // -----------------------------------------------------------------------------

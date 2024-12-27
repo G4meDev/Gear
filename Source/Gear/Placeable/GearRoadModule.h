@@ -27,13 +27,10 @@ public:
 	void SetPreview() override;
 	void SetSelectedBy(AGearBuilderPawn* Player) override;
 
-	void MoveToSocket(const FTransform& TargetSocket, bool InMirrorX);
+	void MoveToSocketTransform(const FTransform& TargetSocket);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* RoadMesh;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UPlaceableSocket* RoadStartSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UPlaceableSocket* RoadEndSocket;
@@ -63,9 +60,6 @@ public:
 	TSubclassOf<AGearRoadModule> RoadModuleClass_MirrorX_MirrorY;
 
 	UPlaceableSocket* GetAttachableSocket();
-
-	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
-	bool bMirrorX;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RoadLength;

@@ -307,7 +307,7 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 
 		if (IsValid(BuilderPawn) && !BuilderPawn->bPlacedModule)
 		{
-			if (IsValid(AddRoadModule(RoadModule, bMirrorX)))
+			if (IsValid(AddRoadModule(RoadModule)))
 			{
 				BuilderPawn->SelectedPlaceableClass = nullptr;
 				BuilderPawn->OnRep_SelectedPlaceableClass();
@@ -323,9 +323,7 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 	}
 }
 
-
-
-AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX)
+AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule)
 {
 	FTransform SpawnTransform;
 
@@ -334,11 +332,10 @@ AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadM
 
 	if (IsValid(SpawnRoadModule))
 	{
-		SpawnRoadModule->bMirrorX = bMirrorX;
 		SetOwner(GetOwner());
 		UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
 
-		SpawnRoadModule->MoveToSocket(GearGameState->RoadModuleSocketTransform, bMirrorX);
+		SpawnRoadModule->MoveToSocketTransform(GearGameState->RoadModuleSocketTransform);
 		GearGameState->RoadModuleStack.Add(SpawnRoadModule);
 		GearGameState->OnModuleStackChanged();
 
@@ -369,7 +366,7 @@ void AGearGameMode::AddCheckpoint()
 {
 	check(IsValid(CheckpointModuleClass) && IsValid(CheckpointClass));
 
-	AGearRoadModule* Module = AddRoadModule(CheckpointModuleClass, false);
+	AGearRoadModule* Module = AddRoadModule(CheckpointModuleClass);
 	if (IsValid(Module))
 	{
 		FTransform SocketTransform = Module->RoadMesh->GetSocketTransform(TEXT("Checkpoint"));

@@ -236,7 +236,7 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 
 		if (IsValid(ActiveRoadModule))
 		{
-			ActiveRoadModule->MoveToSocket(RoadModuleSocket, bSelectedMirroredX);
+			ActiveRoadModule->MoveToSocketTransform(RoadModuleSocket);
 		}
 
 		if (IsValid(DeactiveRoadModule))
