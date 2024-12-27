@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "TrackSpline.generated.h"
 
-class USplineComponent;
 class AGearRoadModule;
 struct FCrossTrackProperty;
 
@@ -22,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USplineComponent* Spline;
+	class UGearSplineComponent* Spline;
 
 public:	
 	virtual void Tick(float DeltaTime) override;

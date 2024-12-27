@@ -98,7 +98,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UVehicleStart* StartPonit_4;
 
-#if WITH_EDITORONLY_DATA
+// -----------------------------------------------------------------
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UArrowComponent* StartPoint_1_Arrow;
@@ -112,5 +112,4 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UArrowComponent* StartPoint_4_Arrow;
 
-#endif
 };

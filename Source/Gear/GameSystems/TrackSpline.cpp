@@ -2,15 +2,18 @@
 
 
 #include "GameSystems/TrackSpline.h"
-#include "Components/SplineComponent.h"
 #include "Placeable/GearRoadModule.h"
+#include "GameSystems/GearSplineComponent.h"
 
 ATrackSpline::ATrackSpline()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	Spline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
+	Spline = CreateDefaultSubobject<UGearSplineComponent>(TEXT("Spline"));
 	SetRootComponent(Spline);
+
+	bReplicates = true;
+	bAlwaysRelevant = true;
 }
 
 void ATrackSpline::BeginPlay()

@@ -23,18 +23,19 @@
 
 
 AGearVehicle::AGearVehicle()
-	: SteerAngle(0.0f)
-	, SteerValue(0.0f)
-	, ThrottleValue(0.0f)
-	, BrakeValue(0.0f)
-	, DistanaceAlongTrack(0.0f)
-	, TargetCheckpoint(1)
-	, bGrantedInvincibility(false)
 {
 	VehicleAudioComponent = CreateDefaultSubobject<UVehicleAudioComponent>(TEXT("VehicleAudioComponent"));
 	VehicleAudioComponent->SetupAttachment(GetRootComponent());
 
-	bAlwaysRelevant = true;
+	SteerValue				= 0.0f;
+	SteerAngle				= 0.0f;
+	ThrottleValue			= 0.0f;
+	DistanaceAlongTrack		= 0.0f;
+	BrakeValue				= 0.0f;
+	TargetCheckpoint		= 1;
+	bGrantedInvincibility	= false;
+
+	bAlwaysRelevant			= true;
 }
 
 void AGearVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

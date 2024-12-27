@@ -51,8 +51,6 @@ ACheckpoint::ACheckpoint()
 	StartPonit_4->SetupAttachment(Root);
 
 	LastStartTime = FLT_MAX;
-
-#if WITH_EDITORONLY_DATA
 	
 	StartPoint_1_Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("StartPoint_1_Arrow"));
 	StartPoint_1_Arrow->SetupAttachment(StartPonit_1);
@@ -65,6 +63,13 @@ ACheckpoint::ACheckpoint()
 
 	StartPoint_4_Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("StartPoint_4_Arrow"));
 	StartPoint_4_Arrow->SetupAttachment(StartPonit_4);
+
+#if UE_BUILD_SHIPPING
+	
+	StartPoint_1_Arrow->MarkAsEditorOnlySubobject();
+	StartPoint_2_Arrow->MarkAsEditorOnlySubobject();
+	StartPoint_3_Arrow->MarkAsEditorOnlySubobject();
+	StartPoint_4_Arrow->MarkAsEditorOnlySubobject();
 
 #endif
 

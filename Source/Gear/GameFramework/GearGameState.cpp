@@ -66,7 +66,7 @@ void AGearGameState::BeginPlay()
 
 	if (!IsValid(TrackSpline))
 	{
-		TrackSpline = GetWorld()->SpawnActor<ATrackSpline>(ATrackSpline::StaticClass(), FTransform::Identity);
+		TrackSpline = Cast<ATrackSpline>(UGameplayStatics::GetActorOfClass(GetWorld(), ATrackSpline::StaticClass()));
 		check(TrackSpline);
 	}
 }
@@ -160,6 +160,14 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 
 void AGearGameState::OnRep_RoadModuleStack()
 {
+	if (HasAuthority())
+	{
+		if (IsValid(TrackSpline))
+		{
+			TrackSpline->RoadModuleStackChanged(RoadModuleStack);
+		}
+	}
+
 	AGearRoadModule* TopModule = RoadModuleStack.Top();
 
 	if (IsValid(TopModule) && TopModule->bShouldNotifyGameState && !TopModule->bGameStateNotified)
@@ -174,11 +182,6 @@ void AGearGameState::OnRep_RoadModuleStack()
 				if (IsValid(BuilderPawn))
 				{
 					BuilderPawn->RoadModuleStackChanged();
-				}
-
-				if (IsValid(TrackSpline))
-				{
-					TrackSpline->RoadModuleStackChanged(RoadModuleStack);
 				}
 			}
 		}
