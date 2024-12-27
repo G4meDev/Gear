@@ -32,6 +32,7 @@ enum class EPlaceableSocketType : uint8
 UENUM(BlueprintType)
 enum class EPlaceableState : uint8
 {
+	None,
 	Preview,
 	Selected,
 	Idle,

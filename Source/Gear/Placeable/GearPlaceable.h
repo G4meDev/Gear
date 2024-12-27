@@ -40,14 +40,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EPlaceableSocketType SocketType;
 
-	UPROPERTY(ReplicatedUsing=OnRep_OwningPlayer)
-	AGearBuilderPawn* OwningPlayer;
+	UPROPERTY(Replicated)
+	AGearPlayerState* OwningPlayer;
 
 	bool HasOwningPlayer() const;
-
-	UFUNCTION()
-	void OnRep_OwningPlayer();
-
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* Root;
@@ -64,20 +60,17 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float PreviewScale;
 
-	UFUNCTION()
-	void OnRep_EnabledSelectionBox();
-
-	UPROPERTY(ReplicatedUsing=OnRep_EnabledSelectionBox, BlueprintReadWrite, EditAnywhere)
-	bool bEnabledSelectionBox;
-
 	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
 
 	void AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint);
 
+	UFUNCTION()
+	void OnRep_PlaceableState(EPlaceableState OldState);
+
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(ReplicatedUsing=OnRep_PlaceableState, BlueprintReadWrite, EditAnywhere)
 	EPlaceableState PlaceableState;
 
 	void SelectionBoxClicked();
@@ -86,4 +79,20 @@ protected:
 	void OnSelectionBoxClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
 	UFUNCTION()
 	void OnSelectionBoxTouched(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
+
+//----------------------------------------------------------------------------
+
+	virtual void OnPreview_Start();
+	virtual void OnPreview_End();
+
+	virtual void OnSelected_Start();
+	virtual void OnSelected_End();
+
+	virtual void OnIdle_Start();
+	virtual void OnIdle_End();
+
+	virtual void OnEnabled_Start();
+	virtual void OnEnabled_End();
+
+	void SetSelectionBoxEnabled(bool bEnabled);
 };

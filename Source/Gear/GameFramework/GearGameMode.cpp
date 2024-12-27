@@ -335,8 +335,6 @@ AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadM
 	if (IsValid(SpawnRoadModule))
 	{
 		SpawnRoadModule->bMirrorX = bMirrorX;
-		SpawnRoadModule->bEnabledSelectionBox = false;
-		SpawnRoadModule->OnRep_EnabledSelectionBox();
 		SetOwner(GetOwner());
 		UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
 

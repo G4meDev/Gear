@@ -19,7 +19,6 @@ AGearPlaceable::AGearPlaceable()
 	SetRootComponent(Root);
 
 	SelectionHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("SelectionHitbox"));
-	SelectionHitbox->SetCollisionProfileName("Selectable");
 	SelectionHitbox->SetupAttachment(Root);
 
 	PreviewRotationPivot = CreateDefaultSubobject<USceneComponent>(TEXT("PreviewRotationPivot"));
@@ -28,12 +27,9 @@ AGearPlaceable::AGearPlaceable()
 	SelectionIndicator = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectionIndicator"));
 	SelectionIndicator->SetupAttachment(PreviewRotationPivot);
 	SelectionIndicator->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SelectionIndicator->SetIsReplicated(true);
 
-	PlaceableState = EPlaceableState::Idle;
+	PlaceableState = EPlaceableState::None;
 	PreviewScale = 1.0f;
-
-	bEnabledSelectionBox = true;
 
 	bReplicates = true;
 	SetReplicateMovement(true);
@@ -48,7 +44,6 @@ void AGearPlaceable::PostInitializeComponents()
 	SelectionHitbox->OnInputTouchBegin.AddDynamic(this, &AGearPlaceable::OnSelectionBoxTouched);
 
 	SelectionIndicatorMaterial = SelectionIndicator->CreateDynamicMaterialInstance(0, nullptr);
-
 	SelectionIndicator->SetVisibility(false);
 }
 
@@ -58,17 +53,20 @@ void AGearPlaceable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(AGearPlaceable, OwningPlayer);
 	DOREPLIFETIME(AGearPlaceable, PlaceableState);
-	DOREPLIFETIME(AGearPlaceable, bEnabledSelectionBox);
 }
 
 void AGearPlaceable::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (PlaceableState == EPlaceableState::Preview)
-	{
-		SetPreview();
-	}
+
+}
+
+void AGearPlaceable::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+
 }
 
 void AGearPlaceable::SelectionBoxClicked()
@@ -103,13 +101,6 @@ void AGearPlaceable::OnSelectionBoxTouched(ETouchIndex::Type FingerIndex, UPrimi
 	SelectionBoxClicked();
 }
 
-void AGearPlaceable::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-
-}
-
 void AGearPlaceable::MarkNotReplicated()
 {
 	SetReplicates(false);
@@ -125,8 +116,11 @@ void AGearPlaceable::SetPreview()
 {
 	if (HasAuthority())
 	{
+		EPlaceableState OldState = PlaceableState;
+
 		PlaceableState = EPlaceableState::Preview;
-		SelectionIndicator->SetVisibility(false);
+
+		OnRep_PlaceableState(OldState);
 	}
 }
 
@@ -134,40 +128,29 @@ void AGearPlaceable::SetSelectedBy(AGearBuilderPawn* Player)
 {
 	if (HasAuthority())
 	{
-		PlaceableState = EPlaceableState::Selected;
-	}
+		EPlaceableState OldState = PlaceableState;
 
-	AGearPlayerState* PlayerState = Player->GetPlayerState<AGearPlayerState>();
-	if (IsValid(PlayerState))
-	{
-		SelectionIndicatorMaterial->SetVectorParameterValue(TEXT("Color"), PlayerState->PlayerColor);
-		SelectionIndicator->SetVisibility(true);
+		AGearPlayerState* PlayerState = IsValid(Player) ? Player->GetPlayerState<AGearPlayerState>() : nullptr;
+		if (IsValid(PlayerState))
+		{
+			OwningPlayer = PlayerState;
+			PlaceableState = EPlaceableState::Selected;
+		}
+
+		else
+		{
+			OwningPlayer = nullptr;
+			PlaceableState = EPlaceableState::Preview;
+		}
+
+		OnRep_PlaceableState(OldState);
+		
 	}
 }
 
 bool AGearPlaceable::HasOwningPlayer() const
 {
-	return OwningPlayer != nullptr;
-}
-
-void AGearPlaceable::OnRep_OwningPlayer()
-{
-	if (OwningPlayer == nullptr)
-	{
-		SetPreview();
-	}
-	else
-	{
-		SetSelectedBy(OwningPlayer);
-	}
-}
-
-void AGearPlaceable::OnRep_EnabledSelectionBox()
-{
-	if (!bEnabledSelectionBox)
-	{
-		SelectionHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
+	return IsValid(OwningPlayer);
 }
 
 void AGearPlaceable::AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint)
@@ -175,4 +158,105 @@ void AGearPlaceable::AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint)
 	AttachToActor(SpawnPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	SetActorScale3D(FVector(PreviewScale));
 	SetActorRelativeLocation(-PreviewRotationPivot->GetRelativeLocation() * PreviewScale);
+}
+
+void AGearPlaceable::OnRep_PlaceableState(EPlaceableState OldState)
+{
+	switch (OldState)
+	{
+	case EPlaceableState::None:
+		break;
+	case EPlaceableState::Preview:
+		OnPreview_End();
+		break;
+	case EPlaceableState::Selected:
+		OnSelected_End();
+		break;
+	case EPlaceableState::Idle:
+		OnIdle_End();
+		break;
+	case EPlaceableState::Enabled:
+		OnEnabled_End();
+		break;
+	default:
+		break;
+	}
+
+	switch (PlaceableState)
+	{
+	case EPlaceableState::None:
+		break;
+	case EPlaceableState::Preview:
+		OnPreview_Start();
+		break;
+	case EPlaceableState::Selected:
+		OnSelected_Start();
+		break;
+	case EPlaceableState::Idle:
+		OnIdle_Start();
+		break;
+	case EPlaceableState::Enabled:
+		OnEnabled_Start();
+		break;
+	default:
+		break;
+	}
+}
+
+// ----------------------------------------------------------------------------------
+
+void AGearPlaceable::OnPreview_Start()
+{
+	SetSelectionBoxEnabled(true);
+}
+
+void AGearPlaceable::OnPreview_End()
+{
+	SetSelectionBoxEnabled(false);
+}
+
+void AGearPlaceable::OnSelected_Start()
+{
+	if (IsValid(OwningPlayer))
+	{
+		SelectionIndicatorMaterial->SetVectorParameterValue(TEXT("Color"), OwningPlayer->PlayerColor);
+		SelectionIndicator->SetVisibility(true);
+	}
+}
+
+void AGearPlaceable::OnSelected_End()
+{
+	SelectionIndicator->SetVisibility(false);
+}
+
+void AGearPlaceable::OnIdle_Start()
+{
+
+}
+
+void AGearPlaceable::OnIdle_End()
+{
+
+}
+
+void AGearPlaceable::OnEnabled_Start()
+{
+
+}
+
+void AGearPlaceable::OnEnabled_End()
+{
+
+}
+
+void AGearPlaceable::SetSelectionBoxEnabled(bool bEnabled)
+{
+	if (bEnabled)
+	{
+		SelectionHitbox->SetCollisionProfileName("Selectable");
+	}
+	else
+	{
+		SelectionHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }

@@ -295,14 +295,12 @@ void AGearBuilderPawn::SetSelectedPlaceable(AGearPlaceable* Placeable)
 	{
 		if (IsValid(SelectedPlaceable))
 		{
-			SelectedPlaceable->OwningPlayer = nullptr;
-			SelectedPlaceable->OnRep_OwningPlayer();
+			SelectedPlaceable->SetSelectedBy(nullptr);
 		}
 
 		if (IsValid(Placeable))
 		{
-			Placeable->OwningPlayer = this;
-			Placeable->OnRep_OwningPlayer();
+			Placeable->SetSelectedBy(this);
 		}
 
 		SelectedPlaceable = Placeable;
