@@ -84,4 +84,11 @@ protected:
 #endif
 
 	virtual void PostNetInit() override;
+
+	// -----------------------------------------------------------------------------
+
+	void SetMainColliderEnabled(bool bEnabled);
+
+	virtual void OnIdle_Start() override;
+	virtual void OnIdle_End() override;
 };

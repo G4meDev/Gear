@@ -27,10 +27,12 @@ AGearRoadModule::AGearRoadModule()
 
 	MainCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("MainCollider"));
 	MainCollider->SetupAttachment(Root);
+	MainCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	MainCollider->ShapeColor = FColor::Blue;
 
 	ExtentCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("ExtentCollider"));
 	ExtentCollider->SetupAttachment(Root);
+	ExtentCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ExtentCollider->ShapeColor = FColor::Yellow;
 
 	PreviewScale = 0.3f;
@@ -167,4 +169,32 @@ void AGearRoadModule::MoveToSocket(const FTransform& TargetSocket, bool InMirror
 UPlaceableSocket* AGearRoadModule::GetAttachableSocket()
 {
 	return bMirrorX ? RoadStartSocket : RoadEndSocket;
+}
+
+// -----------------------------------------------------------------------------
+
+void AGearRoadModule::SetMainColliderEnabled(bool bEnabled)
+{
+	if (bEnabled)
+	{
+		MainCollider->SetCollisionProfileName(TEXT("RoadBoundCollider"));
+	}
+	else
+	{
+		MainCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void AGearRoadModule::OnIdle_Start()
+{
+	Super::OnIdle_Start();
+
+	SetMainColliderEnabled(true);
+}
+
+void AGearRoadModule::OnIdle_End()
+{
+	Super::OnIdle_End();
+
+	SetMainColliderEnabled(false);
 }
