@@ -297,20 +297,22 @@ void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable
 	}
 }
 
-void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, TSubclassOf<AGearRoadModule> RoadModule, UPlaceableSocket* TargetSocket, bool bMirrorX)
+void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX)
 {
-	if (GearMatchState == EGearMatchState::Placing && IsValid(RoadModule) && IsValid(TargetSocket) && GearGameState->GetRoadStackAttachableSocket() == TargetSocket && !TargetSocket->IsOccupied())
+	if (GearMatchState == EGearMatchState::Placing && IsValid(RoadModule))
 	{
 		// TODO: sweep test
 
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
 
-		if (IsValid(BuilderPawn))
+		if (IsValid(BuilderPawn) && !BuilderPawn->bPlacedModule)
 		{
 			if (IsValid(AddRoadModule(RoadModule, bMirrorX)))
 			{
 				BuilderPawn->SelectedPlaceableClass = nullptr;
-				BuilderPawn->OnRep_SelectedPlaceableClass();				
+				BuilderPawn->OnRep_SelectedPlaceableClass();
+
+				BuilderPawn->bPlacedModule = true;
 			}
 
 			if (ShouldAddCheckpoint())
@@ -333,15 +335,14 @@ AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadM
 	if (IsValid(SpawnRoadModule))
 	{
 		SpawnRoadModule->bMirrorX = bMirrorX;
-		SpawnRoadModule->bShouldNotifyGameState = true;
 		SpawnRoadModule->bEnabledSelectionBox = false;
 		SpawnRoadModule->OnRep_EnabledSelectionBox();
 		SetOwner(GetOwner());
 		UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
 
-		SpawnRoadModule->MoveToSocket(GearGameState->GetRoadStackAttachableSocket(), bMirrorX);
+		SpawnRoadModule->MoveToSocket(GearGameState->RoadModuleSocketTransform, bMirrorX);
 		GearGameState->RoadModuleStack.Add(SpawnRoadModule);
-		GearGameState->OnRep_RoadModuleStack();
+		GearGameState->OnModuleStackChanged();
 
 		return SpawnRoadModule;
 	}
@@ -523,7 +524,7 @@ void AGearGameMode::PlaceUnplaced()
 
 		if (IsValid(GearPlayerController))
 		{
-			RequestPlaceRoadModuleForPlayer(GearPlayerController, RoadModuleClass, GearGameState->GetRoadStackAttachableSocket(), false);
+			RequestPlaceRoadModuleForPlayer(GearPlayerController, RoadModuleClass, false);
 		}
 	}
 }

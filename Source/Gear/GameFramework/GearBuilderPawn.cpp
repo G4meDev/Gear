@@ -41,12 +41,11 @@ AGearBuilderPawn::AGearBuilderPawn()
 	ScreenDragValue = FVector2D::Zero();
 	Velocity = FVector2D::Zero();
 
-	SelectedSocket = nullptr;
-
 	BuilderPawnState = EBuilderPawnState::Preview;
 	bSelectedMirroredX = false;
 	bSelectedMirroredY = false;
 	
+	bPlacedModule = false;
 
 	bReplicates = true;
 }
@@ -57,6 +56,7 @@ void AGearBuilderPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(AGearBuilderPawn, SelectedPlaceable);
 	DOREPLIFETIME(AGearBuilderPawn, SelectedPlaceableClass);
+	DOREPLIFETIME(AGearBuilderPawn, bPlacedModule);
 }
 
 void AGearBuilderPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -147,13 +147,12 @@ void AGearBuilderPawn::OnRep_SelectedPlaceableClass()
 		else if (SelectedPlaceableClass == nullptr)
 		{
 			BuilderPawnState = EBuilderPawnState::Waiting;
-			SelectedSocket = nullptr;
 			Cleanup_SpawnedActors();
 		}
 	}
 }
 
-void AGearBuilderPawn::RoadModuleStackChanged()
+void AGearBuilderPawn::OnRoadModuleSocketChanged()
 {
 	if (BuilderPawnState == EBuilderPawnState::PlacingRoadModules)
 	{
@@ -227,27 +226,22 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 
 	if (IsValid(GearGameState))
 	{
-		UPlaceableSocket* AttachableSocket = GearGameState->GetRoadStackAttachableSocket();
+		const FTransform& RoadModuleSocket = GearGameState->RoadModuleSocketTransform;
 
-		if (IsValid(AttachableSocket))
+		bSelectedMirroredX = bMirroredX;
+		bSelectedMirroredY = bMirroredY;
+
+		AGearRoadModule* ActiveRoadModule = bMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
+		AGearRoadModule* DeactiveRoadModule = !bMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
+
+		if (IsValid(ActiveRoadModule))
 		{
-			bSelectedMirroredX = bMirroredX;
-			bSelectedMirroredY = bMirroredY;
+			ActiveRoadModule->MoveToSocket(RoadModuleSocket, bSelectedMirroredX);
+		}
 
-			AGearRoadModule* ActiveRoadModule = bMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
-			AGearRoadModule* DeactiveRoadModule = !bMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
-
-			if (IsValid(ActiveRoadModule))
-			{
-				ActiveRoadModule->MoveToSocket(AttachableSocket, bSelectedMirroredX);
-			}
-
-			if (IsValid(DeactiveRoadModule))
-			{
-				DeactiveRoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
-			}
-
-			SelectedSocket = AttachableSocket;
+		if (IsValid(DeactiveRoadModule))
+		{
+			DeactiveRoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
 		}
 	}
 }
@@ -272,13 +266,9 @@ void AGearBuilderPawn::TeleportToRoadEnd()
 {
 	AGearGameState* GearGameState = Cast<AGearGameState>(UGameplayStatics::GetGameState(GetWorld()));
 	if (IsValid(GearGameState))
-	{
-		UPlaceableSocket* RoadEndSocket = GearGameState->GetRoadStackAttachableSocket();
-		if (IsValid(RoadEndSocket))
-		{
-			Velocity = FVector2D::Zero();
-			SetActorLocation(RoadEndSocket->GetComponentLocation());
-		}
+	{		
+		Velocity = FVector2D::Zero();
+		SetActorLocation(GearGameState->RoadModuleSocketTransform.GetLocation());
 	}
 }
 
@@ -293,7 +283,7 @@ void AGearBuilderPawn::PlaceRoadModule()
 			AGearPlayerController* GearController = GetController<AGearPlayerController>();
 			if (IsValid(GearController) && IsValid(GearGameState))
 			{
-				GearController->PlaceRoadModule(ActiveRoadModule->GetClass(), GearGameState->GetRoadStackAttachableSocket(), bSelectedMirroredX);
+				GearController->PlaceRoadModule(ActiveRoadModule->GetClass(), bSelectedMirroredX);
 			}
 		}
 	}

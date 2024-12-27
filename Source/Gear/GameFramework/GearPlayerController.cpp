@@ -177,12 +177,12 @@ void AGearPlayerController::SelectPlaceable_Implementation(AGearPlaceable* Place
 	}
 }
 
-void AGearPlayerController::PlaceRoadModule_Implementation(TSubclassOf<AGearRoadModule> RoadModule, UPlaceableSocket* TargetSocket, bool bMirrorX)
+void AGearPlayerController::PlaceRoadModule_Implementation(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX)
 {
 	AGearGameMode* GearGameMode = Cast<AGearGameMode>(GetWorld()->GetAuthGameMode());
 	if (IsValid(GearGameMode))
 	{
-		GearGameMode->RequestPlaceRoadModuleForPlayer(this, RoadModule, TargetSocket, bMirrorX);
+		GearGameMode->RequestPlaceRoadModuleForPlayer(this, RoadModule, bMirrorX);
 	}
 }
 

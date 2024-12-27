@@ -48,8 +48,10 @@ public:
 	UFUNCTION()
 	void OnRep_GearMatchState(EGearMatchState OldState);
 
+	void OnModuleStackChanged();
+
 	UFUNCTION()
-	void OnRep_RoadModuleStack();
+	void OnRep_RoadModuleSocketTransform();
 
 	bool FindStartRoadModuleAndAddToStack();
 
@@ -61,6 +63,8 @@ public:
 
 	ACheckpoint* GetFurthestReachedCheckpoint() const;
 	ACheckpoint* GetNextFurthestReachedCheckpoint() const;
+
+	void UpdateRoadModuleSocket();
 
 
 	void ClearOccupiedVehicleStarts();
@@ -87,7 +91,7 @@ public:
 	UPROPERTY()
 	ATrackSpline* TrackSpline;
 
-	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleStack, BlueprintReadWrite, VisibleInstanceOnly)
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
 	TArray<AGearRoadModule*> RoadModuleStack;
 
 	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
@@ -116,6 +120,9 @@ public:
 
 	UPROPERTY(Replicated)
 	int FurthestReachedCheckpoint;
+
+	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleSocketTransform)
+	FTransform RoadModuleSocketTransform;
 
 protected:
 

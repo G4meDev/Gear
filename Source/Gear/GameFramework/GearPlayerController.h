@@ -62,7 +62,7 @@ public:
 	void SelectPlaceable(AGearPlaceable* Placeable);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void PlaceRoadModule(TSubclassOf<AGearRoadModule> RoadModule, UPlaceableSocket* TargetSocket, bool bMirrorX);
+	void PlaceRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
 
 	void ClientStateAllPlayersJoined();
 	void ClientStateMatchStarted();

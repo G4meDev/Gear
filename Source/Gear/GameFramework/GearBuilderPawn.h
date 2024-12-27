@@ -52,7 +52,10 @@ public:
 	UFUNCTION()
 	void OnRep_SelectedPlaceableClass();
 
-	void RoadModuleStackChanged();
+	void OnRoadModuleSocketChanged();
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bPlacedModule;
 
 protected:
 	
@@ -96,9 +99,6 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
 	EBuilderPawnState BuilderPawnState;
-
-	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
-	UPlaceableSocket* SelectedSocket;
 
 	// in preview
 	UPROPERTY(ReplicatedUsing=OnRep_SelectedPlaceable, BlueprintReadWrite)

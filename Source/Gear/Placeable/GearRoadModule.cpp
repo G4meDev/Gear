@@ -26,9 +26,6 @@ AGearRoadModule::AGearRoadModule()
 
 	PreviewScale = 0.3f;
 	bMirrorX = false;
-
-	bShouldNotifyGameState = false;
-	bGameStateNotified = false;
 }
 
 void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
@@ -36,7 +33,6 @@ void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AGearRoadModule, bMirrorX, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(AGearRoadModule, bShouldNotifyGameState, COND_InitialOnly);
 }
 
 void AGearRoadModule::PostInitializeComponents()
@@ -83,15 +79,6 @@ void AGearRoadModule::PostNetInit()
 {
 	Super::PostNetInit();
 
-	// handle late spawn nullptr in AGearGameState::RoadModuleStack
-	if (bShouldNotifyGameState && !bGameStateNotified)
-	{
-		AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();
-		if (IsValid(GearGameState))
-		{
-			GearGameState->OnRep_RoadModuleStack();
-		}
-	}
 }
 
 void AGearRoadModule::Tick(float DeltaTime)
@@ -111,30 +98,25 @@ void AGearRoadModule::SetSelectedBy(AGearBuilderPawn* Player)
 	Super::SetSelectedBy(Player);
 }
 
-void AGearRoadModule::MoveToSocket(UPlaceableSocket* TargetSocket, bool InMirrorX)
+void AGearRoadModule::MoveToSocket(const FTransform& TargetSocket, bool InMirrorX)
 {
-	if (IsValid(TargetSocket))
-	{
-		bMirrorX = InMirrorX;
+	bMirrorX = InMirrorX;
 
-		FTransform TargetSocketTransform = TargetSocket->GetPlaceableSocketTransform();
+	FVector TargetLocation = TargetSocket.GetLocation();
+	FRotator TargetRotation = TargetSocket.Rotator();
 
-		FVector TargetLocation = TargetSocketTransform.GetLocation();
-		FRotator TargetRotation = TargetSocketTransform.Rotator();
-
-		FVector DebugStart = TargetLocation + FVector::UpVector * 20;
+	FVector DebugStart = TargetLocation + FVector::UpVector * 20;
 		
-		if (bMirrorX)
-		{
-			FRotator DeltaRotator = FRotator(0, 180, 0) - RoadEndSocket->GetRelativeRotation();
-			TargetRotation = TargetSocketTransform.TransformRotation(DeltaRotator.Quaternion()).Rotator();
+	if (bMirrorX)
+	{
+		FRotator DeltaRotator = FRotator(0, 180, 0) - RoadEndSocket->GetRelativeRotation();
+		TargetRotation = TargetSocket.TransformRotation(DeltaRotator.Quaternion()).Rotator();
 
-			FVector DeltaLocation = DeltaRotator.RotateVector(RoadEndSocket->GetRelativeTransform().GetLocation());
-			TargetLocation = TargetSocketTransform.TransformPositionNoScale(-DeltaLocation);
-		}
-
-		SetActorLocationAndRotation(TargetLocation, TargetRotation);
+		FVector DeltaLocation = DeltaRotator.RotateVector(RoadEndSocket->GetRelativeTransform().GetLocation());
+		TargetLocation = TargetSocket.TransformPositionNoScale(-DeltaLocation);
 	}
+
+	SetActorLocationAndRotation(TargetLocation, TargetRotation);
 }
 
 UPlaceableSocket* AGearRoadModule::GetAttachableSocket()

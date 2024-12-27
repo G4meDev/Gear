@@ -27,7 +27,7 @@ public:
 	void SetPreview() override;
 	void SetSelectedBy(AGearBuilderPawn* Player) override;
 
-	void MoveToSocket(UPlaceableSocket* TargetSocket, bool InMirrorX);
+	void MoveToSocket(const FTransform& TargetSocket, bool InMirrorX);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* RoadMesh;
@@ -48,11 +48,6 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
 	bool bMirrorX;
-
-	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
-	bool bShouldNotifyGameState;
-
-	bool bGameStateNotified;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RoadLength;

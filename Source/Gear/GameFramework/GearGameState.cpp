@@ -51,13 +51,13 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	
 	DOREPLIFETIME(AGearGameState, GearMatchState);
 	DOREPLIFETIME(AGearGameState, LastGameStateTransitionTime);
-	DOREPLIFETIME(AGearGameState, RoadModuleStack);
 	DOREPLIFETIME(AGearGameState, CheckpointsStack);
 	DOREPLIFETIME(AGearGameState, Vehicles);
 	DOREPLIFETIME(AGearGameState, CheckpointResults);
 	DOREPLIFETIME(AGearGameState, RoundNumber);
 	DOREPLIFETIME(AGearGameState, LastCountDownTime);
 	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpoint);
+	DOREPLIFETIME(AGearGameState, RoadModuleSocketTransform);
 }
 
 void AGearGameState::BeginPlay()
@@ -158,7 +158,7 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 	}
 }
 
-void AGearGameState::OnRep_RoadModuleStack()
+void AGearGameState::OnModuleStackChanged()
 {
 	if (HasAuthority())
 	{
@@ -166,23 +166,22 @@ void AGearGameState::OnRep_RoadModuleStack()
 		{
 			TrackSpline->RoadModuleStackChanged(RoadModuleStack);
 		}
+
+		RoadModuleSocketTransform = RoadModuleStack.Top()->GetAttachableSocket()->GetPlaceableSocketTransform();
+		OnRep_RoadModuleSocketTransform();
 	}
+}
 
-	AGearRoadModule* TopModule = RoadModuleStack.Top();
-
-	if (IsValid(TopModule) && TopModule->bShouldNotifyGameState && !TopModule->bGameStateNotified)
+void AGearGameState::OnRep_RoadModuleSocketTransform()
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		RoadModuleStack.Top()->bGameStateNotified = true;
-
-		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		if (Iterator->Get()->IsLocalController())
 		{
-			if (Iterator->Get()->IsLocalController())
+			AGearBuilderPawn* BuilderPawn = Iterator->Get()->GetPawn<AGearBuilderPawn>();
+			if (IsValid(BuilderPawn))
 			{
-				AGearBuilderPawn* BuilderPawn = Iterator->Get()->GetPawn<AGearBuilderPawn>();
-				if (IsValid(BuilderPawn))
-				{
-					BuilderPawn->RoadModuleStackChanged();
-				}
+				BuilderPawn->OnRoadModuleSocketChanged();
 			}
 		}
 	}
@@ -337,6 +336,8 @@ bool AGearGameState::FindStartRoadModuleAndAddToStack()
 
 	AGearRoadModule* Module = Cast<AGearRoadModule>(AlreadyPlacedRoadModules[0]);
 	RoadModuleStack.Add(Module);
+
+	OnModuleStackChanged();
 	
 	return true;
 }
@@ -382,6 +383,14 @@ ACheckpoint* AGearGameState::GetFurthestReachedCheckpoint() const
 ACheckpoint* AGearGameState::GetNextFurthestReachedCheckpoint() const
 {
 	return FurthestReachedCheckpoint < CheckpointsStack.Num() - 2 ? CheckpointsStack[FurthestReachedCheckpoint + 1] : nullptr;
+}
+
+void AGearGameState::UpdateRoadModuleSocket()
+{
+	if (HasAuthority())
+	{
+		RoadModuleSocketTransform = RoadModuleStack.Top()->GetAttachableSocket()->GetPlaceableSocketTransform();
+	}
 }
 
 void AGearGameState::ClearOccupiedVehicleStarts()
