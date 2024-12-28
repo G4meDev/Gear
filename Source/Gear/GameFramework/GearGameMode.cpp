@@ -92,7 +92,8 @@ void AGearGameMode::Tick(float DeltaSeconds)
 	{
 		if (IsEveryPlayerPlaced())
 		{
-			StartRacing(true);
+			EndPlaceing();
+			//StartRacing(true);
 		}
 	}
 
@@ -458,7 +459,7 @@ bool AGearGameMode::IsEveryPlayerSelectedPlaceables()
 void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 {
 	GetWorld()->GetTimerManager().ClearTimer(SelectingPiecesTimerHandle);
-	GetWorld()->GetTimerManager().SetTimer(PlacingTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartRacing, false), UGameVariablesBFL::GV_PlacingTimeLimit(), false);
+	GetWorld()->GetTimerManager().SetTimer(PlacingTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::EndPlaceing), UGameVariablesBFL::GV_PlacingTimeLimit(), false);
 
 	if (!bEveryPlayerIsReady)
 	{
@@ -485,6 +486,20 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 	SetGearMatchState(EGearMatchState::Placing);
 }
 
+void AGearGameMode::EndPlaceing()
+{
+	if (GearGameState->CheckpointsStack.Num() > 1)
+	{
+		StartRacing();
+	}
+
+	else
+	{
+		DestroyPawns();
+		StartSelectingPlaceables();
+	}
+}
+
 bool AGearGameMode::IsEveryPlayerPlaced()
 {
 	for (APlayerState* Player : GameState->PlayerArray)
@@ -497,31 +512,6 @@ bool AGearGameMode::IsEveryPlayerPlaced()
 	}
 
 	return true;
-}
-
-void AGearGameMode::PlaceUnplaced()
-{
-	TArray<AGearBuilderPawn*> UnplacedRoadModulePawns;
-
-	for (APlayerState* Player : GameState->PlayerArray)
-	{
-		AGearBuilderPawn* BuilderPawn = Cast<AGearBuilderPawn>(Player->GetPawn());
-		if (IsValid(BuilderPawn) && BuilderPawn->SelectedPlaceableClass && BuilderPawn->SelectedPlaceableClass->IsChildOf(AGearRoadModule::StaticClass()))
-		{
-			UnplacedRoadModulePawns.Add(BuilderPawn);
-		}
-	}
-
-	for (AGearBuilderPawn* BuilderPawn : UnplacedRoadModulePawns)
-	{
-		AGearPlayerController* GearPlayerController = BuilderPawn->GetController<AGearPlayerController>();
-		TSubclassOf<AGearRoadModule> RoadModuleClass = BuilderPawn->SelectedPlaceableClass->GetAuthoritativeClass();
-
-		if (IsValid(GearPlayerController))
-		{
-			RequestPlaceRoadModuleForPlayer(GearPlayerController, RoadModuleClass, false);
-		}
-	}
 }
 
 void AGearGameMode::DestroyActors()
@@ -641,14 +631,9 @@ void AGearGameMode::StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicl
 	GearGameState->LastCheckpointStartTime = GetWorld()->GetTimeSeconds();
 }
 
-void AGearGameMode::StartRacing(bool bEveryPlayerPlaced)
+void AGearGameMode::StartRacing()
 {
 	GetWorld()->GetTimerManager().ClearTimer(PlacingTimerHandle);
-
-	if (!bEveryPlayerPlaced)
-	{
-		PlaceUnplaced();
-	}
 
 	SpawnActors();
 

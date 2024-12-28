@@ -247,12 +247,12 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 			if (RoadModule == ActiveRoadModule)
 			{
 				const FTransform& RoadModuleSocket = GearGameState->RoadModuleSocketTransform;
-				ActiveRoadModule->bPrebuildActive = true;
+				RoadModule->bPrebuildActive = true;
 				RoadModule->MoveToSocketTransform(RoadModuleSocket);
 			}
 			else
 			{
-				ActiveRoadModule->bPrebuildActive = false;
+				RoadModule->bPrebuildActive = false;
 				RoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
 			}
 		};

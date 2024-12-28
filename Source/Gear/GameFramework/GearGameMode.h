@@ -70,16 +70,16 @@ protected:
 
 	bool IsEveryPlayerSelectedPlaceables();
 	void StartPlaceing(bool bEveryPlayerIsReady);
+	void EndPlaceing();
 	FTimerHandle PlacingTimerHandle;
 
 	bool IsEveryPlayerPlaced();
-	void PlaceUnplaced();
 	void DestroyActors();
 	void SpawnActors();
 	void DestroyPawns();
 	void SpawnVehicleAtCheckpoint(AGearPlayerState* Player, ACheckpoint* Checkpoint, bool GrantInvincibility);
 	void StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicle* InstgatorVehicle);
-	void StartRacing(bool bEveryPlayerPlaced);
+	void StartRacing();
 
 	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule);
 	bool ShouldAddCheckpoint() const;
