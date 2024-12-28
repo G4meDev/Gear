@@ -146,7 +146,6 @@ void AGearBuilderPawn::OnRep_SelectedPlaceableClass()
 
 		else if (SelectedPlaceableClass == nullptr)
 		{
-			BuilderPawnState = EBuilderPawnState::Waiting;
 			Cleanup_SpawnedActors();
 		}
 	}
@@ -181,18 +180,18 @@ void AGearBuilderPawn::StartPlacing()
 
 }
 
-void AGearBuilderPawn::SpawnPlacingRoadModules()
+AGearRoadModule* AGearBuilderPawn::SpawnRoadModuleLocally(TSubclassOf<AGearPlaceable> SpawnClass)
 {
 	FTransform SpawnTransform = FTransform::Identity;
-	AActor* SpawnedActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), SelectedPlaceableClass, SpawnTransform);
+	AActor* SpawnedActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), SpawnClass, SpawnTransform);
+	AGearRoadModule* RoadModule = Cast<AGearRoadModule>(SpawnedActor);
 
 	if (IsValid(SpawnedActor))
 	{
-		PlacingRoadModule = Cast<AGearRoadModule>(SpawnedActor);
-		if (IsValid(PlacingRoadModule))
+		if (IsValid(RoadModule))
 		{
-			PlacingRoadModule->MarkNotReplicated();
-			UGameplayStatics::FinishSpawningActor(PlacingRoadModule, SpawnTransform);
+			RoadModule->MarkNotReplicated();
+			UGameplayStatics::FinishSpawningActor(RoadModule, SpawnTransform);
 		}
 		else
 		{
@@ -200,24 +199,29 @@ void AGearBuilderPawn::SpawnPlacingRoadModules()
 		}
 	}
 
-	if (IsValid(PlacingRoadModule) && IsValid(PlacingRoadModule->RoadModuleMirroredClass))
-	{
-		SpawnedActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), PlacingRoadModule->RoadModuleMirroredClass, SpawnTransform);
+	return RoadModule;
+}
 
-		if (IsValid(SpawnedActor))
-		{
-			PlacingRoadModuleMirroredY = Cast<AGearRoadModule>(SpawnedActor);
-			if (IsValid(PlacingRoadModuleMirroredY))
-			{
-				PlacingRoadModuleMirroredY->MarkNotReplicated();
-				UGameplayStatics::FinishSpawningActor(PlacingRoadModuleMirroredY, SpawnTransform);
-			}
-			else
-			{
-				SpawnedActor->Destroy();
-			}
-		}
-	}
+void AGearBuilderPawn::SpawnPlacingRoadModules()
+{
+	PlacingRoadModule						= SpawnRoadModuleLocally(SelectedPlaceableClass);
+	PlacingRoadModule_MirroredX				= SpawnRoadModuleLocally(PlacingRoadModule->RoadModuleClass_MirrorX->GetAuthoritativeClass());
+	PlacingRoadModule_MirroredY				= SpawnRoadModuleLocally(PlacingRoadModule->RoadModuleClass_MirrorY->GetAuthoritativeClass());
+	PlacingRoadModule_MirroredX_MirroredY	= SpawnRoadModuleLocally(PlacingRoadModule->RoadModuleClass_MirrorX_MirrorY->GetAuthoritativeClass());
+}
+
+AGearRoadModule* AGearBuilderPawn::GetActiveRoadModule() const
+{
+	if (!bSelectedMirroredX && !bSelectedMirroredY)
+		return PlacingRoadModule;
+
+	else if (bSelectedMirroredX && !bSelectedMirroredY)
+		return PlacingRoadModule_MirroredX;
+
+	else if (!bSelectedMirroredX && bSelectedMirroredY)
+		return PlacingRoadModule_MirroredY;
+
+	return PlacingRoadModule_MirroredX_MirroredY;
 }
 
 void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
@@ -226,40 +230,46 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 
 	if (IsValid(GearGameState))
 	{
-		const FTransform& RoadModuleSocket = GearGameState->RoadModuleSocketTransform;
-
 		bSelectedMirroredX = bMirroredX;
 		bSelectedMirroredY = bMirroredY;
+		
+		const AGearRoadModule* ActiveRoadModule = GetActiveRoadModule();
 
-		AGearRoadModule* ActiveRoadModule = bMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
-		AGearRoadModule* DeactiveRoadModule = !bMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
-
-		if (IsValid(ActiveRoadModule))
+		auto MoveRoadModule = [&](AGearRoadModule* RoadModule)
 		{
-			ActiveRoadModule->MoveToSocketTransform(RoadModuleSocket);
-		}
+			if (RoadModule == ActiveRoadModule)
+			{
+				const FTransform& RoadModuleSocket = GearGameState->RoadModuleSocketTransform;
+				RoadModule->MoveToSocketTransform(RoadModuleSocket);
+			}
+			else
+			{
+				RoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
+			}
+		};
 
-		if (IsValid(DeactiveRoadModule))
-		{
-			DeactiveRoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
-		}
+		MoveRoadModule(PlacingRoadModule);
+		MoveRoadModule(PlacingRoadModule_MirroredX);
+		MoveRoadModule(PlacingRoadModule_MirroredY);
+		MoveRoadModule(PlacingRoadModule_MirroredX_MirroredY);
 	}
 }
 
 void AGearBuilderPawn::Cleanup_SpawnedActors()
 {
-	if (IsValid(PlacingRoadModule))
+	auto CleanRoadModule = [&](AGearRoadModule * RoadModule)
 	{
-		PlacingRoadModule->Destroy();	
-		PlacingRoadModule = nullptr;	
-	}
+		if (IsValid(RoadModule))
+		{
+			RoadModule->Destroy();
+			RoadModule = nullptr;
+		}
+	};
 
-	if (IsValid(PlacingRoadModuleMirroredY))
-	{
-		PlacingRoadModuleMirroredY->Destroy();
-		PlacingRoadModuleMirroredY = nullptr;
-		PlacingRoadModuleMirroredY = nullptr;
-	}
+	CleanRoadModule(PlacingRoadModule);
+	CleanRoadModule(PlacingRoadModule_MirroredX);
+	CleanRoadModule(PlacingRoadModule_MirroredY);
+	CleanRoadModule(PlacingRoadModule_MirroredX_MirroredY);
 }
 
 void AGearBuilderPawn::TeleportToRoadEnd()
@@ -276,7 +286,8 @@ void AGearBuilderPawn::PlaceRoadModule()
 {
 	if (IsLocallyControlled())
 	{
-		AGearRoadModule* ActiveRoadModule = bSelectedMirroredY ? PlacingRoadModuleMirroredY : PlacingRoadModule;
+		const AGearRoadModule* ActiveRoadModule = GetActiveRoadModule();
+
 		if (IsValid(ActiveRoadModule))
 		{
 			AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();

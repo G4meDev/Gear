@@ -107,15 +107,25 @@ protected:
 	UPROPERTY(ReplicatedUsing=OnRep_SelectedPlaceableClass, BlueprintReadWrite)
 	TSubclassOf<AGearPlaceable> SelectedPlaceableClass;
 
+	UPROPERTY()
 	AGearRoadModule* PlacingRoadModule;
-	AGearRoadModule* PlacingRoadModuleMirroredY;
+	UPROPERTY()
+	AGearRoadModule* PlacingRoadModule_MirroredX;
+	UPROPERTY()
+	AGearRoadModule* PlacingRoadModule_MirroredY;
+	UPROPERTY()
+	AGearRoadModule* PlacingRoadModule_MirroredX_MirroredY;
 
 	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
 	bool bSelectedMirroredX;
 	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly)
 	bool bSelectedMirroredY;
 
+	AGearRoadModule* SpawnRoadModuleLocally(TSubclassOf<AGearPlaceable> SpawnClass);
+
 	void SpawnPlacingRoadModules();
+
+	AGearRoadModule* GetActiveRoadModule() const;
 
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY);
