@@ -34,6 +34,10 @@ public:
 
 	virtual void SetSelectedBy(AGearBuilderPawn* Player);
 
+	virtual void SetIdle();
+
+	virtual void SetEnabled();
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void RoundRestBlueprintEvent();
 

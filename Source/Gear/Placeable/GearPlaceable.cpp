@@ -148,6 +148,24 @@ void AGearPlaceable::SetSelectedBy(AGearBuilderPawn* Player)
 	}
 }
 
+void AGearPlaceable::SetIdle()
+{
+	EPlaceableState OldState = PlaceableState;
+
+	PlaceableState = EPlaceableState::Idle;
+
+	OnRep_PlaceableState(OldState);
+}
+
+void AGearPlaceable::SetEnabled()
+{
+	EPlaceableState OldState = PlaceableState;
+
+	PlaceableState = EPlaceableState::Enabled;
+
+	OnRep_PlaceableState(OldState);
+}
+
 bool AGearPlaceable::HasOwningPlayer() const
 {
 	return IsValid(OwningPlayer);

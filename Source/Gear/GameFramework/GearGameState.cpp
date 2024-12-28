@@ -214,6 +214,14 @@ void AGearGameState::SelectingPlaceables_Start()
 
 void AGearGameState::Placing_Start()
 {
+	if (HasAuthority())
+	{
+		for (AGearRoadModule* RoadModule : RoadModuleStack)
+		{
+			RoadModule->SetIdle();
+		}
+	}
+
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
@@ -238,6 +246,14 @@ void AGearGameState::Placing_End()
 
 void AGearGameState::Racing_Start()
 {
+	if (HasAuthority())
+	{
+		for (AGearRoadModule* RoadModule : RoadModuleStack)
+		{
+			RoadModule->SetEnabled();
+		}
+	}
+
 	FurthestReachedDistace = 0;
 	FurthestReachedCheckpoint = 0;
 
