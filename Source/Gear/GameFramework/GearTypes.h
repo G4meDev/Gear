@@ -159,3 +159,11 @@ public:
 		PlayerList.Add(PlayerState);
 	}
 };
+
+UENUM()
+enum class ERoadModuleTraceResult : uint8
+{
+	NotColliding,
+	BodyColliding,
+	ExtentColliding
+};

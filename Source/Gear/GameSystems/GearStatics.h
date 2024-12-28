@@ -4,15 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "GameFramework/GearTypes.h"
 #include "GearStatics.generated.h"
-
-UENUM()
-enum class ERoadModuleTraceResult : uint8
-{
-	NotColliding,
-	BodyColliding,
-	ExtentColliding
-};
 
 UCLASS()
 class GEAR_API UGearStatics : public UBlueprintFunctionLibrary

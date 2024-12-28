@@ -66,7 +66,7 @@ void AGearPlaceable::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
+	
 }
 
 void AGearPlaceable::SelectionBoxClicked()

@@ -125,7 +125,7 @@ protected:
 
 	void SpawnPlacingRoadModules();
 
-	AGearRoadModule* GetActiveRoadModule() const;
+	AGearRoadModule* GetActiveRoadModule();
 
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY);

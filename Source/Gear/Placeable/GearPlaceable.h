@@ -64,6 +64,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float PreviewScale;
 
+	UPROPERTY()
 	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
 
 	void AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint);

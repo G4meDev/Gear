@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Placeable/GearPlaceable.h"
+#include "GameFramework/GearTypes.h"
 #include "GearRoadModule.generated.h"
 
 class UPlaceableSocket;
@@ -28,6 +29,8 @@ public:
 	void SetSelectedBy(AGearBuilderPawn* Player) override;
 
 	void MoveToSocketTransform(const FTransform& TargetSocket);
+
+	void OnTraceStateChanged(ERoadModuleTraceResult Result);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* RoadMesh;
@@ -64,6 +67,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RoadLength;
 
+
+	bool bPrebuild;
+	bool bPrebuildActive;
+	ERoadModuleTraceResult TraceReult;
+
+
+
 #if WITH_EDITORONLY_DATA
 	void UpdateSplineParameters();
 
@@ -73,7 +83,7 @@ public:
 	bool bDirty = false;
 
 	float RotationPivotHeightOffset = -200.0f;
-
+	 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FVector MainColliderPadding = FVector(-100.0f, 200.0f, 500.0f);
 
@@ -92,6 +102,11 @@ protected:
 	virtual void PostNetInit() override;
 
 	// -----------------------------------------------------------------------------
+
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> RoadMeshMaterials;
+
+
 
 	void SetMainColliderEnabled(bool bEnabled);
 

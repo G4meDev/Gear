@@ -104,13 +104,6 @@ void AGearBuilderPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AGearRoadModule* ActiveRoadModule = GetActiveRoadModule();
-
-	if (ActiveRoadModule)
-	{
-		UGearStatics::TraceRoadModule(this, ActiveRoadModule->GetClass(), GetActorTransform());
-	}
-
 	if (IsLocallyControlled() && bCanMove)
 	{
 		Velocity += -ScreenDragValue * MovementSpeed * DeltaTime;
@@ -199,6 +192,7 @@ AGearRoadModule* AGearBuilderPawn::SpawnRoadModuleLocally(TSubclassOf<AGearPlace
 		if (IsValid(RoadModule))
 		{
 			RoadModule->MarkNotReplicated();
+			RoadModule->bPrebuild = true;
 			UGameplayStatics::FinishSpawningActor(RoadModule, SpawnTransform);
 		}
 		else
@@ -216,9 +210,14 @@ void AGearBuilderPawn::SpawnPlacingRoadModules()
 	PlacingRoadModule_MirroredX				= SpawnRoadModuleLocally(PlacingRoadModule->RoadModuleClass_MirrorX->GetAuthoritativeClass());
 	PlacingRoadModule_MirroredY				= SpawnRoadModuleLocally(PlacingRoadModule->RoadModuleClass_MirrorY->GetAuthoritativeClass());
 	PlacingRoadModule_MirroredX_MirroredY	= SpawnRoadModuleLocally(PlacingRoadModule->RoadModuleClass_MirrorX_MirrorY->GetAuthoritativeClass());
+
+	PlacingRoadModule->OnTraceStateChanged(ERoadModuleTraceResult::NotColliding);
+	PlacingRoadModule_MirroredX->OnTraceStateChanged(ERoadModuleTraceResult::NotColliding);
+	PlacingRoadModule_MirroredY->OnTraceStateChanged(ERoadModuleTraceResult::NotColliding);
+	PlacingRoadModule_MirroredX_MirroredY->OnTraceStateChanged(ERoadModuleTraceResult::NotColliding);
 }
 
-AGearRoadModule* AGearBuilderPawn::GetActiveRoadModule() const
+AGearRoadModule* AGearBuilderPawn::GetActiveRoadModule()
 {
 	if (!bSelectedMirroredX && !bSelectedMirroredY)
 		return PlacingRoadModule;
@@ -241,17 +240,19 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 		bSelectedMirroredX = bMirroredX;
 		bSelectedMirroredY = bMirroredY;
 		
-		const AGearRoadModule* ActiveRoadModule = GetActiveRoadModule();
+		AGearRoadModule* ActiveRoadModule = GetActiveRoadModule();
 
 		auto MoveRoadModule = [&](AGearRoadModule* RoadModule)
 		{
 			if (RoadModule == ActiveRoadModule)
 			{
 				const FTransform& RoadModuleSocket = GearGameState->RoadModuleSocketTransform;
+				ActiveRoadModule->bPrebuildActive = true;
 				RoadModule->MoveToSocketTransform(RoadModuleSocket);
 			}
 			else
 			{
+				ActiveRoadModule->bPrebuildActive = false;
 				RoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
 			}
 		};
