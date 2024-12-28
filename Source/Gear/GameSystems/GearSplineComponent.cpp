@@ -14,6 +14,6 @@ void UGearSplineComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UGearSplineComponent, SplineCurves);
-	DOREPLIFETIME(UGearSplineComponent, ReparamStepsPerSegment);
-	DOREPLIFETIME(UGearSplineComponent, bStationaryEndpoints);
+// 	DOREPLIFETIME(UGearSplineComponent, ReparamStepsPerSegment);
+// 	DOREPLIFETIME(UGearSplineComponent, bStationaryEndpoints);
 }

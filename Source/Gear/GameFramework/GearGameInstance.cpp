@@ -9,6 +9,8 @@
 #include "ShaderPipelineCache.h"
 #include "HAL/ThreadHeartBeat.h"
 #include "Utils/DataHelperBFL.h"
+#include "Components/SplineComponent.h"
+#include "GameFramework/Character.h"
 
 #define SAVE_SLOT_NAME "Save"
 #define SAVE_USER_INDEX 0
@@ -16,6 +18,14 @@
 void UGearGameInstance::Init()
 {
 	Super::Init();
+
+#if WITH_EDITORONLY_DATA
+
+	auto* SplineCurvesStruct = FSplineCurves::StaticStruct();
+	auto* BrokenProperty = SplineCurvesStruct->FindPropertyByName(TEXT("Metadata"));
+	BrokenProperty->SetPropertyFlags(BrokenProperty->PropertyFlags | EPropertyFlags::CPF_RepSkip);
+
+#endif
 
 	FWorldDelegates::OnSeamlessTravelStart.AddUObject(this, &UGearGameInstance::OnSeamlessTravelStart);
 	FWorldDelegates::OnSeamlessTravelTransition.AddUObject(this, &UGearGameInstance::OnSeamlessTravelTransition);
