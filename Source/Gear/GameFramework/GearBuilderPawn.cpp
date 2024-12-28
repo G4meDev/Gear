@@ -8,6 +8,7 @@
 #include "Placeable/PlaceableSocket.h"
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
+#include "GameSystems/GearStatics.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringarmComponent.h"
@@ -102,6 +103,13 @@ void AGearBuilderPawn::Destroyed()
 void AGearBuilderPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AGearRoadModule* ActiveRoadModule = GetActiveRoadModule();
+
+	if (ActiveRoadModule)
+	{
+		UGearStatics::TraceRoadModule(this, ActiveRoadModule->GetClass(), GetActorTransform());
+	}
 
 	if (IsLocallyControlled() && bCanMove)
 	{

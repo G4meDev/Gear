@@ -11,6 +11,7 @@
 
 #include "GameSystems/Checkpoint.h"
 #include "GameSystems/VehicleStart.h"
+#include "GameSystems/GearStatics.h"
 
 #include "Placeable/GearPlaceable.h"
 #include "Placeable/GearRoadModule.h"
@@ -304,8 +305,7 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 		// TODO: sweep test
 
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
-
-		if (IsValid(BuilderPawn) && !BuilderPawn->bPlacedModule)
+		if (IsValid(BuilderPawn) && !BuilderPawn->bPlacedModule && UGearStatics::TraceRoadModule(this, RoadModule, GearGameState->RoadModuleSocketTransform) == ERoadModuleTraceResult::NotColliding)
 		{
 			if (IsValid(AddRoadModule(RoadModule)))
 			{

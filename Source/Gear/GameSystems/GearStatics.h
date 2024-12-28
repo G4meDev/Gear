@@ -20,5 +20,5 @@ class GEAR_API UGearStatics : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
-	static ERoadModuleTraceResult TraceRoadModule(TSubclassOf<class AGearRoadModule> RoadModuleClass, const FTransform& SocketTransform);
+	static ERoadModuleTraceResult TraceRoadModule(UObject* WorldContextObject, TSubclassOf<class AGearRoadModule> RoadModuleClass, const FTransform& SocketTransform);
 };
