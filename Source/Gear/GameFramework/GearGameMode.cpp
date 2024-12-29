@@ -80,7 +80,15 @@ void AGearGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (GearMatchState == EGearMatchState::SelectingPlaceables)
+	if (GearMatchState == EGearMatchState::WaitingForPlayerToJoin)
+	{
+		if (CheckIsEveryPlayerReady())
+		{
+			AllPlayerJoined();
+		}
+	}
+
+	else if (GearMatchState == EGearMatchState::SelectingPlaceables)
 	{
 		if (IsEveryPlayerSelectedPlaceables())
 		{
@@ -156,13 +164,6 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 			StartScoreboard();
 		}
 	}
-}
-
-void AGearGameMode::HandleMatchHasEnded()
-{
-	Super::HandleMatchHasEnded();
-
-	SetGearMatchState(EGearMatchState::GameFinished);
 }
 
 bool AGearGameMode::ShouldAbort()
@@ -424,11 +425,6 @@ void AGearGameMode::AssignPlaceablesToUnowningPlayers()
 
 		UnowningPlayers[i]->SetSelectedPlaceable(UnownedPlaceables[i]);
 	}
-}
-
-bool AGearGameMode::ReadyToEndMatch_Implementation()
-{
-	return false;
 }
 
 void AGearGameMode::StartSelectingPlaceables()
@@ -723,21 +719,6 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 		}
 	}
 }
-
-bool AGearGameMode::ReadyToStartMatch_Implementation()
-{
-	return CheckIsEveryPlayerReady();
-}
-
-void AGearGameMode::HandleMatchHasStarted()
-{
-	Super::HandleMatchIsWaitingToStart();
-
-	UE_LOG(LogTemp, Warning, TEXT("match started."));
-
-	AllPlayerJoined();
-}
-
 
 bool AGearGameMode::CheckIsEveryPlayerReady()
 {

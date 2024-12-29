@@ -159,7 +159,7 @@ void UGearGameInstance::ShowLoadingScreen()
 	}
 
 	UGameViewportClient* GameViewportClient = GetGameViewportClient();
-	GameViewportClient->AddViewportWidgetContent(LoadingScreenWidget.ToSharedRef(), 10000);
+	GameViewportClient->AddViewportWidgetContent(LoadingScreenWidget.ToSharedRef(), 0);
 
 	ChangePerformanceSettings(true);
 

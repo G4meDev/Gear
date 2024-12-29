@@ -46,17 +46,7 @@ protected:
 
 	AGearGameState* GearGameState;
 
-// ---------------- AGameMode ----------------------------------------------
-
-	bool ReadyToStartMatch_Implementation() override;
-	void HandleMatchHasStarted() override;
-
-	bool ReadyToEndMatch_Implementation() override;
-	void HandleMatchHasEnded() override;
-
 	void HandleMatchAborted() override;
-
-// -------------------------------------------------------------------------
 
 	void SetGearMatchState(EGearMatchState InGearMatchState);
 
