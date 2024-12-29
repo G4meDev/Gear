@@ -32,6 +32,7 @@ public:
 	void Tick( float DeltaSeconds ) override;
 
 	void AllPlayerJoined_Start();
+	void AllPlayerJoined_End();
 	void SelectingPlaceables_Start();
 	void Placing_Start();
 	void Placing_End();

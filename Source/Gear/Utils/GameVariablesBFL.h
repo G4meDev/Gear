@@ -44,4 +44,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = GameVariables)
 	static float GV_ScoreboardTimeDelay();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static float GV_TransitionDuration();
 };

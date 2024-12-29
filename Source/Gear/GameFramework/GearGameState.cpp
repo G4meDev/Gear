@@ -97,6 +97,7 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		break;
 
 	case EGearMatchState::AllPlayersJoined:
+		AllPlayerJoined_End();
 		break;
 
 	case EGearMatchState::SelectingPlaceables:
@@ -195,6 +196,18 @@ void AGearGameState::AllPlayerJoined_Start()
 		if (IsValid(GearController) && GearController->IsLocalController())
 		{
 			GearController->ClientStateAllPlayersJoined();
+		}
+	}
+}
+
+void AGearGameState::AllPlayerJoined_End()
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		AGearPlayerController* GearController = Cast<AGearPlayerController>(*Iterator);
+		if (IsValid(GearController) && GearController->IsLocalController())
+		{
+			GearController->ClientStateAllPlayersJoined_End();
 		}
 	}
 }

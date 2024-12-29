@@ -153,6 +153,15 @@ void AGearPlayerController::ClientStateAllPlayersJoined()
 	}
 }
 
+void AGearPlayerController::ClientStateAllPlayersJoined_End()
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->ShowTransitionWidget();
+	}
+}
+
 void AGearPlayerController::ClientStateMatchStarted()
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();

@@ -52,3 +52,8 @@ float UGameVariablesBFL::GV_ScoreboardTimeDelay()
 {
 	return 0.7f;
 }
+
+float UGameVariablesBFL::GV_TransitionDuration()
+{
+	return 1.0f;
+}

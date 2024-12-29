@@ -65,6 +65,7 @@ public:
 	void PlaceRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
 
 	void ClientStateAllPlayersJoined();
+	void ClientStateAllPlayersJoined_End();
 	void ClientStateMatchStarted();
 	void ClientStateSelectingPieces(float StateStartTime);
 
