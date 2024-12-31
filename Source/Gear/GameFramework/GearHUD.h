@@ -18,17 +18,6 @@ class GEAR_API AGearHUD : public AHUD
 	GENERATED_BODY()
 	
 public:
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSubclassOf<UUserWidget> TransitaionWidgetClass;
-
-	UPROPERTY()
-	UUserWidget* TransitaionWidget;
-
-	UFUNCTION(BlueprintCallable)
-	void ShowTransitionWidget();
-
-	FTimerHandle TransitionTimerHandle;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowWaitingScreen();
