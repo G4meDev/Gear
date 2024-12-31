@@ -5,7 +5,7 @@
 
 float UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay()
 {
-	return 4.0f;
+	return 2.0f;
 }
 
 float UGameVariablesBFL::GV_CountDownDuration()
