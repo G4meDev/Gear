@@ -20,4 +20,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	static FColor ResolveColorCode(EPlayerColorCode ColorCode);
+
+	UFUNCTION(BlueprintPure)
+	static void ConvertSecondsToMS(float Time, int32& Minutes, float& Seconds);
+
+	UFUNCTION(BlueprintPure)
+	static FString FormatTimeLong(float Time);
+	
 };

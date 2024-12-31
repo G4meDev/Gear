@@ -60,3 +60,18 @@ FColor UDataHelperBFL::ResolveColorCode(EPlayerColorCode ColorCode)
 			return FColor::Black;
 	}
 }
+
+void UDataHelperBFL::ConvertSecondsToMS(float Time, int32& Minutes, float& Seconds)
+{
+	Minutes = Time / 60.0f;
+	Seconds = Time - (Minutes * 60.0f);
+}
+
+FString UDataHelperBFL::FormatTimeLong(float Time)
+{
+	int32 Minutes;
+	float Seconds;
+	ConvertSecondsToMS(Time, Minutes, Seconds);
+	
+	return FString::Printf(TEXT("%.2i:%.3f"), Minutes, Seconds);
+}
