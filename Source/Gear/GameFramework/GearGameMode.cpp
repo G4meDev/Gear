@@ -338,6 +338,7 @@ AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadM
 		UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
 
 		SpawnRoadModule->MoveToSocketTransform(GearGameState->RoadModuleSocketTransform);
+		SpawnRoadModule->SetIdle();
 		GearGameState->RoadModuleStack.Add(SpawnRoadModule);
 		GearGameState->OnModuleStackChanged();
 

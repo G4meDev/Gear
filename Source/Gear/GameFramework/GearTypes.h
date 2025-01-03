@@ -43,6 +43,7 @@ enum class EPlaceableState : uint8
 UENUM(BlueprintType)
 enum class EPrebuildState : uint8
 {
+	Idle = 0,
 	Placable,
 	NotPlaceable
 };

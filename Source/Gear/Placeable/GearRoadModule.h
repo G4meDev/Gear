@@ -100,13 +100,11 @@ protected:
 
 	// -----------------------------------------------------------------------------
 
-// 	UPROPERTY()
-// 	TArray<UMaterialInstanceDynamic*> RoadMeshMaterials;
-
-
-
 	void SetMainColliderEnabled(bool bEnabled);
 
 	virtual void OnIdle_Start() override;
 	virtual void OnIdle_End() override;
+
+	virtual void OnEnabled_Start() override;
+	virtual void OnEnabled_End() override;
 };

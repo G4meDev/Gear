@@ -194,3 +194,17 @@ void AGearRoadModule::OnIdle_End()
 
 	SetMainColliderEnabled(false);
 }
+
+void AGearRoadModule::OnEnabled_Start()
+{
+	Super::OnEnabled_Start();
+
+	RoadMesh->SetHiddenInGame(false);
+}
+
+void AGearRoadModule::OnEnabled_End()
+{
+	Super::OnEnabled_End();
+
+	RoadMesh->SetHiddenInGame(true);
+}

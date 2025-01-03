@@ -338,11 +338,13 @@ void AGearPlaceable::SetSelectionBoxEnabled(bool bEnabled)
 
 void AGearPlaceable::SetPrebuildState(EPrebuildState State)
 {
+	uint8 BuildState = static_cast<uint8>(State);
+
 	for (auto* MID : PrebuildMaterials)
 	{
 		if (IsValid(MID))
 		{
-			MID->SetScalarParameterValue(TEXT("State"), State == EPrebuildState::NotPlaceable ? 0 : 1);
+			MID->SetScalarParameterValue(TEXT("State"), BuildState);
 		}
 	}
 }
