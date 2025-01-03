@@ -14,7 +14,7 @@ AGearRoadModule::AGearRoadModule()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RoadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RoadMesh"));
-	RoadMesh->SetupAttachment(Root);
+	RoadMesh->SetupAttachment(MainModules);
 	RoadMesh->SetCollisionProfileName(TEXT("BlockAll"));
 
 	RoadEndSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("EndSocket"));
@@ -35,8 +35,6 @@ AGearRoadModule::AGearRoadModule()
 
 	PreviewScale = 0.3f;
 
-	bPrebuild = false;
-	bPrebuildActive = false;
 	TraceReult = ERoadModuleTraceResult::NotColliding;
 }
 
@@ -56,13 +54,7 @@ void AGearRoadModule::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (int32 i = 0; i < RoadMesh->GetNumMaterials(); i++)
-	{
-		UMaterialInstanceDynamic* MID = RoadMesh->CreateAndSetMaterialInstanceDynamic(i);
-		check(MID);
 
-		RoadMeshMaterials.Add(MID);
-	}
 }
 
 #if WITH_EDITOR
@@ -139,7 +131,7 @@ void AGearRoadModule::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bPrebuild && bPrebuildActive)
+	if (PlaceableState == EPlaceableState::Placing)
 	{
 		ERoadModuleTraceResult NewResult = UGearStatics::TraceRoadModule(this, GetClass(), GetActorTransform());
 		if (NewResult != TraceReult)
@@ -172,31 +164,7 @@ UPlaceableSocket* AGearRoadModule::GetAttachableSocket()
 
 void AGearRoadModule::OnTraceStateChanged(ERoadModuleTraceResult Result)
 {
-	auto UpdateMaterials = [&](int32 State)
-	{
-		for (auto MID : RoadMeshMaterials)
-		{
-			if (IsValid(MID))
-			{
-				MID->SetScalarParameterValue(TEXT("CanBuild"), State);
-			}
-		}
-	};
-
-	if (Result == ERoadModuleTraceResult::NotColliding)
-	{
-		UpdateMaterials(1);
-	}
-
-	else if (Result == ERoadModuleTraceResult::BodyColliding)
-	{
-		UpdateMaterials(2);
-	}
-
-	else
-	{
-		UpdateMaterials(2);
-	}
+	SetPrebuildState(Result == ERoadModuleTraceResult::NotColliding ? EPrebuildState::Placable : EPrebuildState::NotPlaceable);
 }
 
 // -----------------------------------------------------------------------------

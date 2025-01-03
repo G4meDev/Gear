@@ -33,6 +33,8 @@ public:
 	virtual void SetPreview();
 
 	virtual void SetSelectedBy(AGearBuilderPawn* Player);
+	
+	virtual void  SetPlacing();
 
 	virtual void SetIdle();
 
@@ -51,6 +53,15 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* Root;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* ModulesStack;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* MainModules;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* PrebuildModules;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UBoxComponent* SelectionHitbox;
@@ -85,6 +96,9 @@ protected:
 	UFUNCTION()
 	void OnSelectionBoxTouched(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
 
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> PrebuildMaterials;
+
 //----------------------------------------------------------------------------
 
 	virtual void OnPreview_Start();
@@ -93,6 +107,9 @@ protected:
 	virtual void OnSelected_Start();
 	virtual void OnSelected_End();
 
+	virtual void OnPlacing_Start();
+	virtual void OnPlacing_End();
+
 	virtual void OnIdle_Start();
 	virtual void OnIdle_End();
 
@@ -100,4 +117,6 @@ protected:
 	virtual void OnEnabled_End();
 
 	void SetSelectionBoxEnabled(bool bEnabled);
+
+	void SetPrebuildState(EPrebuildState State);
 };

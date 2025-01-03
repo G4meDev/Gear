@@ -192,7 +192,6 @@ AGearRoadModule* AGearBuilderPawn::SpawnRoadModuleLocally(TSubclassOf<AGearPlace
 		if (IsValid(RoadModule))
 		{
 			RoadModule->MarkNotReplicated();
-			RoadModule->bPrebuild = true;
 			UGameplayStatics::FinishSpawningActor(RoadModule, SpawnTransform);
 		}
 		else
@@ -247,12 +246,12 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 			if (RoadModule == ActiveRoadModule)
 			{
 				const FTransform& RoadModuleSocket = GearGameState->RoadModuleSocketTransform;
-				RoadModule->bPrebuildActive = true;
+				RoadModule->SetPlacing();
 				RoadModule->MoveToSocketTransform(RoadModuleSocket);
 			}
 			else
 			{
-				RoadModule->bPrebuildActive = false;
+				RoadModule->SetIdle();
 				RoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
 			}
 		};

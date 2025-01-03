@@ -35,8 +35,16 @@ enum class EPlaceableState : uint8
 	None,
 	Preview,
 	Selected,
+	Placing,
 	Idle,
 	Enabled
+};
+
+UENUM(BlueprintType)
+enum class EPrebuildState : uint8
+{
+	Placable,
+	NotPlaceable
 };
 
 USTRUCT(BlueprintType)

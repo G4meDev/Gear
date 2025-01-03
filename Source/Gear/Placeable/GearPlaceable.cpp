@@ -18,6 +18,15 @@ AGearPlaceable::AGearPlaceable()
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
+	ModulesStack = CreateDefaultSubobject<USceneComponent>(TEXT("ModulesStack"));
+	ModulesStack->SetupAttachment(Root);
+
+	MainModules = CreateDefaultSubobject<USceneComponent>(TEXT("MainModules"));
+	MainModules->SetupAttachment(ModulesStack);
+
+	PrebuildModules = CreateDefaultSubobject<USceneComponent>(TEXT("PrebuildModules"));
+	PrebuildModules->SetupAttachment(ModulesStack);
+
 	SelectionHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("SelectionHitbox"));
 	SelectionHitbox->SetupAttachment(Root);
 
@@ -59,7 +68,23 @@ void AGearPlaceable::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	TArray<USceneComponent*> PrebuildChildComponents;
+	PrebuildModules->GetChildrenComponents(true, PrebuildChildComponents);
 
+	for (USceneComponent* Child : PrebuildChildComponents)
+	{
+		UStaticMeshComponent* ChildStaticMesh = IsValid(Child) ? Cast<UStaticMeshComponent>(Child) : nullptr;
+		if (IsValid(ChildStaticMesh))
+		{
+			for (int32 i = 0; i < ChildStaticMesh->GetNumMaterials(); i++)
+			{
+				UMaterialInstanceDynamic* MID = ChildStaticMesh->CreateAndSetMaterialInstanceDynamic(i);
+				check(MID);
+
+				PrebuildMaterials.Add(MID);
+			}
+		}
+	}
 }
 
 void AGearPlaceable::Tick(float DeltaTime)
@@ -148,6 +173,17 @@ void AGearPlaceable::SetSelectedBy(AGearBuilderPawn* Player)
 	}
 }
 
+// this only gets called locally
+void AGearPlaceable::SetPlacing()
+{
+	if (HasAuthority())
+	{
+		EPlaceableState OldState = PlaceableState;
+		PlaceableState = EPlaceableState::Placing;
+		OnRep_PlaceableState(OldState);
+	}
+}
+
 void AGearPlaceable::SetIdle()
 {
 	EPlaceableState OldState = PlaceableState;
@@ -190,6 +226,9 @@ void AGearPlaceable::OnRep_PlaceableState(EPlaceableState OldState)
 	case EPlaceableState::Selected:
 		OnSelected_End();
 		break;
+	case EPlaceableState::Placing:
+		OnPlacing_End();
+		break;
 	case EPlaceableState::Idle:
 		OnIdle_End();
 		break;
@@ -210,6 +249,9 @@ void AGearPlaceable::OnRep_PlaceableState(EPlaceableState OldState)
 	case EPlaceableState::Selected:
 		OnSelected_Start();
 		break;
+	case EPlaceableState::Placing:
+		OnPlacing_Start();
+		break;
 	case EPlaceableState::Idle:
 		OnIdle_Start();
 		break;
@@ -226,15 +268,19 @@ void AGearPlaceable::OnRep_PlaceableState(EPlaceableState OldState)
 void AGearPlaceable::OnPreview_Start()
 {
 	SetSelectionBoxEnabled(true);
+	PrebuildModules->SetHiddenInGame(false, true);
 }
 
 void AGearPlaceable::OnPreview_End()
 {
 	SetSelectionBoxEnabled(false);
+	PrebuildModules->SetHiddenInGame(true, true);
 }
 
 void AGearPlaceable::OnSelected_Start()
 {
+	PrebuildModules->SetHiddenInGame(false, true);
+
 	if (IsValid(OwningPlayer))
 	{
 		SelectionIndicatorMaterial->SetVectorParameterValue(TEXT("Color"), OwningPlayer->PlayerColor);
@@ -244,27 +290,38 @@ void AGearPlaceable::OnSelected_Start()
 
 void AGearPlaceable::OnSelected_End()
 {
+	PrebuildModules->SetHiddenInGame(true, true);
 	SelectionIndicator->SetVisibility(false);
+}
+
+void AGearPlaceable::OnPlacing_Start()
+{
+	PrebuildModules->SetHiddenInGame(false, true);
+}
+
+void AGearPlaceable::OnPlacing_End()
+{
+	PrebuildModules->SetHiddenInGame(true, true);
 }
 
 void AGearPlaceable::OnIdle_Start()
 {
-
+	PrebuildModules->SetHiddenInGame(false, true);
 }
 
 void AGearPlaceable::OnIdle_End()
 {
-
+	PrebuildModules->SetHiddenInGame(true, true);
 }
 
 void AGearPlaceable::OnEnabled_Start()
 {
-
+	PrebuildModules->SetHiddenInGame(true, true);
 }
 
 void AGearPlaceable::OnEnabled_End()
 {
-
+	PrebuildModules->SetHiddenInGame(false, true);
 }
 
 void AGearPlaceable::SetSelectionBoxEnabled(bool bEnabled)
@@ -276,5 +333,16 @@ void AGearPlaceable::SetSelectionBoxEnabled(bool bEnabled)
 	else
 	{
 		SelectionHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void AGearPlaceable::SetPrebuildState(EPrebuildState State)
+{
+	for (auto* MID : PrebuildMaterials)
+	{
+		if (IsValid(MID))
+		{
+			MID->SetScalarParameterValue(TEXT("State"), State == EPrebuildState::NotPlaceable ? 0 : 1);
+		}
 	}
 }

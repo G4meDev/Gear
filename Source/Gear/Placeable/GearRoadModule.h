@@ -67,9 +67,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RoadLength;
 
-
-	bool bPrebuild;
-	bool bPrebuildActive;
 	ERoadModuleTraceResult TraceReult;
 
 
@@ -103,8 +100,8 @@ protected:
 
 	// -----------------------------------------------------------------------------
 
-	UPROPERTY()
-	TArray<UMaterialInstanceDynamic*> RoadMeshMaterials;
+// 	UPROPERTY()
+// 	TArray<UMaterialInstanceDynamic*> RoadMeshMaterials;
 
 
 
