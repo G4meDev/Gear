@@ -310,11 +310,12 @@ bool AGearVehicle::CanRemoveInvincibility()
 	FBoxSphereBounds3d Bounds = GetMesh()->Bounds;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQuery;
 	ObjectTypeQuery.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
 	TArray<AActor*> OutActors;
+	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(Bounds.SphereRadius);
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
 
-	const bool bHasOccluders = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), Bounds.GetSphere().Center, Bounds.SphereRadius, ObjectTypeQuery, nullptr, ActorsToIgnore, OutActors);
+	const bool bHasOccluders = GetWorld()->OverlapAnyTestByObjectType(Bounds.Origin, FQuat::Identity, FCollisionObjectQueryParams(ObjectTypeQuery), CollisionShape, QueryParams);
 	//DrawDebugSphere(GetWorld(), Bounds.GetSphere().Center, Bounds.SphereRadius, 8, bHasOccluders ? FColor::Red : FColor::Blue, false, 0.1f);
 
 	return !bHasOccluders;

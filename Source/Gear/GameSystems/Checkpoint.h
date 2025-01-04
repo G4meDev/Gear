@@ -116,4 +116,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UArrowComponent* StartPoint_4_Arrow;
 
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USoundBase* CheerSound;
 };

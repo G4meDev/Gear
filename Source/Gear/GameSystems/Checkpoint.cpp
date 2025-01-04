@@ -9,6 +9,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 ACheckpoint::ACheckpoint()
@@ -227,6 +228,9 @@ void ACheckpoint::PlayerReachedCheckpoint_Multi_Implementation(class AGearPlayer
 {
 	if (Position == 1)
 	{
+		check(CheerSound);
+
 		CheerParticleComponent->ResetSystem();
+		UGameplayStatics::PlaySound2D(GetWorld(), CheerSound);
 	}
 }
