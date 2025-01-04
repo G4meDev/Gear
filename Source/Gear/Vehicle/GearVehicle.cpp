@@ -322,7 +322,7 @@ bool AGearVehicle::CanRemoveInvincibility()
 
 bool AGearVehicle::IsSpectating()
 {
-	return IsValid(GetGearGameState()) ? GearGameState->FurthestReachedCheckpoint + 1 != TargetCheckpoint : true;
+	return IsValid(GetGearGameState()) ? GearGameState->FurthestReachedCheckpoint + 1 < TargetCheckpoint : true;
 }
 
 void AGearVehicle::OnRep_GrantedInvincibility()

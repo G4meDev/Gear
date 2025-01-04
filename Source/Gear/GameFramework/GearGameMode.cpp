@@ -263,10 +263,10 @@ bool AGearGameMode::LoadPlaceableSpawnPoints()
 
 bool AGearGameMode::IsEveryPlayerEliminated() const
 {
-	bool bEveryPlayerEliminated = true;
 	for (AGearVehicle* V : GearGameState->Vehicles)
 	{
 		if (IsValid(V) && !V->IsSpectating())
+		//if (IsValid(V))
 		{
 			return false;
 		}
