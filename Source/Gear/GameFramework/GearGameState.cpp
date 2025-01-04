@@ -550,3 +550,17 @@ void AGearGameState::RemovePlayerState(APlayerState* PlayerState)
 		}
 	}
 }
+
+//---------------------------------------------------------------------------------------------------------------------------
+
+void AGearGameState::BroadcastSelectedEvent_Multi_Implementation(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass)
+{
+	check(SelectedSound);
+	UGameplayStatics::PlaySound2D(GetWorld(), SelectedSound);
+}
+
+void AGearGameState::BroadcastPlacedEvent_Multi_Implementation(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass)
+{
+	check(PlacedSound);
+	UGameplayStatics::PlaySound2D(GetWorld(), PlacedSound);
+}

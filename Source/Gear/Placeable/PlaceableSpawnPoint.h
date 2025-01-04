@@ -20,7 +20,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY()
-	float PreviewRotationSpeed = 30.0f;
+	float PreviewRotationSpeed = 15.0f;
 
 	float PreviewRotaionOffset;
 };

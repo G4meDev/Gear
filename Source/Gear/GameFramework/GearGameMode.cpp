@@ -294,9 +294,12 @@ void AGearGameMode::DestroyVehicle(AGearVehicle* Vehicle)
 
 void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearBuilderPawn* Player)
 {
-	if (GearMatchState == EGearMatchState::SelectingPlaceables && IsValid(Placeable) && IsValid(Player) && !Placeable->HasOwningPlayer())
+	if (GearMatchState == EGearMatchState::SelectingPlaceables && IsValid(Placeable) && IsValid(Player) && !Player->HasSelectedPlaceable() && !Placeable->HasOwningPlayer())
 	{
 		Player->SetSelectedPlaceable(Placeable);
+		FDetachmentTransformRules DetachmentRule(EDetachmentRule::KeepWorld, false);
+		Placeable->DetachFromActor(DetachmentRule);
+		GearGameState->BroadcastSelectedEvent_Multi(Player->GetPlayerState<AGearPlayerState>(), AGearPlaceable::StaticClass()->GetAuthoritativeClass());
 	}
 }
 
@@ -304,8 +307,6 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 {
 	if (GearMatchState == EGearMatchState::Placing && IsValid(RoadModule))
 	{
-		// TODO: sweep test
-
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
 		if (IsValid(BuilderPawn) && !BuilderPawn->bPlacedModule && UGearStatics::TraceRoadModule(this, RoadModule, GearGameState->RoadModuleSocketTransform) == ERoadModuleTraceResult::NotColliding)
 		{
@@ -315,6 +316,7 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 				BuilderPawn->OnRep_SelectedPlaceableClass();
 
 				BuilderPawn->bPlacedModule = true;
+				GearGameState->BroadcastPlacedEvent_Multi(PC->GetPlayerState<AGearPlayerState>(), RoadModule);
 			}
 
 			if (ShouldAddCheckpoint())

@@ -125,6 +125,14 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleSocketTransform)
 	FTransform RoadModuleSocketTransform;
 
+//---------------------------------------------------------------------------------------------------------------------------
+
+	UFUNCTION(NetMulticast, Reliable)
+	void BroadcastSelectedEvent_Multi(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void BroadcastPlacedEvent_Multi(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -136,4 +144,10 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AVehicleCamera> VehicleCameraClass;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USoundBase* SelectedSound;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USoundBase* PlacedSound;
 };
