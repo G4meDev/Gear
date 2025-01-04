@@ -56,7 +56,8 @@ public:
 
 	void ClearOccupied();
 
-
+	UFUNCTION(NetMulticast, Reliable)
+	void PlayerReachedCheckpoint_Multi(class AGearPlayerState* Player, int32 Position);
 
 protected:
 
@@ -85,6 +86,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USkeletalMeshComponent* HandMesh;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UNiagaraComponent* CheerParticleComponent;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UVehicleStart* StartPonit_1;

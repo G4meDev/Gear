@@ -8,6 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "NiagaraComponent.h"
 #include "Net/UnrealNetwork.h"
 
 ACheckpoint::ACheckpoint()
@@ -37,6 +38,10 @@ ACheckpoint::ACheckpoint()
 	HandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HandMesh"));
 	HandMesh->SetupAttachment(Root);
 	HandMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	CheerParticleComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("CheerParticleComponent"));
+	CheerParticleComponent->SetupAttachment(Root);
+	CheerParticleComponent->SetAutoActivate(false);
 
 	StartPonit_1 = CreateDefaultSubobject<UVehicleStart>(TEXT("StartPoint_1"));
 	StartPonit_1->SetupAttachment(Root);
@@ -215,5 +220,13 @@ void ACheckpoint::ClearOccupied()
 	for (UVehicleStart* VehicleStart : StartPoints)
 	{
 		VehicleStart->ClearOccupied();
+	}
+}
+
+void ACheckpoint::PlayerReachedCheckpoint_Multi_Implementation(class AGearPlayerState* Player, int32 Position)
+{
+	if (Position == 1)
+	{
+		CheerParticleComponent->ResetSystem();
 	}
 }

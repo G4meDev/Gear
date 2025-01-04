@@ -717,7 +717,11 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 		Vehicle->TargetCheckpoint = CheckpointIndex + 1;
 		UE_LOG(LogTemp, Warning, TEXT("%s is %i player to reached checkpoint number %i"), *GearPlayerState->GetPlayerName(), GearGameState->CheckpointResults[CheckpointIndex - 1].PlayerList.Num(), CheckpointIndex);
 
-		GearGameState->BroadcastReachedCheckpointEvent_Multi(Vehicle->GetPlayerState<AGearPlayerState>(), TargetCheckpoint, GearGameState->CheckpointResults[CheckpointIndex - 1].PlayerList.Num());
+		AGearPlayerState* Player = Vehicle->GetPlayerState<AGearPlayerState>();
+		int32 Position = GearGameState->CheckpointResults[CheckpointIndex - 1].PlayerList.Num();
+
+		GearGameState->BroadcastReachedCheckpointEvent_Multi(Player, TargetCheckpoint, Position);
+		TargetCheckpoint->PlayerReachedCheckpoint_Multi(Player, Position);
 
 		if (CheckpointIndex > GearGameState->FurthestReachedCheckpoint)
 		{
