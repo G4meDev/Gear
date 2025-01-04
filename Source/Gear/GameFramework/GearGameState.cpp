@@ -283,7 +283,8 @@ void AGearGameState::Racing_Start()
 	}
 
 	FurthestReachedDistace = 0;
-	FurthestReachedCheckpoint = 0;
+// 	FurthestReachedCheckpoint = 0;
+// 	OnRep_FurthestReachedCheckpoint();
 
 	if (!IsValid(VehicleCamera))
 	{
@@ -598,5 +599,20 @@ void AGearGameState::BroadcastReachedCheckpointEvent_Multi_Implementation(AGearP
 	if (IsValid(NotifictionBoardWidget))
 	{
 		NotifictionBoardWidget->NotifyReachedCheckpoint(PlayerState, Checkpoint, Position);
+	}
+}
+
+void AGearGameState::OnRep_FurthestReachedCheckpoint()
+{
+	if (GearMatchState == EGearMatchState::Racing)
+	{
+		for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+		{
+			AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
+			if (IsValid(PlayerController) && PlayerController->IsLocalController())
+			{
+				PlayerController->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsStack.Num());
+			}
+		}
 	}
 }

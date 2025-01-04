@@ -57,4 +57,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void RemovePlayer(AGearPlayerState* InPlayer);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum);
 };

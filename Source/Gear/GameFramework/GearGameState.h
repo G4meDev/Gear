@@ -119,7 +119,7 @@ public:
 
 	float FurthestReachedDistace;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_FurthestReachedCheckpoint, BlueprintReadWrite)
 	int FurthestReachedCheckpoint;
 
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleSocketTransform)
@@ -138,6 +138,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void BroadcastReachedCheckpointEvent_Multi(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position);
+
+	UFUNCTION()
+	void OnRep_FurthestReachedCheckpoint();
 
 protected:
 

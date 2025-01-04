@@ -79,4 +79,6 @@ public:
 	void ClientStateScoreboard_End();
 
 	void ClientStateGameFinished(float StateStartTime);
+
+	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum);
 };

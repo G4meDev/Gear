@@ -599,6 +599,7 @@ void AGearGameMode::StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicl
 	const bool bNeedsCountDown = !IsValid(InstgatorVehicle);
 
 	GearGameState->FurthestReachedCheckpoint = Checkpoint->CheckpointIndex;
+	GearGameState->OnRep_FurthestReachedCheckpoint();
 
 	// if there was no vehicle reached to checkpoint start with countdown
 	if (bNeedsCountDown)
@@ -649,6 +650,7 @@ void AGearGameMode::StartRacing()
 	GearGameState->Vehicles.Empty(4);
 	GearGameState->FurthestReachedDistace = 0;
 	GearGameState->FurthestReachedCheckpoint = 0;
+	GearGameState->OnRep_FurthestReachedCheckpoint();
 	GearGameState->ClearCheckpointResults();
 	GearGameState->ClearOccupiedVehicleStarts();
 
@@ -720,6 +722,7 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 		if (CheckpointIndex > GearGameState->FurthestReachedCheckpoint)
 		{
 			GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
+			GearGameState->OnRep_FurthestReachedCheckpoint();
 			if (GearGameState->CheckpointsStack.Top() != TargetCheckpoint)
 			{
 				StartRacingAtCheckpoint(TargetCheckpoint, Vehicle);
