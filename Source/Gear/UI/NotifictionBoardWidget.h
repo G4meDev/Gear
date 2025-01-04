@@ -21,5 +21,8 @@ public:
 	void NotifyPlayerPlaced(class AGearPlayerState* Player, TSubclassOf<class AGearPlaceable> Placeable);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void NotifyElimination(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason);
+	void NotifyElimination(class AGearPlayerState* PlayerState, EElimanationReason ElimanationReason);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void NotifyReachedCheckpoint(AGearPlayerState* PlayerState, class ACheckpoint* Checkpoint, int32 Position);
 };

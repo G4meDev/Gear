@@ -136,6 +136,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void BroadcastEliminationEvent_Multi(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void BroadcastReachedCheckpointEvent_Multi(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position);
+
 protected:
 
 	virtual void BeginPlay() override;

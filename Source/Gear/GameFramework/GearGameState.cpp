@@ -592,3 +592,11 @@ void AGearGameState::BroadcastEliminationEvent_Multi_Implementation(AGearPlayerS
 		NotifictionBoardWidget->NotifyElimination(PlayerState, ElimanationReason);
 	}
 }
+
+void AGearGameState::BroadcastReachedCheckpointEvent_Multi_Implementation(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position)
+{
+	if (IsValid(NotifictionBoardWidget))
+	{
+		NotifictionBoardWidget->NotifyReachedCheckpoint(PlayerState, Checkpoint, Position);
+	}
+}
