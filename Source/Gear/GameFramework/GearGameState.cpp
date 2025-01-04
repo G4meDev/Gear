@@ -11,6 +11,10 @@
 #include "Placeable/GearHazard.h"
 #include "Placeable/PlaceableSocket.h"
 
+#include "UI/NotifictionBoardWidget.h"
+
+#include "Placeable/PlaceableSocket.h"
+
 #include "GameSystems/Checkpoint.h"
 #include "GameSystems/TrackSpline.h"
 
@@ -69,6 +73,11 @@ void AGearGameState::BeginPlay()
 		TrackSpline = Cast<ATrackSpline>(UGameplayStatics::GetActorOfClass(GetWorld(), ATrackSpline::StaticClass()));
 		check(TrackSpline);
 	}
+
+	check(IsValid(NotifictionBoardClass));
+
+	NotifictionBoardWidget = CreateWidget<UNotifictionBoardWidget>(GetWorld(),  NotifictionBoardClass);
+	NotifictionBoardWidget->AddToViewport();
 }
 
 void AGearGameState::Destroyed()
@@ -78,6 +87,12 @@ void AGearGameState::Destroyed()
 	if (IsValid(TrackSpline))
 	{
 		TrackSpline->Destroy();
+	}
+
+	if (IsValid(NotifictionBoardWidget))
+	{
+		NotifictionBoardWidget->RemoveFromParent();
+		NotifictionBoardWidget = nullptr;
 	}
 }
 
@@ -563,4 +578,17 @@ void AGearGameState::BroadcastPlacedEvent_Multi_Implementation(AGearPlayerState*
 {
 	check(PlacedSound);
 	UGameplayStatics::PlaySound2D(GetWorld(), PlacedSound);
+	
+	if (IsValid(NotifictionBoardWidget))
+	{
+		NotifictionBoardWidget->NotifyPlayerPlaced(PlayerState, PlaceableClass);
+	}
+}
+
+void AGearGameState::BroadcastEliminationEvent_Multi_Implementation(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason)
+{
+	if (IsValid(NotifictionBoardWidget))
+	{
+		NotifictionBoardWidget->NotifyElimination(PlayerState, ElimanationReason);
+	}
 }

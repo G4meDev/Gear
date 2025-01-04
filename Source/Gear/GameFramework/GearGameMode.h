@@ -92,7 +92,7 @@ protected:
 	// --------------------------------------------------------------------------
 
 	bool IsEveryPlayerEliminated() const;
-	bool ShouldVehicleDie(AGearVehicle* Vehicle) const;
+	bool ShouldVehicleDie(AGearVehicle* Vehicle, EElimanationReason& EliminationReson);
 	void DestroyVehicle(AGearVehicle* Vehicle);
 
 	EGearMatchState GearMatchState;

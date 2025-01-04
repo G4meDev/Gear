@@ -127,8 +127,12 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 
 		if (IsValid(Vehicle))
 		{
-			if (ShouldVehicleDie(Vehicle))
+			EElimanationReason ElimanationReason;
+			bool bShouldVehicleDie = ShouldVehicleDie(Vehicle, ElimanationReason);
+
+			if (bShouldVehicleDie)
 			{
+				GearGameState->BroadcastEliminationEvent_Multi(Vehicle->GetPlayerState<AGearPlayerState>(), ElimanationReason);
 				DestroyVehicle(Vehicle);
 			}
 
@@ -271,10 +275,15 @@ bool AGearGameMode::IsEveryPlayerEliminated() const
 	return true;
 }
 
-bool AGearGameMode::ShouldVehicleDie(AGearVehicle* Vehicle) const
+bool AGearGameMode::ShouldVehicleDie(AGearVehicle* Vehicle, EElimanationReason& EliminationReson)
 {
 	const bool bOutsideCameraFrustom = GearGameState->VehicleCamera ? GearGameState->VehicleCamera->IsOutsideCameraFrustum(Vehicle) : false;
-	return !Vehicle->IsSpectating() && (Vehicle->IsOutsideTrack() || bOutsideCameraFrustom);
+	if (!Vehicle->IsSpectating() && (Vehicle->IsOutsideTrack() || bOutsideCameraFrustom))
+	{
+		EliminationReson = bOutsideCameraFrustom ? EElimanationReason::OutsideCameraFrustum : EElimanationReason::Falldown;
+		return true;
+	}
+	return false;
 }
 
 void AGearGameMode::DestroyVehicle(AGearVehicle* Vehicle)

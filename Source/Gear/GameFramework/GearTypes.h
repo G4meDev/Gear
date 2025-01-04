@@ -176,3 +176,10 @@ enum class ERoadModuleTraceResult : uint8
 	BodyColliding,
 	ExtentColliding
 };
+
+UENUM(BlueprintType)
+enum class EElimanationReason : uint8
+{
+	Falldown,
+	OutsideCameraFrustum
+};

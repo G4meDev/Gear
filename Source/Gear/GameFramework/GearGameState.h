@@ -133,6 +133,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void BroadcastPlacedEvent_Multi(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void BroadcastEliminationEvent_Multi(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -144,6 +147,14 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AVehicleCamera> VehicleCameraClass;
+	
+//----------------------------------------------------------------------------------------------------------------------------
+
+ 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+ 	TSubclassOf<UUserWidget> NotifictionBoardClass;
+
+	UPROPERTY()
+	class UNotifictionBoardWidget* NotifictionBoardWidget;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USoundBase* SelectedSound;
