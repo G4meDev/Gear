@@ -75,9 +75,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float PreviewScale;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UTexture2D* PlaceableIcon;
-
 	UPROPERTY()
 	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
 
