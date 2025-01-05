@@ -61,6 +61,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AGearGameState, RoundNumber);
 	DOREPLIFETIME(AGearGameState, LastCountDownTime);
 	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpoint);
+	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpointTime);
 	DOREPLIFETIME(AGearGameState, RoadModuleSocketTransform);
 }
 
@@ -283,8 +284,6 @@ void AGearGameState::Racing_Start()
 	}
 
 	FurthestReachedDistace = 0;
-// 	FurthestReachedCheckpoint = 0;
-// 	OnRep_FurthestReachedCheckpoint();
 
 	if (!IsValid(VehicleCamera))
 	{
@@ -611,7 +610,7 @@ void AGearGameState::OnRep_FurthestReachedCheckpoint()
 			AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
 			if (IsValid(PlayerController) && PlayerController->IsLocalController())
 			{
-				PlayerController->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsStack.Num());
+				PlayerController->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsStack.Num(), FurthestReachedCheckpointTime);
 			}
 		}
 	}

@@ -122,6 +122,9 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_FurthestReachedCheckpoint, BlueprintReadWrite)
 	int FurthestReachedCheckpoint;
 
+	UPROPERTY(Replicated)
+	float FurthestReachedCheckpointTime;
+
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleSocketTransform)
 	FTransform RoadModuleSocketTransform;
 

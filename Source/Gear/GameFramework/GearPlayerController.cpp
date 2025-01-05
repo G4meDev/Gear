@@ -270,12 +270,12 @@ void AGearPlayerController::ClientStateGameFinished(float StateStartTime)
 	}
 }
 
-void AGearPlayerController::NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum)
+void AGearPlayerController::NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float ReachTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsNum);
+		GearHUD->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsNum, ReachTime);
 	}
 }
 

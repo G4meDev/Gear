@@ -80,5 +80,5 @@ public:
 
 	void ClientStateGameFinished(float StateStartTime);
 
-	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum);
+	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float ReachTime);
 };

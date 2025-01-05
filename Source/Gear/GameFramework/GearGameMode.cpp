@@ -101,7 +101,6 @@ void AGearGameMode::Tick(float DeltaSeconds)
 		if (IsEveryPlayerPlaced())
 		{
 			EndPlaceing();
-			//StartRacing(true);
 		}
 	}
 
@@ -266,7 +265,6 @@ bool AGearGameMode::IsEveryPlayerEliminated() const
 	for (AGearVehicle* V : GearGameState->Vehicles)
 	{
 		if (IsValid(V) && !V->IsSpectating())
-		//if (IsValid(V))
 		{
 			return false;
 		}
@@ -599,6 +597,7 @@ void AGearGameMode::StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicl
 	const bool bNeedsCountDown = !IsValid(InstgatorVehicle);
 
 	GearGameState->FurthestReachedCheckpoint = Checkpoint->CheckpointIndex;
+	GearGameState->FurthestReachedCheckpointTime = GetWorld()->GetTimeSeconds();
 	GearGameState->OnRep_FurthestReachedCheckpoint();
 
 	// if there was no vehicle reached to checkpoint start with countdown
@@ -650,6 +649,7 @@ void AGearGameMode::StartRacing()
 	GearGameState->Vehicles.Empty(4);
 	GearGameState->FurthestReachedDistace = 0;
 	GearGameState->FurthestReachedCheckpoint = 0;
+	GearGameState->FurthestReachedCheckpointTime = GetWorld()->GetTimeSeconds();
 	GearGameState->OnRep_FurthestReachedCheckpoint();
 	GearGameState->ClearCheckpointResults();
 	GearGameState->ClearOccupiedVehicleStarts();
@@ -726,6 +726,7 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 		if (CheckpointIndex > GearGameState->FurthestReachedCheckpoint)
 		{
 			GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
+			GearGameState->FurthestReachedCheckpointTime = GetWorld()->GetTimeSeconds();
 			GearGameState->OnRep_FurthestReachedCheckpoint();
 			if (GearGameState->CheckpointsStack.Top() != TargetCheckpoint)
 			{

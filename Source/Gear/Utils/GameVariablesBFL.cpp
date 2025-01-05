@@ -28,6 +28,11 @@ float UGameVariablesBFL::GV_PlacingTimeLimit()
 	return 10.0f;
 }
 
+float UGameVariablesBFL::GV_RacingTimeLimit()
+{
+	return 20.0f;
+}
+
 int32 UGameVariablesBFL::GV_FinishingCheckpointScore()
 {
 	return 150;
