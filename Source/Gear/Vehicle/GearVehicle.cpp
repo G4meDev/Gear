@@ -17,6 +17,8 @@
 #include "InputAction.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 #define VEHICLE_TESTMAP_NAME "VehicleTestMap"
@@ -150,6 +152,10 @@ void AGearVehicle::Destroyed()
 		VehicleInputWidget->RemoveFromParent();
 		VehicleInputWidget = nullptr;
 	}
+
+	check(IsValid(EliminationFXActorClass));
+
+	GetWorld()->SpawnActor<AActor>(EliminationFXActorClass, GetActorLocation(), GetActorRotation());
 
 	Super::Destroyed();
 }

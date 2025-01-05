@@ -117,6 +117,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UMaterialInterface* VehicleMaterialParent_Transparent;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AActor> EliminationFXActorClass;
+
 	void Input_Throttle(const FInputActionInstance& Instance);
 	void Input_Brake(const FInputActionInstance& Instance);
 
