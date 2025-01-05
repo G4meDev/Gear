@@ -70,6 +70,8 @@ protected:
 	void SpawnVehicleAtCheckpoint(AGearPlayerState* Player, ACheckpoint* Checkpoint, bool GrantInvincibility);
 	void StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicle* InstgatorVehicle);
 	void StartRacing();
+	FTimerHandle RacingTimerHandle;
+	FTimerHandle RacingEndDelayTimerHandle;
 
 	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule);
 	bool ShouldAddCheckpoint() const;
@@ -94,6 +96,7 @@ protected:
 	bool IsEveryPlayerEliminated() const;
 	bool ShouldVehicleDie(AGearVehicle* Vehicle, EElimanationReason& EliminationReson);
 	void DestroyVehicle(AGearVehicle* Vehicle);
+	void DestroyAllVehicles(bool bIncludeSpectators = false);
 
 	EGearMatchState GearMatchState;
 

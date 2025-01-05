@@ -514,6 +514,16 @@ TArray<AGearPlayerState*> AGearGameState::GetPlayersPlacement()
 	return Results;
 }
 
+void AGearGameState::UpdateFurthestReachedCheckpoint(int32 CheckpointIndex)
+{
+	if (HasAuthority())
+	{
+		FurthestReachedCheckpoint = CheckpointIndex;
+		FurthestReachedCheckpointTime = GetWorld()->GetTimeSeconds();
+		OnRep_FurthestReachedCheckpoint();
+	}
+}
+
 bool AGearGameState::IsCountDown()
 {
 	float Time = GetServerWorldTimeSeconds() - LastCountDownTime;

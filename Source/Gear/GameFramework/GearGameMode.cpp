@@ -145,7 +145,7 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 
 	bool bEveryPlayerEliminated = IsEveryPlayerEliminated();
 
-	if (bEveryPlayerEliminated)
+	if (bEveryPlayerEliminated && !RacingEndDelayTimerHandle.IsValid())
 	{
 		for (int i = GearGameState->Vehicles.Num() - 1; i >= 0; i--)
 		{
@@ -155,16 +155,17 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 		GearGameState->Vehicles.Empty(4);
 
 		ACheckpoint* NextCheckpoint = GearGameState->GetNextFurthestReachedCheckpoint();
+		const bool bRaceFinished = !IsValid(NextCheckpoint);
 
-		if (IsValid(NextCheckpoint))
+		if (bRaceFinished)
 		{
-			GearGameState->ClearOccupiedVehicleStarts();
-			StartRacingAtCheckpoint(NextCheckpoint, nullptr);
+			GetWorld()->GetTimerManager().SetTimer(RacingEndDelayTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartScoreboard), UGameVariablesBFL::GV_RacingEndDelay(), false);
 		}
-
 		else
 		{
-			StartScoreboard();
+			GearGameState->ClearOccupiedVehicleStarts();
+			AGearVehicle* NullVehicle = nullptr;
+			GetWorld()->GetTimerManager().SetTimer(RacingEndDelayTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::StartRacingAtCheckpoint, NextCheckpoint, NullVehicle), UGameVariablesBFL::GV_RacingEndDelay(), false);
 		}
 	}
 }
@@ -296,6 +297,23 @@ void AGearGameMode::DestroyVehicle(AGearVehicle* Vehicle)
 	if (IsValid(NextCheckpoint))
 	{
 		SpawnVehicleAtCheckpoint(Player, NextCheckpoint, true);
+	}
+}
+
+void AGearGameMode::DestroyAllVehicles(bool bIncludeSpectators)
+{
+	for (int i = GearGameState->Vehicles.Num() - 1; i >= 0; i--)
+	{
+		AGearVehicle* Vehicle = GearGameState->Vehicles[i];
+		if (IsValid(Vehicle))
+		{
+			if (Vehicle->IsSpectating() && !bIncludeSpectators)
+			{
+				continue;
+			}
+
+			DestroyVehicle(Vehicle);
+		}
 	}
 }
 
@@ -593,12 +611,16 @@ void AGearGameMode::SpawnVehicleAtCheckpoint(AGearPlayerState* Player, ACheckpoi
 void AGearGameMode::StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicle* InstgatorVehicle)
 {
 	check(IsValid(Checkpoint));
+
+	GetWorld()->GetTimerManager().ClearTimer(RacingTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(RacingEndDelayTimerHandle);
+
+	GetWorld()->GetTimerManager().SetTimer(RacingTimerHandle, FTimerDelegate::CreateUObject(this, &AGearGameMode::DestroyAllVehicles, false)
+		, UGameVariablesBFL::GV_RacingTimeLimit(), false);
 	
 	const bool bNeedsCountDown = !IsValid(InstgatorVehicle);
 
-	GearGameState->FurthestReachedCheckpoint = Checkpoint->CheckpointIndex;
-	GearGameState->FurthestReachedCheckpointTime = GetWorld()->GetTimeSeconds();
-	GearGameState->OnRep_FurthestReachedCheckpoint();
+	GearGameState->UpdateFurthestReachedCheckpoint(Checkpoint->CheckpointIndex);
 
 	// if there was no vehicle reached to checkpoint start with countdown
 	if (bNeedsCountDown)
@@ -648,9 +670,7 @@ void AGearGameMode::StartRacing()
 	DestroyPawns();
 	GearGameState->Vehicles.Empty(4);
 	GearGameState->FurthestReachedDistace = 0;
-	GearGameState->FurthestReachedCheckpoint = 0;
-	GearGameState->FurthestReachedCheckpointTime = GetWorld()->GetTimeSeconds();
-	GearGameState->OnRep_FurthestReachedCheckpoint();
+	GearGameState->UpdateFurthestReachedCheckpoint(0);
 	GearGameState->ClearCheckpointResults();
 	GearGameState->ClearOccupiedVehicleStarts();
 
@@ -662,6 +682,9 @@ void AGearGameMode::StartRacing()
 
 void AGearGameMode::StartScoreboard()
 {
+	GetWorld()->GetTimerManager().ClearTimer(RacingTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(RacingEndDelayTimerHandle);
+
 	GetWorld()->GetTimerManager().SetTimer(ScoreboardTimerHandle,
 		FTimerDelegate::CreateUObject(this, &AGearGameMode::ScoreboardLifespanFinished), GearGameState->GetEstimatedScoreboardLifespan(), false);
 
@@ -673,7 +696,7 @@ void AGearGameMode::StartScoreboard()
 
 void AGearGameMode::ScoreboardLifespanFinished()
 {
-	ScoreboardTimerHandle.Invalidate();
+	GetWorld()->GetTimerManager().ClearTimer(ScoreboardTimerHandle);
 
 	if (GearGameState->IsAnyPlayerWinning())
 	{
@@ -725,9 +748,8 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 
 		if (CheckpointIndex > GearGameState->FurthestReachedCheckpoint)
 		{
-			GearGameState->FurthestReachedCheckpoint = CheckpointIndex;
-			GearGameState->FurthestReachedCheckpointTime = GetWorld()->GetTimeSeconds();
-			GearGameState->OnRep_FurthestReachedCheckpoint();
+			GearGameState->UpdateFurthestReachedCheckpoint(CheckpointIndex);
+
 			if (GearGameState->CheckpointsStack.Top() != TargetCheckpoint)
 			{
 				StartRacingAtCheckpoint(TargetCheckpoint, Vehicle);

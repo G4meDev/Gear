@@ -79,6 +79,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	TArray<AGearPlayerState*> GetPlayersPlacement();
 
+	void UpdateFurthestReachedCheckpoint(int32 CheckpointIndex);
 
 	UFUNCTION(BlueprintPure)
 	bool IsCountDown();
@@ -120,7 +121,7 @@ public:
 	float FurthestReachedDistace;
 
 	UPROPERTY(ReplicatedUsing=OnRep_FurthestReachedCheckpoint, BlueprintReadWrite)
-	int FurthestReachedCheckpoint;
+	int32 FurthestReachedCheckpoint;
 
 	UPROPERTY(Replicated)
 	float FurthestReachedCheckpointTime;

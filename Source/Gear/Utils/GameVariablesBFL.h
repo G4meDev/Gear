@@ -34,6 +34,9 @@ public:
 	static float GV_RacingTimeLimit();
 
 	UFUNCTION(BlueprintPure, Category = GameVariables)
+	static float GV_RacingEndDelay();
+
+	UFUNCTION(BlueprintPure, Category = GameVariables)
 	static int32 GV_FinishingCheckpointScore();
 
 	UFUNCTION(BlueprintPure, Category = GameVariables)
