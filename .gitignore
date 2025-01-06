@@ -76,3 +76,5 @@ DerivedDataCache/*
 
 **/backup/
 **/.autosave/
+**/geo/
+**/render/

@@ -30,7 +30,7 @@ float UGameVariablesBFL::GV_PlacingTimeLimit()
 
 float UGameVariablesBFL::GV_RacingTimeLimit()
 {
-	return 5.0f;
+	return 20.0f;
 }
 
 float UGameVariablesBFL::GV_RacingEndDelay()
