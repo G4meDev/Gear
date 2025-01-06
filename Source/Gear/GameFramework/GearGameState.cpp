@@ -303,11 +303,6 @@ void AGearGameState::Racing_Start()
 
 void AGearGameState::Racing_End()
 {
-	if (IsValid(VehicleCamera))
-	{
-		VehicleCamera->Destroy();
-	}
-
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
@@ -340,6 +335,11 @@ void AGearGameState::Scoreboard_Start()
 
 void AGearGameState::Scoreboard_End()
 {
+	if (IsValid(VehicleCamera))
+	{
+		VehicleCamera->Destroy();
+	}
+
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
