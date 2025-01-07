@@ -359,20 +359,20 @@ bool AGearVehicle::IsOutsideTrack() const
 
 float AGearVehicle::GetWheelSteerAngle(int32 Index)
 {
-	check(Index >= 0 && Index < GetChaosMovementComponent()->Wheels.Num() && IsValid(ChaosMovementComponent->Wheels[Index]));
-	return ChaosMovementComponent->Wheels[Index]->GetSteerAngle();
+	auto& Wheels = GetChaosMovementComponent()->Wheels;
+	return Index < Wheels.Num() && IsValid(Wheels[Index]) ? Wheels[Index]->GetSteerAngle() : 0.0f;
 }
 
 float AGearVehicle::GetWheelRotation(int32 Index)
 {
-	check(Index >= 0 && Index < GetChaosMovementComponent()->Wheels.Num() && IsValid(ChaosMovementComponent->Wheels[Index]));
-	return ChaosMovementComponent->Wheels[Index]->GetRotationAngle();
+	auto& Wheels = GetChaosMovementComponent()->Wheels;
+	return Index < Wheels.Num() && IsValid(Wheels[Index]) ? Wheels[Index]->GetRotationAngle() : 0.0f;
 }
 
 float AGearVehicle::GetWheelRotationSpeed(int32 Index)
 {
-	check(Index >= 0 && Index < GetChaosMovementComponent()->Wheels.Num() && IsValid(ChaosMovementComponent->Wheels[Index]));
-	return ChaosMovementComponent->Wheels[Index]->GetRotationAngularVelocity();
+	auto& Wheels = GetChaosMovementComponent()->Wheels;
+	return Index < Wheels.Num() && IsValid(Wheels[Index]) ? Wheels[Index]->GetRotationAngularVelocity() : 0.0f;
 }
 
 float AGearVehicle::GetSteerAngle()
