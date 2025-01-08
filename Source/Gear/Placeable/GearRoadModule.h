@@ -48,9 +48,6 @@ public:
 	UBoxComponent* ExtentCollider;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSubclassOf<AGearRoadModule> RoadModuleMirroredClass;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> RoadModuleClass;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
