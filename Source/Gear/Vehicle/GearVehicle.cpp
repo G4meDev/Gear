@@ -375,6 +375,11 @@ float AGearVehicle::GetWheelRotationSpeed(int32 Index)
 	return Index < Wheels.Num() && IsValid(Wheels[Index]) ? Wheels[Index]->GetRotationAngularVelocity() : 0.0f;
 }
 
+bool AGearVehicle::IsWheelOnGround(int32 Index)
+{
+	return IsValid(GetChaosMovementComponent()) ? GetChaosMovementComponent()->GetWheelState(Index).bInContact : false;
+}
+
 float AGearVehicle::GetSteerAngle()
 {
 	return SteerAngle;

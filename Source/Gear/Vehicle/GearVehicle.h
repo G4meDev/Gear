@@ -67,6 +67,9 @@ public:
 	float GetWheelRotationSpeed(int32 Index);
 
 	UFUNCTION(BlueprintPure)
+	bool IsWheelOnGround(int32 Index);
+
+	UFUNCTION(BlueprintPure)
 	float GetSteerAngle();
 
 protected:
