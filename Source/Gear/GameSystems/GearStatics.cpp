@@ -26,7 +26,7 @@ ERoadModuleTraceResult UGearStatics::TraceRoadModule(UObject* WorldContextObject
 	bool bHitMainBody = TraceForCollider(RoadModule->MainCollider);
 
 #if !UE_BUILD_SHIPPING
-	DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitMainBody ? FColor::Red : FColor::Blue, false, 0.1f);
+	//DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitMainBody ? FColor::Red : FColor::Blue, false, 0.1f);
 #endif
 
 	if (bHitMainBody)
@@ -36,7 +36,7 @@ ERoadModuleTraceResult UGearStatics::TraceRoadModule(UObject* WorldContextObject
 	bool bHitExtent = TraceForCollider(RoadModule->ExtentCollider);
 
 #if !UE_BUILD_SHIPPING
-	DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitExtent ? FColor::Red : FColor::Yellow, false, 0.1f);
+	//DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitExtent ? FColor::Red : FColor::Yellow, false, 0.1f);
 #endif
 
 	if (bHitExtent)
