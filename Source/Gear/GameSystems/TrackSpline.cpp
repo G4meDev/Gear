@@ -38,6 +38,8 @@ void ATrackSpline::RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadMod
 	auto AddSplinePoint = [&](int StackIndex, int SplinePointIndex) 
 	{
 		SplinePoint = RoadModulesStack[StackIndex]->RoadSpline->GetSplinePointAt(SplinePointIndex, ESplineCoordinateSpace::World);
+
+		SplinePoint.Type = RoadModulesStack[StackIndex]->RoadSpline->GetSplinePointType(SplinePointIndex);
 		SplinePoint.Position = RoadModulesStack[StackIndex]->RoadSpline->GetLocationAtSplineInputKey(SplinePointIndex, ESplineCoordinateSpace::World);
 		SplinePoint.ArriveTangent = RoadModulesStack[StackIndex]->RoadSpline->GetArriveTangentAtSplinePoint(SplinePointIndex, ESplineCoordinateSpace::World);
 		SplinePoint.LeaveTangent = RoadModulesStack[StackIndex]->RoadSpline->GetLeaveTangentAtSplinePoint(SplinePointIndex, ESplineCoordinateSpace::World);
