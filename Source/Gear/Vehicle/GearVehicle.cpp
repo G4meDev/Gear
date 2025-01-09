@@ -380,6 +380,11 @@ bool AGearVehicle::IsWheelOnGround(int32 Index)
 	return IsValid(GetChaosMovementComponent()) ? GetChaosMovementComponent()->GetWheelState(Index).bInContact : false;
 }
 
+bool AGearVehicle::IsWheelSkiding(int32 Index)
+{
+	return IsValid(GetChaosMovementComponent()) ? GetChaosMovementComponent()->GetWheelState(Index).bIsSkidding : false;
+}
+
 float AGearVehicle::GetSteerAngle()
 {
 	return SteerAngle;

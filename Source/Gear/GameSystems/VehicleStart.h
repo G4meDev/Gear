@@ -7,7 +7,7 @@
 #include "VehicleStart.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Gear), meta=(BlueprintSpawnableComponent) )
 class GEAR_API UVehicleStart : public USceneComponent
 {
 	GENERATED_BODY()

@@ -12,7 +12,8 @@
 				"Engine",
 				"ChaosVehiclesEngine",
 				"ChaosVehicles",
-				"UMG"
+				"UMG",
+				"Niagara"
 			]
 		}
 	],

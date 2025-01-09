@@ -70,6 +70,9 @@ public:
 	bool IsWheelOnGround(int32 Index);
 
 	UFUNCTION(BlueprintPure)
+	bool IsWheelSkiding(int32 Index);
+
+	UFUNCTION(BlueprintPure)
 	float GetSteerAngle();
 
 protected:
