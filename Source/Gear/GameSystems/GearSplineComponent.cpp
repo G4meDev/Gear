@@ -6,14 +6,23 @@
 
 UGearSplineComponent::UGearSplineComponent()
 {
-	SetIsReplicatedByDefault(true);
+	SetIsReplicatedByDefault(false);
 }
 
-void UGearSplineComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+FSplineCurves UGearSplineComponent::GetSplineCurves()
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UGearSplineComponent, SplineCurves);
-// 	DOREPLIFETIME(UGearSplineComponent, ReparamStepsPerSegment);
-// 	DOREPLIFETIME(UGearSplineComponent, bStationaryEndpoints);
+	return SplineCurves;
 }
+
+void UGearSplineComponent::SetSplineCurves(const FSplineCurves& InSplineCurves)
+{
+	SplineCurves = InSplineCurves;
+	UpdateSpline();
+}
+
+//void UGearSplineComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+//{
+//	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//
+//	DOREPLIFETIME(UGearSplineComponent, SplineCurves);
+//}

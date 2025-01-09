@@ -17,5 +17,10 @@ public:
 
 	UGearSplineComponent();
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+public:
+	FSplineCurves GetSplineCurves();
+
+	void SetSplineCurves(const FSplineCurves& InSplineCurves);
+
+	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

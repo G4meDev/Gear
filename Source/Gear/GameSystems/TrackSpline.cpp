@@ -3,7 +3,7 @@
 
 #include "GameSystems/TrackSpline.h"
 #include "Placeable/GearRoadModule.h"
-#include "GameSystems/GearSplineComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ATrackSpline::ATrackSpline()
 {
@@ -14,6 +14,13 @@ ATrackSpline::ATrackSpline()
 
 	bReplicates = true;
 	bAlwaysRelevant = true;
+}
+
+void ATrackSpline::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATrackSpline, SplineCurves);
 }
 
 void ATrackSpline::BeginPlay()
@@ -28,8 +35,18 @@ void ATrackSpline::Tick(float DeltaTime)
 
 }
 
+void ATrackSpline::OnRep_SplineCurves()
+{
+	Spline->SetSplineCurves(SplineCurves);
+}
+
 void ATrackSpline::RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadModulesStack)
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	Spline->ClearSplinePoints(false);
 
 	check(!RoadModulesStack.IsEmpty());
@@ -62,6 +79,7 @@ void ATrackSpline::RoadModuleStackChanged(const TArray<AGearRoadModule*> RoadMod
 		}
 	}
 
+	SplineCurves = Spline->GetSplineCurves();
 	Spline->UpdateSpline();
 }
 

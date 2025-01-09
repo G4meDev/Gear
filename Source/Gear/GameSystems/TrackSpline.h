@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameSystems/GearSplineComponent.h"
 #include "TrackSpline.generated.h"
 
 class AGearRoadModule;
@@ -21,7 +22,13 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UGearSplineComponent* Spline;
+	UGearSplineComponent* Spline;
+
+	UFUNCTION()
+	void OnRep_SplineCurves();
+
+	UPROPERTY(ReplicatedUsing=OnRep_SplineCurves)
+	FSplineCurves SplineCurves;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
