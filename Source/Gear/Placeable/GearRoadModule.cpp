@@ -83,7 +83,7 @@ void AGearRoadModule::UpdateSplineParameters()
 		FVector MinBound;
 		FVector MaxBound;
 		RoadMesh->GetLocalBounds(MinBound, MaxBound);
-
+		
 		FVector RotationPivotLocation = (MinBound + MaxBound) / 2.0f;
 		RotationPivotLocation.Z = MinBound.Z + RotationPivotHeightOffset;
 

@@ -352,7 +352,7 @@ void AGearVehicle::OnRep_GrantedInvincibility()
 bool AGearVehicle::IsOutsideTrack() const
 {
 	FTransform TrackTransform = GearGameState->TrackSpline->GetTrackTransfsormAtDistance(DistanaceAlongTrack);
-	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -700.0f;
+	return GetActorLocation().Z - TrackTransform.GetLocation().Z < -400.0f;
 }
 
 // ---------------------------------------------------------------------------
