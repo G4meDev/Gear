@@ -20,7 +20,6 @@ void UVehicleSkidmarkComponent::BeginPlay()
 	Super::BeginPlay();
 
 	OwningVehicle = GetOwner<AGearVehicle>();
-	NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(ParticleEffect, this, NAME_None, FVector::Zero(), FRotator::ZeroRotator, FVector::OneVector, EAttachLocation::SnapToTarget, true, ENCPoolMethod::AutoRelease, true);
 }
 
 void UVehicleSkidmarkComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -28,12 +27,23 @@ void UVehicleSkidmarkComponent::TickComponent(float DeltaTime, enum ELevelTick T
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	check(OwningVehicle);
-	check(NiagaraComponent);
 
 	bool bWheelOnGround = OwningVehicle->IsWheelOnGround(WheelIndex);
 	bool bWheelSkiding = OwningVehicle->IsWheelSkiding(WheelIndex);
 
-	NiagaraComponent->SetFloatParameter(TEXT("User.Active"), bWheelOnGround && bWheelSkiding);
+	bool bEffectActive = IsValid(NiagaraComponent);
+
+	if (bEffectActive && (!bWheelOnGround || !bWheelSkiding))
+	{
+		NiagaraComponent->Deactivate();
+		NiagaraComponent = nullptr;
+	}
+
+	if (!bEffectActive && bWheelOnGround && bWheelSkiding)
+	{
+		NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(ParticleEffect, this, NAME_None, FVector::Zero(), FRotator::ZeroRotator, FVector::OneVector, EAttachLocation::SnapToTarget, true, ENCPoolMethod::AutoRelease, true);
+		
+	}
 }
 
 void UVehicleSkidmarkComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
