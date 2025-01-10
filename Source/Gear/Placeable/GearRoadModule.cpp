@@ -100,7 +100,7 @@ void AGearRoadModule::UpdateColliders()
 		RoadMesh->GetLocalBounds(MinBound, MaxBound);
 
 		FVector BoundOrigin = (MinBound + MaxBound) / 2;
-		BoundOrigin = RoadMesh->GetComponentTransform().TransformPosition(BoundOrigin);
+		BoundOrigin = ModulesStack->GetRelativeTransform().TransformPosition(BoundOrigin);
 
 		FVector BoundExtent = (MaxBound - MinBound) / 2;
 		BoundExtent += MainColliderPadding;
