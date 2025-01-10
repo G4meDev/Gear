@@ -27,4 +27,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	static FString FormatTimeLong(float Time);
 	
+	UFUNCTION(BlueprintPure)
+	static float RelativeToUnitPeriodWithCap(float RelativeTime, float Period, float Cap);
+
+	UFUNCTION(BlueprintPure)
+	static float SmoothStep(float Value, float Min, float Max);
 };

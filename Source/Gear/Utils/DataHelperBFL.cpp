@@ -2,6 +2,7 @@
 
 
 #include "Utils/DataHelperBFL.h"
+#include "Kismet/KismetMathLibrary.h"
 
 FColor UDataHelperBFL::ResolveColorCode(EPlayerColorCode ColorCode)
 {
@@ -74,4 +75,20 @@ FString UDataHelperBFL::FormatTimeLong(float Time)
 	ConvertSecondsToMS(Time, Minutes, Seconds);
 	
 	return FString::Printf(TEXT("%.2i:%.3f"), Minutes, Seconds);
+}
+
+float UDataHelperBFL::RelativeToUnitPeriodWithCap(float RelativeTime, float Period, float Cap)
+{
+	float Result = FMath::Fmod(RelativeTime, Period);
+	float CapRatio = Cap / Period; 
+
+	Result = FMath::Abs((Result / Period) - 0.5f) * 2;
+	Result = UKismetMathLibrary::MapRangeClamped(Result, CapRatio, 1 - CapRatio, 0, 1);
+
+	return Result;
+}
+
+float UDataHelperBFL::SmoothStep(float Value, float Min, float Max)
+{
+	return FMath::SmoothStep(Min, Max, Value);
 }

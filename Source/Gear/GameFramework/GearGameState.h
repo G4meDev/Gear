@@ -87,7 +87,7 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	double LastGameStateTransitionTime;
 
 	UPROPERTY()
