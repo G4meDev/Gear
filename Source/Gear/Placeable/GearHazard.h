@@ -27,5 +27,23 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+#if WITH_EDITORONLY_DATA
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bDirty = false;
+
+	float RotationPivotHeightOffset = -200.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float SelectionHitboxPadding = 50.0f;
+
+#endif
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void GetHazardBounds(FVector& Min, FVector& Max);
+
+#endif
 };
