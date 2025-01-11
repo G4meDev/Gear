@@ -16,7 +16,6 @@
 #include "Placeable/GearPlaceable.h"
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
-#include "Placeable/PlaceableSocket.h"
 #include "Placeable/PlaceableSpawnPoint.h"
 #include "Placeable/SpawnableSocket.h"
 #include "Placeable/HazardSocketComponent.h"

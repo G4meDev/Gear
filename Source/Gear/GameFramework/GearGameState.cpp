@@ -9,11 +9,8 @@
 
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
-#include "Placeable/PlaceableSocket.h"
 
 #include "UI/NotifictionBoardWidget.h"
-
-#include "Placeable/PlaceableSocket.h"
 
 #include "GameSystems/Checkpoint.h"
 #include "GameSystems/TrackSpline.h"
@@ -184,7 +181,7 @@ void AGearGameState::OnModuleStackChanged()
 			TrackSpline->RoadModuleStackChanged(RoadModuleStack);
 		}
 
-		RoadModuleSocketTransform = RoadModuleStack.Top()->GetAttachableSocket()->GetPlaceableSocketTransform();
+		RoadModuleSocketTransform = RoadModuleStack.Top()->GetAttachableSocket()->GetComponentTransform();
 		OnRep_RoadModuleSocketTransform();
 	}
 }
@@ -402,7 +399,7 @@ bool AGearGameState::FindStartCheckpointAndAddToStack()
 	return true;
 }
 
-UPlaceableSocket* AGearGameState::GetRoadStackAttachableSocket()
+USceneComponent* AGearGameState::GetRoadStackAttachableSocket()
 {
 	if (!RoadModuleStack.IsEmpty() && IsValid(RoadModuleStack.Top()))
 	{
@@ -433,7 +430,7 @@ void AGearGameState::UpdateRoadModuleSocket()
 {
 	if (HasAuthority())
 	{
-		RoadModuleSocketTransform = RoadModuleStack.Top()->GetAttachableSocket()->GetPlaceableSocketTransform();
+		RoadModuleSocketTransform = RoadModuleStack.Top()->GetAttachableSocket()->GetComponentTransform();
 	}
 }
 

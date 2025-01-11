@@ -35,11 +35,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* RoadMesh;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UPlaceableSocket* RoadEndSocket;
+ 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+ 	USceneComponent* RoadEndSocketComponent;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* HazardSockets;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* SpawnableSockets;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USplineComponent* RoadSpline;
@@ -62,7 +65,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> RoadModuleClass_MirrorX_MirrorY;
 
-	UPlaceableSocket* GetAttachableSocket();
+	USceneComponent* GetAttachableSocket();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RoadLength;
@@ -87,6 +90,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FVector ExtentColliderSize = FVector(3000.0f, 1000.0f, 500.0f);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float SelectionBoxPadding = 200.0f;
 
 #endif
 

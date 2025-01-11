@@ -43,9 +43,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void RoundRestBlueprintEvent();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPlaceableSocketType SocketType;
-
 	UPROPERTY(Replicated)
 	AGearPlayerState* OwningPlayer;
 
@@ -67,16 +64,10 @@ public:
 	UBoxComponent* SelectionHitbox;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UStaticMeshComponent* SelectionIndicator;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* PreviewRotationPivot;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float PreviewScale;
-
-	UPROPERTY()
-	UMaterialInstanceDynamic* SelectionIndicatorMaterial;
 
 	void AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint);
 

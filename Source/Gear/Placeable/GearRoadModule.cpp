@@ -4,7 +4,6 @@
 #include "Placeable/GearRoadModule.h"
 #include "GameFramework/GearGameState.h"
 #include "GameSystems/GearStatics.h"
-#include "Placeable/PlaceableSocket.h"
 #include "Components/SplineComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/GearBuilderPawn.h"
@@ -19,11 +18,14 @@ AGearRoadModule::AGearRoadModule()
 	RoadMesh->SetupAttachment(MainModules);
 	RoadMesh->SetCollisionProfileName(TEXT("BlockAll"));
 
-	RoadEndSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("EndSocket"));
-	RoadEndSocket->SetupAttachment(Root);
+	RoadEndSocketComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RoadEndSocket"));
+	RoadEndSocketComponent->SetupAttachment(Root);
 
 	HazardSockets = CreateDefaultSubobject<USceneComponent>(TEXT("HazardSockets"));
 	HazardSockets->SetupAttachment(ModulesStack);
+
+	SpawnableSockets = CreateDefaultSubobject<USceneComponent>(TEXT("SpawnableSockets"));
+	SpawnableSockets->SetupAttachment(ModulesStack);
 
 	RoadSpline = CreateDefaultSubobject<USplineComponent>(TEXT("RoadSpline"));
 	RoadSpline->SetupAttachment(Root);
@@ -94,7 +96,7 @@ void AGearRoadModule::UpdateSplineParameters()
 {
 	RoadLength = RoadSpline->GetSplineLength();
 
-	if (IsValid(RoadMesh) && IsValid(SelectionIndicator) && IsValid(PreviewRotationPivot))
+	if (IsValid(RoadMesh) && IsValid(PreviewRotationPivot))
 	{
 		FVector MinBound;
 		FVector MaxBound;
@@ -119,17 +121,18 @@ void AGearRoadModule::UpdateColliders()
 		BoundOrigin = ModulesStack->GetRelativeTransform().TransformPosition(BoundOrigin);
 
 		FVector BoundExtent = (MaxBound - MinBound) / 2;
-		BoundExtent += MainColliderPadding;
 
 		MainCollider->SetRelativeLocation(BoundOrigin);
-		MainCollider->SetBoxExtent(BoundExtent);
+		MainCollider->SetBoxExtent(BoundExtent + MainColliderPadding);
 
+		SelectionHitbox->SetRelativeLocation(BoundOrigin);
+		SelectionHitbox->SetBoxExtent(BoundExtent + SelectionBoxPadding);
 
-		BoundOrigin = RoadEndSocket->GetRelativeTransform().TransformPosition(FVector(ExtentColliderSize.X, 0, 0));
+		BoundOrigin = RoadEndSocketComponent->GetRelativeTransform().TransformPosition(FVector(ExtentColliderSize.X, 0, 0));
 		BoundExtent = ExtentColliderSize;
 
 		ExtentCollider->SetRelativeLocation(BoundOrigin);
-		ExtentCollider->SetRelativeRotation(RoadEndSocket->GetRelativeRotation());
+		ExtentCollider->SetRelativeRotation(RoadEndSocketComponent->GetRelativeRotation());
 		ExtentCollider->SetBoxExtent(BoundExtent);
 	}
 
@@ -173,9 +176,9 @@ void AGearRoadModule::MoveToSocketTransform(const FTransform& TargetSocket)
 	SetActorLocationAndRotation(TargetSocket.GetLocation(), TargetSocket.Rotator());
 }
 
-UPlaceableSocket* AGearRoadModule::GetAttachableSocket()
+USceneComponent* AGearRoadModule::GetAttachableSocket()
 {
-	return RoadEndSocket;
+	return RoadEndSocketComponent;
 }
 
 void AGearRoadModule::OnTraceStateChanged(ERoadModuleTraceResult Result)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include "GameFramework/GearTypes.h"
 #include "HazardSocketComponent.generated.h"
 
 
@@ -28,8 +29,13 @@ public:
 
 	void MarkOccupied();
 
+
+
 protected:
 	
 	UPROPERTY(ReplicatedUsing=OnRep_Occupied)
 	bool bOccupied;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Occupied, EditDefaultsOnly)
+	EHazardSocketType SocketType;
 };

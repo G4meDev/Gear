@@ -24,12 +24,6 @@ enum class EGearMatchState : uint8
 };
 
 UENUM(BlueprintType)
-enum class EPlaceableSocketType : uint8
-{
-	Road
-};
-
-UENUM(BlueprintType)
 enum class EPlaceableState : uint8
 {
 	None,
@@ -175,6 +169,14 @@ enum class ERoadModuleTraceResult : uint8
 	NotColliding,
 	BodyColliding,
 	ExtentColliding
+};
+
+UENUM()
+enum class EHazardSocketType : uint8
+{
+	SmallHazard,
+	BigHazard,
+	SideHazard
 };
 
 UENUM(BlueprintType)

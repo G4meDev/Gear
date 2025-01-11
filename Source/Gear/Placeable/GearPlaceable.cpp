@@ -33,10 +33,6 @@ AGearPlaceable::AGearPlaceable()
 	PreviewRotationPivot = CreateDefaultSubobject<USceneComponent>(TEXT("PreviewRotationPivot"));
 	PreviewRotationPivot->SetupAttachment(Root);
 
-	SelectionIndicator = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectionIndicator"));
-	SelectionIndicator->SetupAttachment(PreviewRotationPivot);
-	SelectionIndicator->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 	PlaceableState = EPlaceableState::None;
 	PreviewScale = 1.0f;
 
@@ -51,9 +47,6 @@ void AGearPlaceable::PostInitializeComponents()
 
 	SelectionHitbox->OnClicked.AddDynamic(this, &AGearPlaceable::OnSelectionBoxClicked);
 	SelectionHitbox->OnInputTouchBegin.AddDynamic(this, &AGearPlaceable::OnSelectionBoxTouched);
-
-	SelectionIndicatorMaterial = SelectionIndicator->CreateDynamicMaterialInstance(0, nullptr);
-	SelectionIndicator->SetVisibility(false);
 }
 
 void AGearPlaceable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -281,17 +274,11 @@ void AGearPlaceable::OnSelected_Start()
 {
 	PrebuildModules->SetHiddenInGame(false, true);
 
-	if (IsValid(OwningPlayer))
-	{
-		SelectionIndicatorMaterial->SetVectorParameterValue(TEXT("Color"), OwningPlayer->PlayerColor);
-		SelectionIndicator->SetVisibility(true);
-	}
 }
 
 void AGearPlaceable::OnSelected_End()
 {
 	PrebuildModules->SetHiddenInGame(true, true);
-	SelectionIndicator->SetVisibility(false);
 }
 
 void AGearPlaceable::OnPlacing_Start()

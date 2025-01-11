@@ -5,7 +5,6 @@
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearPlayerState.h"
 #include "Placeable/GearPlaceable.h"
-#include "Placeable/PlaceableSocket.h"
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
 #include "Placeable/HazardSocketMarker.h"

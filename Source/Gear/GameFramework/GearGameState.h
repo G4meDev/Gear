@@ -58,7 +58,7 @@ public:
 
 	bool FindStartCheckpointAndAddToStack();
 
-	UPlaceableSocket* GetRoadStackAttachableSocket();
+	USceneComponent* GetRoadStackAttachableSocket();
 
 	ACheckpoint* GetCheckPointAtIndex(int Index);
 

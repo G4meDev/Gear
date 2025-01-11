@@ -9,6 +9,7 @@ UHazardSocketComponent::UHazardSocketComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
+	SocketType = EHazardSocketType::SmallHazard;
 	bOccupied = false;
 
 	SetIsReplicatedByDefault(true);
@@ -18,6 +19,7 @@ void UHazardSocketComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME_CONDITION(UHazardSocketComponent, SocketType, COND_InitialOnly);
 	DOREPLIFETIME(UHazardSocketComponent, bOccupied);
 }
 
