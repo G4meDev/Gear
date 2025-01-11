@@ -64,6 +64,11 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void PlaceRoadModule(TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
 
+	UFUNCTION(Server, Reliable)
+	void PlaceHazard(class UHazardSocketComponent* TargetSocket);
+
+	void ClickedOnHazardSocketMarker(class AHazardSocketMarker* HazardSocketMarker);
+
 	void ClientStateAllPlayersJoined();
 	void ClientStateAllPlayersJoined_End();
 	void ClientStateMatchStarted();

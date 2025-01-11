@@ -9,6 +9,8 @@
 #include "Vehicle/VehicleCamera.h"
 #include "GearHUD.h"
 #include "Placeable/GearPlaceable.h"
+#include "Placeable/HazardSocketMarker.h"
+#include "Placeable/HazardSocketComponent.h"
 #include "GameSystems/TrackSpline.h"
 
 #include "EnhancedInputSubsystems.h"
@@ -191,6 +193,23 @@ void AGearPlayerController::PlaceRoadModule_Implementation(TSubclassOf<AGearRoad
 	if (IsValid(GearGameMode))
 	{
 		GearGameMode->RequestPlaceRoadModuleForPlayer(this, RoadModule, bMirrorX);
+	}
+}
+
+void AGearPlayerController::PlaceHazard_Implementation(class UHazardSocketComponent* TargetSocket)
+{
+	AGearGameMode* GearGameMode = Cast<AGearGameMode>(GetWorld()->GetAuthGameMode());
+	if (IsValid(GearGameMode))
+	{
+		GearGameMode->RequestPlaceHazardForPlayer(this, TargetSocket);
+	}
+}
+
+void AGearPlayerController::ClickedOnHazardSocketMarker(class AHazardSocketMarker* HazardSocketMarker)
+{
+	if (IsValid(HazardSocketMarker) && IsValid(HazardSocketMarker->TargetSocket))
+	{
+		PlaceHazard(HazardSocketMarker->TargetSocket);
 	}
 }
 

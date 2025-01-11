@@ -12,16 +12,24 @@ class GEAR_API UHazardSocketComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
-public:	
-	UHazardSocketComponent();
-
 protected:
-	virtual void BeginPlay() override;
-
 
 
 public:	
+
+	UHazardSocketComponent();
+	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION()
+	void OnRep_Occupied();
+
+	bool IsOccupied() const;
+
+	void MarkOccupied();
+
+protected:
 	
+	UPROPERTY(ReplicatedUsing=OnRep_Occupied)
+	bool bOccupied;
 };

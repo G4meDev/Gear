@@ -180,8 +180,8 @@ void AGearBuilderPawn::StartPlacing()
 	else if (SelectedPlaceableClass->IsChildOf<AGearHazard>())
 	{
 		BuilderPawnState = EBuilderPawnState::PlacingHazards;
-		SpawnPlacingHazard();
-		UpdatePlacingHazardMarkers();
+		SpawnHazard();
+		UpdateHazardMarkers();
 	}
 }
 
@@ -267,7 +267,7 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 	}
 }
 
-void AGearBuilderPawn::SpawnPlacingHazard()
+void AGearBuilderPawn::SpawnHazard()
 {
 	FTransform SpawnTransform = FTransform::Identity;
 	AActor* SpawnedActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), SelectedPlaceableClass, SpawnTransform);
@@ -288,7 +288,7 @@ void AGearBuilderPawn::SpawnPlacingHazard()
 	}
 }
 
-void AGearBuilderPawn::UpdatePlacingHazardMarkers()
+void AGearBuilderPawn::UpdateHazardMarkers()
 {
 	DestroyHazardMarkers();
 
@@ -311,6 +311,7 @@ void AGearBuilderPawn::UpdatePlacingHazardMarkers()
 					{
 						FTransform SpawnTransform = HazardSocket->GetComponentTransform();
 						AHazardSocketMarker* HazardSocketMarker = GetWorld()->SpawnActor<AHazardSocketMarker>(PlacingHazard->SocketMarkerClass, SpawnTransform.GetLocation(), SpawnTransform.Rotator());
+						HazardSocketMarker->TargetSocket = HazardSocket;
 					}
 				}
 			}

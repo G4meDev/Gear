@@ -134,8 +134,8 @@ protected:
 	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
 	int32 RemainingHazardCount;
 
-	void SpawnPlacingHazard();
-	void UpdatePlacingHazardMarkers();
+	void SpawnHazard();
+	void UpdateHazardMarkers();
 	void DestroyHazardMarkers();
 
 	UPROPERTY()
@@ -144,6 +144,7 @@ protected:
 	void Cleanup_SpawnedActors();
 
 	friend class AGearGameMode;
+	friend class UHazardSocketComponent;
 
 private:
 

@@ -19,6 +19,7 @@
 #include "Placeable/PlaceableSocket.h"
 #include "Placeable/PlaceableSpawnPoint.h"
 #include "Placeable/SpawnableSocket.h"
+#include "Placeable/HazardSocketComponent.h"
 
 #include "Utils/GameVariablesBFL.h"
 #include "kismet/GameplayStatics.h"
@@ -331,9 +332,11 @@ void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable
 
 void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX)
 {
-	if (GearMatchState == EGearMatchState::Placing && IsValid(RoadModule))
+	if (GearMatchState == EGearMatchState::Placing && IsValid(PC) && IsValid(RoadModule))
 	{
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
+
+		// TODO: remove placedmodule and check for road module class
 		if (IsValid(BuilderPawn) && !BuilderPawn->bPlacedModule && UGearStatics::TraceRoadModule(this, RoadModule, GearGameState->RoadModuleSocketTransform) == ERoadModuleTraceResult::NotColliding)
 		{
 			if (IsValid(AddRoadModule(RoadModule)))
@@ -348,6 +351,32 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 			if (ShouldAddCheckpoint())
 			{
 				AddCheckpoint();
+			}
+		}
+	}
+}
+
+void AGearGameMode::RequestPlaceHazardForPlayer(AGearPlayerController* PC, class UHazardSocketComponent* TargetSocket)
+{
+	if (GearMatchState == EGearMatchState::Placing && IsValid(PC) && IsValid(TargetSocket) && !TargetSocket->IsOccupied())
+	{
+		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
+		if (IsValid(BuilderPawn) && BuilderPawn->RemainingHazardCount > 0 && IsValid(BuilderPawn->SelectedPlaceableClass) && BuilderPawn->SelectedPlaceableClass->IsChildOf<AGearHazard>())
+		{
+			TSubclassOf<AGearPlaceable> SpawnClass = BuilderPawn->SelectedPlaceableClass;
+			AGearHazard* Hazard = AddHazard(SpawnClass, TargetSocket);
+			if (IsValid(Hazard))
+			{
+				TargetSocket->MarkOccupied();
+				BuilderPawn->RemainingHazardCount--;
+
+				if (BuilderPawn->RemainingHazardCount <= 0)
+				{
+					BuilderPawn->SelectedPlaceableClass = nullptr;
+					BuilderPawn->OnRep_SelectedPlaceableClass();
+
+					GearGameState->BroadcastPlacedEvent_Multi(PC->GetPlayerState<AGearPlayerState>(), SpawnClass);
+				}
 			}
 		}
 	}
@@ -379,6 +408,14 @@ AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadM
 	}
 
 	return nullptr;
+}
+
+class AGearHazard* AGearGameMode::AddHazard(TSubclassOf<AGearPlaceable> HazardClass, UHazardSocketComponent* TargetSocket)
+{
+	FTransform SpawnTransform = TargetSocket->GetComponentTransform();
+	AGearHazard* Hazard = GetWorld()->SpawnActor<AGearHazard>(HazardClass, SpawnTransform.GetLocation(), SpawnTransform.Rotator());
+
+	return Hazard;
 }
 
 bool AGearGameMode::ShouldAddCheckpoint() const

@@ -38,6 +38,8 @@ public:
 
 	void RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX);
 
+	void RequestPlaceHazardForPlayer(AGearPlayerController* PC, class UHazardSocketComponent* TargetSocket);
+
 	void VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint);
 
 protected:
@@ -74,6 +76,7 @@ protected:
 	FTimerHandle RacingEndDelayTimerHandle;
 
 	AGearRoadModule* AddRoadModule(TSubclassOf<AGearRoadModule> RoadModule);
+	class AGearHazard* AddHazard(TSubclassOf<AGearPlaceable> HazardClass, UHazardSocketComponent* TargetSocket);
 	bool ShouldAddCheckpoint() const;
 	void AddCheckpoint();
 
