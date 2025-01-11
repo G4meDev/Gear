@@ -32,6 +32,8 @@ public:
 
 	void OnTraceStateChanged(ERoadModuleTraceResult Result);
 
+	void InitializePrebuildMaterials();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* RoadMesh;
 
@@ -73,7 +75,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	ERoadModuleTraceResult TraceReult;
 
+	UPROPERTY()
+ 	TArray<UMaterialInstanceDynamic*> PrebuildMaterials;
 
+	void SetPrebuildState(EPrebuildState State);
 
 #if WITH_EDITORONLY_DATA
 	void UpdateSplineParameters();

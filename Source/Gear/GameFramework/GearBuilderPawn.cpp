@@ -194,6 +194,8 @@ AGearRoadModule* AGearBuilderPawn::SpawnRoadModuleLocally(TSubclassOf<AGearPlace
 		{
 			RoadModule->MarkNotReplicated();
 			UGameplayStatics::FinishSpawningActor(RoadModule, SpawnTransform);
+
+			RoadModule->InitializePrebuildMaterials();
 		}
 		else
 		{

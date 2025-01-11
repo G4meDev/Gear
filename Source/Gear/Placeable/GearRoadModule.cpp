@@ -181,9 +181,43 @@ USceneComponent* AGearRoadModule::GetAttachableSocket()
 	return RoadEndSocketComponent;
 }
 
+void AGearRoadModule::SetPrebuildState(EPrebuildState State)
+{
+	uint8 BuildState = static_cast<uint8>(State);
+
+	for (auto* MID : PrebuildMaterials)
+	{
+		if (IsValid(MID))
+		{
+			MID->SetScalarParameterValue(TEXT("State"), BuildState);
+		}
+	}
+}
+
 void AGearRoadModule::OnTraceStateChanged(ERoadModuleTraceResult Result)
 {
 	SetPrebuildState(Result == ERoadModuleTraceResult::NotColliding ? EPrebuildState::Placable : EPrebuildState::NotPlaceable);
+}
+
+void AGearRoadModule::InitializePrebuildMaterials()
+{
+	TArray<USceneComponent*> PrebuildChildComponents;
+	PrebuildModules->GetChildrenComponents(true, PrebuildChildComponents);
+
+	for (USceneComponent* Child : PrebuildChildComponents)
+	{
+		UStaticMeshComponent* ChildStaticMesh = IsValid(Child) ? Cast<UStaticMeshComponent>(Child) : nullptr;
+		if (IsValid(ChildStaticMesh))
+		{
+			for (int32 i = 0; i < ChildStaticMesh->GetNumMaterials(); i++)
+			{
+				UMaterialInstanceDynamic* MID = ChildStaticMesh->CreateDynamicMaterialInstance(i, PrebuildMaterial);
+				check(MID);
+
+				PrebuildMaterials.Add(MID);
+			}
+		}
+	}
 }
 
 // -----------------------------------------------------------------------------

@@ -87,8 +87,8 @@ protected:
 	UFUNCTION()
 	void OnSelectionBoxTouched(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
 
-	UPROPERTY()
-	TArray<UMaterialInstanceDynamic*> PrebuildMaterials;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMaterialInterface* PrebuildMaterial;
 
 //----------------------------------------------------------------------------
 
@@ -108,6 +108,4 @@ protected:
 	virtual void OnEnabled_End();
 
 	void SetSelectionBoxEnabled(bool bEnabled);
-
-	void SetPrebuildState(EPrebuildState State);
 };

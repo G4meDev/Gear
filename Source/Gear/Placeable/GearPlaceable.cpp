@@ -60,24 +60,8 @@ void AGearPlaceable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void AGearPlaceable::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	TArray<USceneComponent*> PrebuildChildComponents;
-	PrebuildModules->GetChildrenComponents(true, PrebuildChildComponents);
 
-	for (USceneComponent* Child : PrebuildChildComponents)
-	{
-		UStaticMeshComponent* ChildStaticMesh = IsValid(Child) ? Cast<UStaticMeshComponent>(Child) : nullptr;
-		if (IsValid(ChildStaticMesh))
-		{
-			for (int32 i = 0; i < ChildStaticMesh->GetNumMaterials(); i++)
-			{
-				UMaterialInstanceDynamic* MID = ChildStaticMesh->CreateAndSetMaterialInstanceDynamic(i);
-				check(MID);
 
-				PrebuildMaterials.Add(MID);
-			}
-		}
-	}
 }
 
 void AGearPlaceable::Tick(float DeltaTime)
@@ -320,18 +304,5 @@ void AGearPlaceable::SetSelectionBoxEnabled(bool bEnabled)
 	else
 	{
 		SelectionHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-}
-
-void AGearPlaceable::SetPrebuildState(EPrebuildState State)
-{
-	uint8 BuildState = static_cast<uint8>(State);
-
-	for (auto* MID : PrebuildMaterials)
-	{
-		if (IsValid(MID))
-		{
-			MID->SetScalarParameterValue(TEXT("State"), BuildState);
-		}
 	}
 }
