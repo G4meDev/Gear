@@ -22,28 +22,47 @@ public:
 	void SetPreview() override;
 	void SetSelectedBy(AGearBuilderPawn* Player) override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 PlacingCount;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<class AHazardSocketMarker> SocketMarkerClass;
 
 protected:
 	virtual void BeginPlay() override;
 
-#if WITH_EDITORONLY_DATA
+
+	#if WITH_EDITORONLY_DATA
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bDirty = false;
 
-	float RotationPivotHeightOffset = -200.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float SelectionHitboxPadding = 50.0f;
-
 #endif
 
 #if WITH_EDITOR
+
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
-	UFUNCTION(BlueprintNativeEvent)
-	void GetHazardBounds(FVector& Min, FVector& Max);
-
 #endif
+
+// ---------------------------------------------------------------------------------------------------------
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Idle_Start();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Idle_End();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Enabled_Start();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Enabled_End();
+
+	virtual void OnIdle_Start() override;
+	virtual void OnIdle_End() override;
+
+	virtual void OnEnabled_Start() override;
+	virtual void OnEnabled_End() override;
+
 };

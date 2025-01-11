@@ -8,6 +8,8 @@
 #include "Placeable/PlaceableSocket.h"
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
+#include "Placeable/HazardSocketMarker.h"
+#include "Placeable/HazardSocketComponent.h"
 #include "GameSystems/GearStatics.h"
 
 #include "Components/StaticMeshComponent.h"
@@ -48,6 +50,8 @@ AGearBuilderPawn::AGearBuilderPawn()
 	
 	bPlacedModule = false;
 
+	RemainingHazardCount = 0;
+
 	bReplicates = true;
 }
 
@@ -58,6 +62,7 @@ void AGearBuilderPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AGearBuilderPawn, SelectedPlaceable);
 	DOREPLIFETIME(AGearBuilderPawn, SelectedPlaceableClass);
 	DOREPLIFETIME(AGearBuilderPawn, bPlacedModule);
+	DOREPLIFETIME(AGearBuilderPawn, RemainingHazardCount);
 }
 
 void AGearBuilderPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -175,10 +180,9 @@ void AGearBuilderPawn::StartPlacing()
 	else if (SelectedPlaceableClass->IsChildOf<AGearHazard>())
 	{
 		BuilderPawnState = EBuilderPawnState::PlacingHazards;
+		SpawnPlacingHazard();
+		UpdatePlacingHazardMarkers();
 	}
-		
-
-
 }
 
 AGearRoadModule* AGearBuilderPawn::SpawnRoadModuleLocally(TSubclassOf<AGearPlaceable> SpawnClass)
@@ -263,21 +267,89 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 	}
 }
 
+void AGearBuilderPawn::SpawnPlacingHazard()
+{
+	FTransform SpawnTransform = FTransform::Identity;
+	AActor* SpawnedActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), SelectedPlaceableClass, SpawnTransform);
+	PlacingHazard = Cast<AGearHazard>(SpawnedActor);
+
+	if (IsValid(SpawnedActor))
+	{
+		if (IsValid(PlacingHazard))
+		{
+			PlacingHazard->MarkNotReplicated();
+			UGameplayStatics::FinishSpawningActor(PlacingHazard, SpawnTransform);
+		}
+		else
+		{
+			SpawnedActor->Destroy();
+			PlacingHazard = nullptr;
+		}
+	}
+}
+
+void AGearBuilderPawn::UpdatePlacingHazardMarkers()
+{
+	DestroyHazardMarkers();
+
+	if (IsValid(PlacingHazard) && IsValid(PlacingHazard->SocketMarkerClass))
+	{
+		TArray<AActor*> RoadModules;
+		UGameplayStatics::GetAllActorsOfClass(this, AGearRoadModule::StaticClass(), RoadModules);
+
+		for (AActor* RoadModuleActor : RoadModules)
+		{
+			AGearRoadModule* RoadModule = Cast<AGearRoadModule>(RoadModuleActor);
+			if (IsValid(RoadModule))
+			{
+				TInlineComponentArray<UHazardSocketComponent*> HazardSockets;
+				RoadModule->GetComponents<UHazardSocketComponent>(HazardSockets);
+
+				for (UHazardSocketComponent* HazardSocket : HazardSockets)
+				{
+					if (IsValid(HazardSocket))
+					{
+						FTransform SpawnTransform = HazardSocket->GetComponentTransform();
+						AHazardSocketMarker* HazardSocketMarker = GetWorld()->SpawnActor<AHazardSocketMarker>(PlacingHazard->SocketMarkerClass, SpawnTransform.GetLocation(), SpawnTransform.Rotator());
+					}
+				}
+			}
+		}
+	}
+}
+
+void AGearBuilderPawn::DestroyHazardMarkers()
+{
+	TArray<AActor*> HazardMarkers;
+	UGameplayStatics::GetAllActorsOfClass(this, AHazardSocketMarker::StaticClass(), HazardMarkers);
+
+	for (AActor* Actor : HazardMarkers)
+	{
+		if (IsValid(Actor))
+		{
+			Actor->Destroy();
+		}
+	}
+}
+
 void AGearBuilderPawn::Cleanup_SpawnedActors()
 {
-	auto CleanRoadModule = [&](AGearRoadModule * RoadModule)
+	auto CleanActor = [&](AActor* Actor)
 	{
-		if (IsValid(RoadModule))
+		if (IsValid(Actor))
 		{
-			RoadModule->Destroy();
-			RoadModule = nullptr;
+			Actor->Destroy();
+			Actor = nullptr;
 		}
 	};
 
-	CleanRoadModule(PlacingRoadModule);
-	CleanRoadModule(PlacingRoadModule_MirroredX);
-	CleanRoadModule(PlacingRoadModule_MirroredY);
-	CleanRoadModule(PlacingRoadModule_MirroredX_MirroredY);
+	CleanActor(PlacingRoadModule);
+	CleanActor(PlacingRoadModule_MirroredX);
+	CleanActor(PlacingRoadModule_MirroredY);
+	CleanActor(PlacingRoadModule_MirroredX_MirroredY);
+
+	CleanActor(PlacingHazard);
+	DestroyHazardMarkers();
 }
 
 void AGearBuilderPawn::TeleportToRoadEnd()

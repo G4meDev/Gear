@@ -15,6 +15,7 @@
 
 #include "Placeable/GearPlaceable.h"
 #include "Placeable/GearRoadModule.h"
+#include "Placeable/GearHazard.h"
 #include "Placeable/PlaceableSocket.h"
 #include "Placeable/PlaceableSpawnPoint.h"
 #include "Placeable/SpawnableSocket.h"
@@ -497,6 +498,12 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 		{
 			BuilderPawn->SelectedPlaceableClass = BuilderPawn->SelectedPlaceable->GetClass();
 			BuilderPawn->SelectedPlaceable = nullptr;
+
+			if (BuilderPawn->SelectedPlaceableClass->IsChildOf(AGearHazard::StaticClass()))
+			{
+				BuilderPawn->RemainingHazardCount = BuilderPawn->SelectedPlaceableClass->GetDefaultObject<AGearHazard>()->PlacingCount;
+			}
+
 			BuilderPawn->OnRep_SelectedPlaceableClass();
 		}
 	}

@@ -39,6 +39,9 @@ public:
 	UPlaceableSocket* RoadEndSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* HazardSockets;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USplineComponent* RoadSpline;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

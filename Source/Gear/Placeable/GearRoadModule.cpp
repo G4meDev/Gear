@@ -20,6 +20,9 @@ AGearRoadModule::AGearRoadModule()
 	RoadEndSocket = CreateDefaultSubobject<UPlaceableSocket>(TEXT("EndSocket"));
 	RoadEndSocket->SetupAttachment(Root);
 
+	HazardSockets = CreateDefaultSubobject<USceneComponent>(TEXT("HazardSockets"));
+	HazardSockets->SetupAttachment(ModulesStack);
+
 	RoadSpline = CreateDefaultSubobject<USplineComponent>(TEXT("RoadSpline"));
 	RoadSpline->SetupAttachment(Root);
 

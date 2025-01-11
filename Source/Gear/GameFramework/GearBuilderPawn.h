@@ -130,6 +130,17 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY);
 
+
+	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
+	int32 RemainingHazardCount;
+
+	void SpawnPlacingHazard();
+	void UpdatePlacingHazardMarkers();
+	void DestroyHazardMarkers();
+
+	UPROPERTY()
+	class AGearHazard* PlacingHazard;
+
 	void Cleanup_SpawnedActors();
 
 	friend class AGearGameMode;
