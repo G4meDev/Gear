@@ -365,8 +365,11 @@ void AGearGameMode::RequestPlaceHazardForPlayer(AGearPlayerController* PC, class
 			AGearHazard* Hazard = AddHazard(SpawnClass, TargetSocket);
 			if (IsValid(Hazard))
 			{
-				TargetSocket->MarkOccupied();
+				Hazard->SetIdle();
+
 				BuilderPawn->RemainingHazardCount--;
+				TargetSocket->MarkOccupied();
+				TargetSocket->OnRep_Occupied();
 
 				if (BuilderPawn->RemainingHazardCount <= 0)
 				{

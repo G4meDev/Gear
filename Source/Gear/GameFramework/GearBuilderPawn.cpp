@@ -290,7 +290,7 @@ void AGearBuilderPawn::UpdateHazardMarkers()
 
 					for (UHazardSocketComponent* HazardSocket : HazardSockets)
 					{
-						if (IsValid(HazardSocket))
+						if (IsValid(HazardSocket) && !HazardSocket->IsOccupied())
 						{
 							FTransform SpawnTransform = HazardSocket->GetComponentTransform();
 							AHazardSocketMarker* HazardSocketMarker = GetWorld()->SpawnActor<AHazardSocketMarker>(SocketMarkerClass, SpawnTransform.GetLocation(), SpawnTransform.Rotator());

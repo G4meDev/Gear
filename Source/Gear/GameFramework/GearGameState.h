@@ -67,6 +67,9 @@ public:
 
 	void UpdateRoadModuleSocket();
 
+	void MarkActorsIdle();
+	void MarkActorsEnabled();
+
 
 	void ClearOccupiedVehicleStarts();
 	void ClearCheckpointResults();
