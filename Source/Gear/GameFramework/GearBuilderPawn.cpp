@@ -47,8 +47,6 @@ AGearBuilderPawn::AGearBuilderPawn()
 	BuilderPawnState = EBuilderPawnState::Preview;
 	bSelectedMirroredX = false;
 	bSelectedMirroredY = false;
-	
-	bPlacedModule = false;
 
 	RemainingHazardCount = 0;
 
@@ -61,7 +59,6 @@ void AGearBuilderPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(AGearBuilderPawn, SelectedPlaceable);
 	DOREPLIFETIME(AGearBuilderPawn, SelectedPlaceableClass);
-	DOREPLIFETIME(AGearBuilderPawn, bPlacedModule);
 	DOREPLIFETIME(AGearBuilderPawn, RemainingHazardCount);
 }
 
@@ -152,6 +149,7 @@ void AGearBuilderPawn::OnRep_SelectedPlaceableClass()
 
 		else if (SelectedPlaceableClass == nullptr)
 		{
+			BuilderPawnState = EBuilderPawnState::Idle;
 			Cleanup_SpawnedActors();
 		}
 	}
@@ -163,6 +161,7 @@ void AGearBuilderPawn::OnRoadModuleSocketChanged()
 	{
 		UpdatePlacingRoadModule(bSelectedMirroredX, bSelectedMirroredY);
 	}
+
 }
 
 void AGearBuilderPawn::StartPlacing()
@@ -180,7 +179,6 @@ void AGearBuilderPawn::StartPlacing()
 	else if (SelectedPlaceableClass->IsChildOf<AGearHazard>())
 	{
 		BuilderPawnState = EBuilderPawnState::PlacingHazards;
-		SpawnHazard();
 		UpdateHazardMarkers();
 	}
 }
@@ -267,51 +265,36 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 	}
 }
 
-void AGearBuilderPawn::SpawnHazard()
-{
-	FTransform SpawnTransform = FTransform::Identity;
-	AActor* SpawnedActor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), SelectedPlaceableClass, SpawnTransform);
-	PlacingHazard = Cast<AGearHazard>(SpawnedActor);
-
-	if (IsValid(SpawnedActor))
-	{
-		if (IsValid(PlacingHazard))
-		{
-			PlacingHazard->MarkNotReplicated();
-			UGameplayStatics::FinishSpawningActor(PlacingHazard, SpawnTransform);
-		}
-		else
-		{
-			SpawnedActor->Destroy();
-			PlacingHazard = nullptr;
-		}
-	}
-}
-
+// gets called on begin play of road module and occupied event of hazard socket
 void AGearBuilderPawn::UpdateHazardMarkers()
 {
-	DestroyHazardMarkers();
-
-	if (IsValid(PlacingHazard) && IsValid(PlacingHazard->SocketMarkerClass))
+	if (BuilderPawnState == EBuilderPawnState::PlacingHazards)
 	{
-		TArray<AActor*> RoadModules;
-		UGameplayStatics::GetAllActorsOfClass(this, AGearRoadModule::StaticClass(), RoadModules);
+		DestroyHazardMarkers();
 
-		for (AActor* RoadModuleActor : RoadModules)
+		TSubclassOf<AHazardSocketMarker> SocketMarkerClass = SelectedPlaceableClass->GetDefaultObject<AGearHazard>()->SocketMarkerClass;
+
+		if (IsValid(SocketMarkerClass))
 		{
-			AGearRoadModule* RoadModule = Cast<AGearRoadModule>(RoadModuleActor);
-			if (IsValid(RoadModule))
-			{
-				TInlineComponentArray<UHazardSocketComponent*> HazardSockets;
-				RoadModule->GetComponents<UHazardSocketComponent>(HazardSockets);
+			TArray<AActor*> RoadModules;
+			UGameplayStatics::GetAllActorsOfClass(this, AGearRoadModule::StaticClass(), RoadModules);
 
-				for (UHazardSocketComponent* HazardSocket : HazardSockets)
+			for (AActor* RoadModuleActor : RoadModules)
+			{
+				AGearRoadModule* RoadModule = Cast<AGearRoadModule>(RoadModuleActor);
+				if (IsValid(RoadModule))
 				{
-					if (IsValid(HazardSocket))
+					TInlineComponentArray<UHazardSocketComponent*> HazardSockets;
+					RoadModule->GetComponents<UHazardSocketComponent>(HazardSockets);
+
+					for (UHazardSocketComponent* HazardSocket : HazardSockets)
 					{
-						FTransform SpawnTransform = HazardSocket->GetComponentTransform();
-						AHazardSocketMarker* HazardSocketMarker = GetWorld()->SpawnActor<AHazardSocketMarker>(PlacingHazard->SocketMarkerClass, SpawnTransform.GetLocation(), SpawnTransform.Rotator());
-						HazardSocketMarker->TargetSocket = HazardSocket;
+						if (IsValid(HazardSocket))
+						{
+							FTransform SpawnTransform = HazardSocket->GetComponentTransform();
+							AHazardSocketMarker* HazardSocketMarker = GetWorld()->SpawnActor<AHazardSocketMarker>(SocketMarkerClass, SpawnTransform.GetLocation(), SpawnTransform.Rotator());
+							HazardSocketMarker->TargetSocket = HazardSocket;
+						}
 					}
 				}
 			}
@@ -349,7 +332,6 @@ void AGearBuilderPawn::Cleanup_SpawnedActors()
 	CleanActor(PlacingRoadModule_MirroredY);
 	CleanActor(PlacingRoadModule_MirroredX_MirroredY);
 
-	CleanActor(PlacingHazard);
 	DestroyHazardMarkers();
 }
 

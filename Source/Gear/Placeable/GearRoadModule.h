@@ -67,6 +67,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RoadLength;
 
+	UPROPERTY(BlueprintReadOnly)
 	ERoadModuleTraceResult TraceReult;
 
 

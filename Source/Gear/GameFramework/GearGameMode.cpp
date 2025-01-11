@@ -336,15 +336,14 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 	{
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
 
-		// TODO: remove placedmodule and check for road module class
-		if (IsValid(BuilderPawn) && !BuilderPawn->bPlacedModule && UGearStatics::TraceRoadModule(this, RoadModule, GearGameState->RoadModuleSocketTransform) == ERoadModuleTraceResult::NotColliding)
+		if (IsValid(BuilderPawn) && IsValid(BuilderPawn->SelectedPlaceableClass) && BuilderPawn->SelectedPlaceableClass->IsChildOf<AGearRoadModule>()
+			&& UGearStatics::TraceRoadModule(this, RoadModule, GearGameState->RoadModuleSocketTransform) == ERoadModuleTraceResult::NotColliding)
 		{
 			if (IsValid(AddRoadModule(RoadModule)))
 			{
 				BuilderPawn->SelectedPlaceableClass = nullptr;
 				BuilderPawn->OnRep_SelectedPlaceableClass();
 
-				BuilderPawn->bPlacedModule = true;
 				GearGameState->BroadcastPlacedEvent_Multi(PC->GetPlayerState<AGearPlayerState>(), RoadModule);
 			}
 

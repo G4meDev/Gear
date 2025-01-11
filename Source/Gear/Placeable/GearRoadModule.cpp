@@ -7,6 +7,8 @@
 #include "Placeable/PlaceableSocket.h"
 #include "Components/SplineComponent.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/GearBuilderPawn.h"
+#include "GameFramework/GearPlayerController.h"
 #include "Net/UnrealNetwork.h"
 
 AGearRoadModule::AGearRoadModule()
@@ -57,7 +59,18 @@ void AGearRoadModule::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* const PlayerController = Iterator->Get();
+		if (IsValid(PlayerController) && PlayerController->IsLocalController())
+		{
+			AGearBuilderPawn* BuilderPawn = PlayerController->GetPawn<AGearBuilderPawn>();
+			if (IsValid(BuilderPawn))
+			{
+				BuilderPawn->UpdateHazardMarkers();
+			}
+		}
+	}
 }
 
 #if WITH_EDITOR

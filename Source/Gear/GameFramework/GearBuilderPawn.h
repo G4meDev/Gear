@@ -21,7 +21,7 @@ enum class EBuilderPawnState : uint8
 	Preview,
 	PlacingRoadModules,
 	PlacingHazards,
-	Waiting
+	Idle
 };
 
 UCLASS()
@@ -53,9 +53,6 @@ public:
 	void OnRep_SelectedPlaceableClass();
 
 	void OnRoadModuleSocketChanged();
-
-	UPROPERTY(Replicated, BlueprintReadOnly)
-	bool bPlacedModule;
 
 protected:
 	
@@ -125,6 +122,7 @@ protected:
 
 	void SpawnPlacingRoadModules();
 
+	UFUNCTION(BlueprintPure)
 	AGearRoadModule* GetActiveRoadModule();
 
 	UFUNCTION(BlueprintCallable)
@@ -134,17 +132,14 @@ protected:
 	UPROPERTY(Replicated, BlueprintReadWrite, VisibleInstanceOnly)
 	int32 RemainingHazardCount;
 
-	void SpawnHazard();
 	void UpdateHazardMarkers();
 	void DestroyHazardMarkers();
-
-	UPROPERTY()
-	class AGearHazard* PlacingHazard;
 
 	void Cleanup_SpawnedActors();
 
 	friend class AGearGameMode;
 	friend class UHazardSocketComponent;
+	friend class AGearRoadModule;
 
 private:
 
