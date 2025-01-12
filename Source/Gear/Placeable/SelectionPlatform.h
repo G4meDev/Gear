@@ -19,10 +19,28 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* PlatformMesh;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* Socket_1;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* Socket_2;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* Socket_3;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* Socket_4;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* Socket_5;
+
 public:	
 	ASelectionPlatform();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY()
+	TArray<USceneComponent*> Sockets;
 
 protected:
 };

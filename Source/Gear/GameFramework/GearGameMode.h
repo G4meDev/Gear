@@ -93,7 +93,6 @@ protected:
 	void SpawnNewPlaceables();
 
 	bool LoadPlaceables();
-	bool LoadPlaceableSpawnPoints();
 	
 	// --------------------------------------------------------------------------
 
@@ -125,5 +124,4 @@ protected:
 	float CheckpointDistance;
 	
 	TArray<FPlaceableDescription> AvaliablePlaceables;
-	TArray<APlaceableSpawnPoint*> HazardPreviewSpawnPoints;
 };

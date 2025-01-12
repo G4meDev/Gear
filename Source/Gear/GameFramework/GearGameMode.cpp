@@ -16,7 +16,6 @@
 #include "Placeable/GearPlaceable.h"
 #include "Placeable/GearRoadModule.h"
 #include "Placeable/GearHazard.h"
-#include "Placeable/PlaceableSpawnPoint.h"
 #include "Placeable/SpawnableSocket.h"
 #include "Placeable/HazardSocketComponent.h"
 #include "Placeable/SelectionPlatform.h"
@@ -51,12 +50,6 @@ void AGearGameMode::BeginPlay()
 	if (!LoadPlaceables())
 	{
 		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards found"));
-		bFailed = true;
-	}
-
-	if (!LoadPlaceableSpawnPoints())
-	{
-		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards preview spawn point found"));
 		bFailed = true;
 	}
 
@@ -194,7 +187,7 @@ void AGearGameMode::SpawnNewBuilderPawns()
 		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
 		if (IsValid(PlayerController))
 		{
-			AGearBuilderPawn* BuilderPawn = GetWorld()->SpawnActor<AGearBuilderPawn>(DefaultPawnClass);
+			AGearBuilderPawn* BuilderPawn = GetWorld()->SpawnActor<AGearBuilderPawn>(DefaultPawnClass, SelectionPlatform->GetActorLocation(), FRotator::ZeroRotator);
 			PlayerController->Possess(BuilderPawn);
 		}
 	}
@@ -204,14 +197,13 @@ void AGearGameMode::SpawnNewPlaceables()
 {
 	PreviewPlaceables.Empty(5);
 
-	for (APlaceableSpawnPoint* SpawnPoint : HazardPreviewSpawnPoints)
+	for (USceneComponent* Socket : SelectionPlatform->Sockets)
 	{
-		// TODO: implement hazard spawning logic, for now spawn randomly
-		TSubclassOf<AGearPlaceable>& SpawnClass = AvaliablePlaceables[ FMath::RandRange(0, AvaliablePlaceables.Num()-1) ].Class;
+		TSubclassOf<AGearPlaceable>& SpawnClass = AvaliablePlaceables[FMath::RandRange(0, AvaliablePlaceables.Num() - 1)].Class;
 
-		AGearPlaceable* PlaceableActor = GetWorld()->SpawnActor<AGearPlaceable>(SpawnClass, SpawnPoint->GetTransform());
+		AGearPlaceable* PlaceableActor = GetWorld()->SpawnActor<AGearPlaceable>(SpawnClass, Socket->GetComponentLocation(), Socket->GetComponentRotation());
 		PlaceableActor->SetPreview();
-		PlaceableActor->AttachToSpawnPoint(SpawnPoint);
+		PlaceableActor->AttachPlaceableToComponent(Socket);
 
 		PreviewPlaceables.Add(PlaceableActor);
 	}
@@ -252,25 +244,6 @@ bool AGearGameMode::LoadPlaceables()
 	}
 
 	return false;
-}
-
-bool AGearGameMode::LoadPlaceableSpawnPoints()
-{
-	HazardPreviewSpawnPoints.Empty(5);
-	
-	TArray<AActor*> SpawnActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlaceableSpawnPoint::StaticClass(), SpawnActors);
-
-	for (AActor* Actor : SpawnActors)
-	{
-		APlaceableSpawnPoint* SpawnPoint = Cast<APlaceableSpawnPoint>(Actor);
-		if (IsValid(SpawnPoint))
-		{
-			HazardPreviewSpawnPoints.Add(SpawnPoint);
-		}
-	}
-
-	return HazardPreviewSpawnPoints.Num() == 5;
 }
 
 bool AGearGameMode::IsEveryPlayerEliminated() const

@@ -9,7 +9,6 @@
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearBuilderPawn.h"
-#include "Placeable/PlaceableSpawnPoint.h"
 
 AGearPlaceable::AGearPlaceable()
 {
@@ -184,9 +183,9 @@ bool AGearPlaceable::HasOwningPlayer() const
 	return IsValid(OwningPlayer);
 }
 
-void AGearPlaceable::AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint)
+void AGearPlaceable::AttachPlaceableToComponent(USceneComponent* Component)
 {
-	AttachToActor(SpawnPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	AttachToComponent(Component, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	SetActorScale3D(FVector(PreviewScale));
 	SetActorRelativeLocation(-PreviewRotationPivot->GetRelativeLocation() * PreviewScale);
 }

@@ -69,7 +69,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float PreviewScale;
 
-	void AttachToSpawnPoint(APlaceableSpawnPoint* SpawnPoint);
+	void AttachPlaceableToComponent(USceneComponent* Component);
 
 	UFUNCTION()
 	void OnRep_PlaceableState(EPlaceableState OldState);
