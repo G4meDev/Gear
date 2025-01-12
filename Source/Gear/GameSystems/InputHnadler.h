@@ -1,0 +1,50 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+struct FMouseInputHandler
+{	
+protected:
+
+	FKey Key;
+	FVector2D Velocity;
+	FVector2D Value;
+	bool bHoldingKey;
+
+public:
+	FMouseInputHandler();
+
+	void Init(const FKey& InKey);
+
+	void Tick(APlayerController* PC);
+
+	FVector2D GetVelocity() const;
+	FVector2D GetValue() const;
+
+	bool IsHoldingKey() const;
+};
+
+
+struct FTouchInputHandler
+{
+protected:
+
+	ETouchIndex::Type TouchIndex;
+	FVector2D Velocity;
+	FVector2D Value;
+	bool bHoldingTouch;
+
+public:
+	FTouchInputHandler();
+
+	void Init(ETouchIndex::Type InTouchIndex);
+
+	void Tick(APlayerController* PC);
+
+	FVector2D GetVelocity() const;
+	FVector2D GetValue() const;
+
+	bool IsHoldingTouch() const;
+};

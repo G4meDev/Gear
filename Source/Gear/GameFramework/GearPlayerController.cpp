@@ -22,11 +22,6 @@ AGearPlayerController::AGearPlayerController()
 	bAutoManageActiveCameraTarget = false;
 
 	IsReady = false;
-
-	bDraggingTouch_1 = false;
-	bDraggingTouch_2 = false;
-	LastTouch_1 = FVector2D::ZeroVector;
-	LastTouch_2 = FVector2D::ZeroVector;
 }
 
 void AGearPlayerController::PostInitializeComponents()
@@ -48,6 +43,18 @@ void AGearPlayerController::BeginPlay()
 				InputSystem->AddMappingContext(InputMappingContext, 0);
 			}
 		}
+
+#if PLATFORM_WINDOWS
+
+		LeftMouseInputHandler.Init(EKeys::LeftMouseButton);
+		RightMouseInputHandler.Init(EKeys::RightMouseButton);
+
+#elif PLATFORM_ANDROID
+
+		Touch1_InputHandler.Init(ETouchIndex::Touch1);
+		Touch2_InputHandler.Init(ETouchIndex::Touch2);
+
+#endif
 
 
 		AGearHUD* GearHUD = GetHUD<AGearHUD>();
@@ -75,111 +82,43 @@ void AGearPlayerController::Tick(float DeltaSeconds)
 
 	if (IsLocalController())
 	{
-		UpdatePinchValueAndInjectInput();
-		UpdateScreenDragValueAndInjectInput();
-		
+		UpdateAndInjectInputs();
 	}
 }
 
-void AGearPlayerController::UpdateScreenDragValueAndInjectInput()
+void AGearPlayerController::UpdateAndInjectInputs()
 {
-	bool bKeyDown = false;
-	FVector2D KeyPosition = FVector2D(0.0f);
-
-#if PLATFORM_WINDOWS
-
-	bKeyDown = IsInputKeyDown(EKeys::LeftMouseButton);
-	GetMousePosition(KeyPosition.X, KeyPosition.Y);
-
-#elif PLATFORM_ANDROID
-
-	GetInputTouchState(ETouchIndex::Touch1, KeyPosition.X, KeyPosition.Y, bKeyDown);
-
-#endif
-
-	FVector2D ScreenDragValue;
-
-	if (!bKeyDown)
-	{
-		ScreenDragValue = FVector2D::Zero();
-		LastTouch_1 = FVector2D::Zero();
-		bDraggingTouch_1 = false;
-	}
-
-	// just started dragging
-	else if (bKeyDown && !bDraggingTouch_1)
-	{
-		ScreenDragValue = FVector2D::Zero();
-		LastTouch_1 = KeyPosition;
-		bDraggingTouch_1 = true;
-	}
-
-	else
-	{
-		ScreenDragValue = KeyPosition - LastTouch_1;
-		LastTouch_1 = KeyPosition;
-		bDraggingTouch_1 = true;
-	}
-
-	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-	{
-		if (IsValid(MoveScreenAction))
-		{
-// 			int32 SizeX;
-// 			int32 SizeY;
-// 			GetViewportSize(SizeX, SizeY);
-// 
-// 			ScreenDragValue /= FVector2D(SizeX, SizeY);
-			
-			TArray<UInputModifier*> Modifiers;
-			TArray<UInputTrigger*> Triggers;
-
-			InputSystem->InjectInputForAction(MoveScreenAction, FInputActionValue(FInputActionValue::Axis2D(ScreenDragValue)), Modifiers, Triggers);
-		}
-	}
-
-}
-
-void AGearPlayerController::UpdatePinchValueAndInjectInput()
-{
+	FVector2D ScreenDragValue = FVector2D::ZeroVector;
 	float PinchValue = 0.0f;
 
 #if PLATFORM_WINDOWS
 
-	FVector2D KeyPosition;
-	bool bKeyDown = IsInputKeyDown(EKeys::RightMouseButton);
-	GetMousePosition(KeyPosition.X, KeyPosition.Y);
+	LeftMouseInputHandler.Tick(this);
+	RightMouseInputHandler.Tick(this);
 
-	if (!bKeyDown)
-	{
-		LastTouch_2 = FVector2D::ZeroVector;
-		bDraggingTouch_2 = false;
-	}
-
-	else if (bKeyDown && !bDraggingTouch_2)
-	{
-		LastTouch_2 = KeyPosition;
-		bDraggingTouch_2 = true;
-	}
-
-	else
-	{
-		PinchValue = KeyPosition.X - LastTouch_2.X;
-		LastTouch_2 = KeyPosition;
-	}
-
+	ScreenDragValue = LeftMouseInputHandler.GetVelocity();
+	PinchValue = RightMouseInputHandler.GetVelocity().X;
 
 #elif PLATFORM_ANDROID
+
+	Touch1_InputHandler.Tick(this);
+
+	ScreenDragValue = Touch1_InputHandler.GetVelocity();
 
 #endif
 
 	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 	{
+		TArray<UInputModifier*> Modifiers;
+		TArray<UInputTrigger*> Triggers;
+
+		if (IsValid(MoveScreenAction))
+		{
+			InputSystem->InjectInputForAction(MoveScreenAction, FInputActionValue(FInputActionValue::Axis2D(ScreenDragValue)), Modifiers, Triggers);
+		}
+
 		if (IsValid(PinchAction))
 		{
-			TArray<UInputModifier*> Modifiers;
-			TArray<UInputTrigger*> Triggers;
-
 			InputSystem->InjectInputForAction(PinchAction, FInputActionValue(FInputActionValue::Axis1D(PinchValue)), Modifiers, Triggers);
 		}
 	}

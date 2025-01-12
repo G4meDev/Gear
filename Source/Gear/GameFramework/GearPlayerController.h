@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/GearTypes.h"
+#include "GameSystems/InputHnadler.h"
 #include "GearPlayerController.generated.h"
 
 class AGearPlayerState;
@@ -40,13 +41,19 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* PinchAction;
 
-	FVector2D LastTouch_1;
-	FVector2D LastTouch_2;
-	bool bDraggingTouch_1;
-	bool bDraggingTouch_2;
+	void UpdateAndInjectInputs();
 
-	void UpdateScreenDragValueAndInjectInput();
-	void UpdatePinchValueAndInjectInput();
+#if PLATFORM_WINDOWS
+
+	FMouseInputHandler RightMouseInputHandler;
+	FMouseInputHandler LeftMouseInputHandler;
+
+#elif PLATFORM_ANDROID
+
+	FTouchInputHandler Touch1_InputHandler;
+	FTouchInputHandler Touch2_InputHandler;
+
+#endif
 
 public:
 
