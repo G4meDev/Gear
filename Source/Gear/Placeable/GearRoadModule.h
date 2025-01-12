@@ -119,4 +119,6 @@ protected:
 
 	virtual void OnEnabled_Start() override;
 	virtual void OnEnabled_End() override;
+
+	friend class AGearBuilderPawn;
 };
