@@ -19,6 +19,7 @@
 #include "Placeable/PlaceableSpawnPoint.h"
 #include "Placeable/SpawnableSocket.h"
 #include "Placeable/HazardSocketComponent.h"
+#include "Placeable/SelectionPlatform.h"
 
 #include "Utils/GameVariablesBFL.h"
 #include "kismet/GameplayStatics.h"
@@ -174,6 +175,16 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 bool AGearGameMode::ShouldAbort()
 {
 	return NumTravellingPlayers == 0 && NumPlayers < 2;
+}
+
+void AGearGameMode::SpawnSelectionPlatform()
+{
+	FVector SpawnLocation = FVector
+		( (GearGameState->WorldMin.X + GearGameState->WorldMax.X) / 2
+		, (GearGameState->WorldMin.Y + GearGameState->WorldMax.Y) / 2
+		, GearGameState->WorldMax.Z + 500.0f);
+
+	SelectionPlatform = GetWorld()->SpawnActor<ASelectionPlatform>(SelectionPlatformClass, SpawnLocation, FRotator::ZeroRotator);
 }
 
 void AGearGameMode::SpawnNewBuilderPawns()
@@ -400,6 +411,9 @@ AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadM
 		GearGameState->RoadModuleStack.Add(SpawnRoadModule);
 		GearGameState->OnModuleStackChanged();
 
+		GearGameState->WorldMin = FVector::Min(GearGameState->WorldMin, SpawnRoadModule->GetActorLocation());
+		GearGameState->WorldMax = FVector::Max(GearGameState->WorldMax, SpawnRoadModule->GetActorLocation());
+
 		return SpawnRoadModule;
 	}
 
@@ -496,6 +510,7 @@ void AGearGameMode::AssignPlaceablesToUnowningPlayers()
 
 void AGearGameMode::StartSelectingPlaceables()
 {
+	SpawnSelectionPlatform();
 	SpawnNewBuilderPawns();
 	SpawnNewPlaceables();
 
@@ -550,6 +565,8 @@ void AGearGameMode::StartPlaceing(bool bEveryPlayerIsReady)
 	{
 		PreviewPlaceable->Destroy();
 	}
+
+	SelectionPlatform->Destroy();
 
 	UE_LOG(LogTemp, Warning, TEXT("start placing pieces"));
 	SetGearMatchState(EGearMatchState::Placing);

@@ -88,6 +88,7 @@ protected:
 
 	bool ShouldAbort();
 
+	void SpawnSelectionPlatform();
 	void SpawnNewBuilderPawns();
 	void SpawnNewPlaceables();
 
@@ -113,6 +114,12 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<ACheckpoint> CheckpointClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<class ASelectionPlatform> SelectionPlatformClass;
+
+	UPROPERTY()
+	class ASelectionPlatform* SelectionPlatform;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float CheckpointDistance;

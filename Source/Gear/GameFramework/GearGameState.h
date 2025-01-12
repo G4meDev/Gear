@@ -132,6 +132,11 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleSocketTransform, BlueprintReadOnly)
 	FTransform RoadModuleSocketTransform;
 
+	UPROPERTY(Replicated)
+	FVector WorldMin;
+	UPROPERTY(Replicated)
+	FVector WorldMax;
+
 //---------------------------------------------------------------------------------------------------------------------------
 
 	UFUNCTION(NetMulticast, Reliable)

@@ -31,6 +31,9 @@ AGearGameState::AGearGameState()
 	FurthestReachedDistace = 0.0f;
 	FurthestReachedCheckpoint = 0;
 	RoundNumber = 0;
+
+	WorldMin = FVector::ZeroVector;
+	WorldMax = FVector::ZeroVector;
 }
 
 void AGearGameState::Tick(float DeltaSeconds)
@@ -60,6 +63,8 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpoint);
 	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpointTime);
 	DOREPLIFETIME(AGearGameState, RoadModuleSocketTransform);
+	DOREPLIFETIME(AGearGameState, WorldMin);
+	DOREPLIFETIME(AGearGameState, WorldMax);
 }
 
 void AGearGameState::BeginPlay()
