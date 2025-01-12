@@ -15,6 +15,7 @@
 #include "GameFramework/SpringarmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Engine/Targetpoint.h"
 #include "EnhancedInputComponent.h"
 #include "Components/InputComponent.h"
@@ -42,6 +43,10 @@ AGearBuilderPawn::AGearBuilderPawn()
 	Drag = 4.0f;
 	ScreenDragValue = FVector2D::Zero();
 	Velocity = FVector2D::Zero();
+
+	PinchValue = 0.0f;
+	ZoomMovementStrength = 100.0f;
+
 	WorldConstraintPadding = FVector(10000.0f, 10000.0f, 500.0f);
 
 	BuilderPawnState = EBuilderPawnState::Preview;
@@ -76,6 +81,9 @@ void AGearBuilderPawn::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	Input->BindAction(MoveScreenAction, ETriggerEvent::Triggered, this, &AGearBuilderPawn::MoveScreenInputTrigger);
 	Input->BindAction(MoveScreenAction, ETriggerEvent::Completed, this, &AGearBuilderPawn::MoveScreenInputCompleted);
+
+	Input->BindAction(PinchAction, ETriggerEvent::Triggered, this, &AGearBuilderPawn::PinchInputTrigger);
+	Input->BindAction(PinchAction, ETriggerEvent::Completed, this, &AGearBuilderPawn::PinchInputCompleted);
 }
 
 void AGearBuilderPawn::MoveScreenInputTrigger(const FInputActionInstance& Instance)
@@ -87,6 +95,16 @@ void AGearBuilderPawn::MoveScreenInputTrigger(const FInputActionInstance& Instan
 void AGearBuilderPawn::MoveScreenInputCompleted(const FInputActionInstance& Instance)
 {
 	ScreenDragValue = FVector2D::Zero();
+}
+
+void AGearBuilderPawn::PinchInputTrigger(const FInputActionInstance& Instance)
+{
+	PinchValue = Instance.GetValue().Get<float>();
+}
+
+void AGearBuilderPawn::PinchInputCompleted(const FInputActionInstance& Instance)
+{
+	PinchValue = 0.0f;
 }
 
 void AGearBuilderPawn::BeginPlay()
@@ -118,12 +136,25 @@ void AGearBuilderPawn::Tick(float DeltaTime)
 	if (IsLocallyControlled() && bCanMove)
 	{
 		Move(DeltaTime);
-		ConstraintPawnToWorldBuonds();
 	}
 }
 
 void AGearBuilderPawn::Move(float DeltaTime)
 {
+	AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();
+	if (!IsValid(GearGameState))
+	{
+		return;
+	}
+
+	FVector WorldMin;
+	FVector WorldMax;
+	GearGameState->GetWorldBounds(WorldMin, WorldMax);
+
+	FBox WorldBound = FBox(WorldMin, WorldMax);
+	WorldBound = WorldBound.ExpandBy(WorldConstraintPadding);
+
+
 	Velocity += -ScreenDragValue * MovementSpeed * DeltaTime;
 
 	if (Velocity.IsNearlyZero(KINDA_SMALL_NUMBER))
@@ -146,26 +177,49 @@ void AGearBuilderPawn::Move(float DeltaTime)
 
 		SetActorLocation(GetActorLocation() + DeltaLocation);
 	}
-}
 
-void AGearBuilderPawn::ConstraintPawnToWorldBuonds()
-{
-	AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();
-
-	if (IsValid(GearGameState))
+	if (PinchValue != 0.0f)
 	{
-		FVector WorldMin;
-		FVector WorldMax;
-		GearGameState->GetWorldBounds(WorldMin, WorldMax);
+		FVector LookDir = GetActorLocation() - Camera->GetComponentLocation();
+		LookDir.Normalize();
+		FVector DisplacementVector = LookDir * PinchValue * ZoomMovementStrength * DeltaTime;
+		
+		float Z = GetActorLocation().Z + DisplacementVector.Z;
 
-		FBox WorldBound = FBox(WorldMin, WorldMax);
-		WorldBound = WorldBound.ExpandBy(WorldConstraintPadding);
-
-		if (!WorldBound.IsInsideOrOn(GetActorLocation()))
+		if (Z > WorldBound.Max.Z)
 		{
-			Velocity = FVector2D::ZeroVector;
-			SetActorLocation(WorldBound.GetClosestPointTo(GetActorLocation()));
+			float H = WorldMax.Z - GetActorLocation().Z;
+			if (H > 0)
+			{
+				float A = H * DisplacementVector.Length() / DisplacementVector.Z;
+				DisplacementVector = DisplacementVector.GetSafeNormal() * A;
+			}
+			else
+			{
+				DisplacementVector = FVector::ZeroVector;
+			}
 		}
+		else if (Z < WorldBound.Min.Z)
+		{
+			float H = GetActorLocation().Z - WorldMin.Z;
+			if (H > 0)
+			{
+				float A = H * DisplacementVector.Length() / -DisplacementVector.Z;
+				DisplacementVector = DisplacementVector.GetSafeNormal() * A;
+			}
+			else
+			{
+				DisplacementVector = FVector::ZeroVector;
+			}
+		}
+
+		SetActorLocation(GetActorLocation() + DisplacementVector);
+	}
+
+	if (!WorldBound.IsInsideOrOn(GetActorLocation()))
+	{
+		Velocity = FVector2D::ZeroVector;
+		SetActorLocation(WorldBound.GetClosestPointTo(GetActorLocation()));
 	}
 }
 

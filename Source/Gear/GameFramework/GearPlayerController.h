@@ -37,11 +37,16 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* MoveScreenAction;
 
-	FVector2D LastDragPosition;
-	bool bDraging;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInputAction* PinchAction;
+
+	FVector2D LastTouch_1;
+	FVector2D LastTouch_2;
+	bool bDraggingTouch_1;
+	bool bDraggingTouch_2;
 
 	void UpdateScreenDragValueAndInjectInput();
-	void UpdateZoomValueAndInjectInput();
+	void UpdatePinchValueAndInjectInput();
 
 public:
 

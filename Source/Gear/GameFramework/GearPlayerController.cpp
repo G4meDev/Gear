@@ -23,8 +23,10 @@ AGearPlayerController::AGearPlayerController()
 
 	IsReady = false;
 
-	bDraging = false;
-	LastDragPosition = FVector2D::Zero();
+	bDraggingTouch_1 = false;
+	bDraggingTouch_2 = false;
+	LastTouch_1 = FVector2D::ZeroVector;
+	LastTouch_2 = FVector2D::ZeroVector;
 }
 
 void AGearPlayerController::PostInitializeComponents()
@@ -73,7 +75,7 @@ void AGearPlayerController::Tick(float DeltaSeconds)
 
 	if (IsLocalController())
 	{
-		UpdateZoomValueAndInjectInput();
+		UpdatePinchValueAndInjectInput();
 		UpdateScreenDragValueAndInjectInput();
 		
 	}
@@ -100,23 +102,23 @@ void AGearPlayerController::UpdateScreenDragValueAndInjectInput()
 	if (!bKeyDown)
 	{
 		ScreenDragValue = FVector2D::Zero();
-		LastDragPosition = FVector2D::Zero();
-		bDraging = false;
+		LastTouch_1 = FVector2D::Zero();
+		bDraggingTouch_1 = false;
 	}
 
 	// just started dragging
-	else if (bKeyDown && !bDraging)
+	else if (bKeyDown && !bDraggingTouch_1)
 	{
 		ScreenDragValue = FVector2D::Zero();
-		LastDragPosition = KeyPosition;
-		bDraging = true;
+		LastTouch_1 = KeyPosition;
+		bDraggingTouch_1 = true;
 	}
 
 	else
 	{
-		ScreenDragValue = KeyPosition - LastDragPosition;
-		LastDragPosition = KeyPosition;
-		bDraging = true;
+		ScreenDragValue = KeyPosition - LastTouch_1;
+		LastTouch_1 = KeyPosition;
+		bDraggingTouch_1 = true;
 	}
 
 	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
@@ -138,9 +140,49 @@ void AGearPlayerController::UpdateScreenDragValueAndInjectInput()
 
 }
 
-void AGearPlayerController::UpdateZoomValueAndInjectInput()
+void AGearPlayerController::UpdatePinchValueAndInjectInput()
 {
+	float PinchValue = 0.0f;
 
+#if PLATFORM_WINDOWS
+
+	FVector2D KeyPosition;
+	bool bKeyDown = IsInputKeyDown(EKeys::RightMouseButton);
+	GetMousePosition(KeyPosition.X, KeyPosition.Y);
+
+	if (!bKeyDown)
+	{
+		LastTouch_2 = FVector2D::ZeroVector;
+		bDraggingTouch_2 = false;
+	}
+
+	else if (bKeyDown && !bDraggingTouch_2)
+	{
+		LastTouch_2 = KeyPosition;
+		bDraggingTouch_2 = true;
+	}
+
+	else
+	{
+		PinchValue = KeyPosition.X - LastTouch_2.X;
+		LastTouch_2 = KeyPosition;
+	}
+
+
+#elif PLATFORM_ANDROID
+
+#endif
+
+	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+	{
+		if (IsValid(PinchAction))
+		{
+			TArray<UInputModifier*> Modifiers;
+			TArray<UInputTrigger*> Triggers;
+
+			InputSystem->InjectInputForAction(PinchAction, FInputActionValue(FInputActionValue::Axis1D(PinchValue)), Modifiers, Triggers);
+		}
+	}
 }
 
 void AGearPlayerController::ClientStateAllPlayersJoined()

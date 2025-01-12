@@ -39,8 +39,6 @@ public:
 
 	void Move(float DeltaTime);
 
-	void ConstraintPawnToWorldBuonds();
-
 	void StartPlacing();
 
 	UFUNCTION(BlueprintCallable)
@@ -71,8 +69,10 @@ protected:
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void MoveScreenInputTrigger(const FInputActionInstance& Instance);
-
 	void MoveScreenInputCompleted(const FInputActionInstance& Instance);
+
+	void PinchInputTrigger(const FInputActionInstance& Instance);
+	void PinchInputCompleted(const FInputActionInstance& Instance);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* ViewTarget;
@@ -85,6 +85,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* MoveScreenAction;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInputAction* PinchAction;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float MovementSpeed;
@@ -100,6 +103,9 @@ protected:
 
 	FVector2D ScreenDragValue;
 	FVector2D Velocity;
+
+	float PinchValue;
+	float ZoomMovementStrength;
 
 	bool bCanMove;
 
