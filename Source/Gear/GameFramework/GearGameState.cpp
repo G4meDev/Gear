@@ -572,6 +572,12 @@ float AGearGameState::TimeFromLastTransition() const
 	return GetServerWorldTimeSeconds() - LastGameStateTransitionTime;
 }
 
+void AGearGameState::GetWorldBounds(FVector& World_Min, FVector& World_Max)
+{
+	World_Min = WorldMin;
+	World_Max = WorldMax;
+}
+
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);

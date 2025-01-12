@@ -42,6 +42,7 @@ AGearBuilderPawn::AGearBuilderPawn()
 	Drag = 4.0f;
 	ScreenDragValue = FVector2D::Zero();
 	Velocity = FVector2D::Zero();
+	WorldConstraintPadding = 10000.0f;
 
 	BuilderPawnState = EBuilderPawnState::Preview;
 	bSelectedMirroredX = false;
@@ -116,27 +117,54 @@ void AGearBuilderPawn::Tick(float DeltaTime)
 
 	if (IsLocallyControlled() && bCanMove)
 	{
-		Velocity += -ScreenDragValue * MovementSpeed * DeltaTime;
+		Move(DeltaTime);
+		ConstraintPawnToWorldBuonds();
+	}
+}
 
-		if (Velocity.IsNearlyZero(KINDA_SMALL_NUMBER))
+void AGearBuilderPawn::Move(float DeltaTime)
+{
+	Velocity += -ScreenDragValue * MovementSpeed * DeltaTime;
+
+	if (Velocity.IsNearlyZero(KINDA_SMALL_NUMBER))
+	{
+		Velocity = FVector2D::Zero();
+	}
+
+	else
+	{
+		float VelocityMagnitude = Velocity.Length();
+		Velocity.Normalize();
+
+		VelocityMagnitude = FMath::FInterpTo(VelocityMagnitude, 0.0f, DeltaTime, Drag);
+		VelocityMagnitude = FMath::FInterpConstantTo(VelocityMagnitude, 0.0f, DeltaTime, Damping);
+
+		Velocity *= VelocityMagnitude;
+
+		FVector Velocity3D = FVector(Velocity.X, Velocity.Y, 0);
+		FVector DeltaLocation = GetTransform().InverseTransformVectorNoScale(Velocity3D);
+
+		SetActorLocation(GetActorLocation() + DeltaLocation);
+	}
+}
+
+void AGearBuilderPawn::ConstraintPawnToWorldBuonds()
+{
+	AGearGameState* GearGameState = GetWorld()->GetGameState<AGearGameState>();
+
+	if (IsValid(GearGameState))
+	{
+		FVector WorldMin;
+		FVector WorldMax;
+		GearGameState->GetWorldBounds(WorldMin, WorldMax);
+
+		FBox WorldBound = FBox(WorldMin, WorldMax);
+		WorldBound = WorldBound.ExpandBy(WorldConstraintPadding);
+
+		if (!WorldBound.IsInsideOrOn(GetActorLocation()))
 		{
-			Velocity = FVector2D::Zero();
-		}
-
-		else
-		{
-			float VelocityMagnitude = Velocity.Length();
-			Velocity.Normalize();
-			
-			VelocityMagnitude = FMath::FInterpTo(VelocityMagnitude, 0.0f, DeltaTime, Drag);
-			VelocityMagnitude = FMath::FInterpConstantTo(VelocityMagnitude, 0.0f, DeltaTime, Damping);
-
-			Velocity *= VelocityMagnitude;
-
-			FVector Velocity3D = FVector(Velocity.X, Velocity.Y, 0);
-			FVector DeltaLocation = GetTransform().InverseTransformVectorNoScale(Velocity3D);
-
-			SetActorLocation(GetActorLocation() + DeltaLocation);
+			Velocity = FVector2D::ZeroVector;
+			SetActorLocation(WorldBound.GetClosestPointTo(GetActorLocation()));
 		}
 	}
 }

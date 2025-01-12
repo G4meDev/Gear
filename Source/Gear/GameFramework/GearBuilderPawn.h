@@ -37,6 +37,10 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void Move(float DeltaTime);
+
+	void ConstraintPawnToWorldBuonds();
+
 	void StartPlacing();
 
 	UFUNCTION(BlueprintCallable)
@@ -90,6 +94,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Drag;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float WorldConstraintPadding;
 
 	FVector2D ScreenDragValue;
 	FVector2D Velocity;

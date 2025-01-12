@@ -89,6 +89,8 @@ public:
 
 	float TimeFromLastTransition() const;
 
+	void GetWorldBounds(FVector& World_Min, FVector& World_Max);
+
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
 
@@ -134,11 +136,6 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleSocketTransform, BlueprintReadOnly)
 	FTransform RoadModuleSocketTransform;
 
-	UPROPERTY(Replicated)
-	FVector WorldMin;
-	UPROPERTY(Replicated)
-	FVector WorldMax;
-
 //---------------------------------------------------------------------------------------------------------------------------
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -170,6 +167,11 @@ protected:
 	
 //----------------------------------------------------------------------------------------------------------------------------
 
+	UPROPERTY(Replicated)
+	FVector WorldMin;
+	UPROPERTY(Replicated)
+	FVector WorldMax;
+
  	UPROPERTY(BlueprintReadWrite, EditAnywhere)
  	TSubclassOf<UUserWidget> NotifictionBoardClass;
 
@@ -184,4 +186,6 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USoundBase* PlacedSound;
+
+	friend class AGearGameMode;
 };
