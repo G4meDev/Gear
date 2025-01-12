@@ -42,7 +42,7 @@ AGearBuilderPawn::AGearBuilderPawn()
 	Drag = 4.0f;
 	ScreenDragValue = FVector2D::Zero();
 	Velocity = FVector2D::Zero();
-	WorldConstraintPadding = 10000.0f;
+	WorldConstraintPadding = FVector(10000.0f, 10000.0f, 500.0f);
 
 	BuilderPawnState = EBuilderPawnState::Preview;
 	bSelectedMirroredX = false;

@@ -96,7 +96,7 @@ protected:
 	float Drag;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float WorldConstraintPadding;
+	FVector WorldConstraintPadding;
 
 	FVector2D ScreenDragValue;
 	FVector2D Velocity;

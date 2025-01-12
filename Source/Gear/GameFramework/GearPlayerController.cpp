@@ -73,57 +73,49 @@ void AGearPlayerController::Tick(float DeltaSeconds)
 
 	if (IsLocalController())
 	{
+		UpdateZoomValueAndInjectInput();
 		UpdateScreenDragValueAndInjectInput();
-
 		
 	}
 }
 
 void AGearPlayerController::UpdateScreenDragValueAndInjectInput()
 {
-	bool bMouseDown = IsInputKeyDown(EKeys::LeftMouseButton);
-	FVector2D MousePosition;
-	GetMousePosition(MousePosition.X, MousePosition.Y);
-	
-	bool bTouchDown;
-	FVector2D TouchPosition;
-	GetInputTouchState(ETouchIndex::Touch1, TouchPosition.X, TouchPosition.Y, bTouchDown);
+	bool bKeyDown = false;
+	FVector2D KeyPosition = FVector2D(0.0f);
 
-	bool HoldingScreen = bMouseDown || bTouchDown;
+#if PLATFORM_WINDOWS
 
-	FVector2D CurrentPosition = FVector2D::Zero();
+	bKeyDown = IsInputKeyDown(EKeys::LeftMouseButton);
+	GetMousePosition(KeyPosition.X, KeyPosition.Y);
 
-	if (bMouseDown)
-	{
-		CurrentPosition = MousePosition;
-	}
-	
-	else if (bTouchDown)
-	{
-		CurrentPosition = TouchPosition;
-	}
+#elif PLATFORM_ANDROID
+
+	GetInputTouchState(ETouchIndex::Touch1, KeyPosition.X, KeyPosition.Y, bKeyDown);
+
+#endif
 
 	FVector2D ScreenDragValue;
 
-	if (!HoldingScreen)
+	if (!bKeyDown)
 	{
 		ScreenDragValue = FVector2D::Zero();
 		LastDragPosition = FVector2D::Zero();
 		bDraging = false;
 	}
 
-	// just started draging
-	else if (HoldingScreen && !bDraging)
+	// just started dragging
+	else if (bKeyDown && !bDraging)
 	{
 		ScreenDragValue = FVector2D::Zero();
-		LastDragPosition = CurrentPosition;
+		LastDragPosition = KeyPosition;
 		bDraging = true;
 	}
 
 	else
 	{
-		ScreenDragValue = CurrentPosition - LastDragPosition;
-		LastDragPosition = CurrentPosition;
+		ScreenDragValue = KeyPosition - LastDragPosition;
+		LastDragPosition = KeyPosition;
 		bDraging = true;
 	}
 
@@ -143,6 +135,11 @@ void AGearPlayerController::UpdateScreenDragValueAndInjectInput()
 			InputSystem->InjectInputForAction(MoveScreenAction, FInputActionValue(FInputActionValue::Axis2D(ScreenDragValue)), Modifiers, Triggers);
 		}
 	}
+
+}
+
+void AGearPlayerController::UpdateZoomValueAndInjectInput()
+{
 
 }
 

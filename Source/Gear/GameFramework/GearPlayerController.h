@@ -41,6 +41,7 @@ protected:
 	bool bDraging;
 
 	void UpdateScreenDragValueAndInjectInput();
+	void UpdateZoomValueAndInjectInput();
 
 public:
 
