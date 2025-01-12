@@ -33,6 +33,8 @@ public:
 	
 	AGearBuilderPawn();
 
+	virtual void UnPossessed() override;
+
 	virtual void Tick(float DeltaTime) override;
 
 	void StartPlacing();

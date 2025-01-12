@@ -53,6 +53,14 @@ AGearBuilderPawn::AGearBuilderPawn()
 	bReplicates = true;
 }
 
+void AGearBuilderPawn::UnPossessed()
+{
+	if (HasAuthority() && IsValid(this))
+	{
+		Destroy();
+	}
+}
+
 void AGearBuilderPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
