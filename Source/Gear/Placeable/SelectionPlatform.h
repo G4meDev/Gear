@@ -39,6 +39,9 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float SocketRotationSpeed;
+
 	UPROPERTY()
 	TArray<USceneComponent*> Sockets;
 

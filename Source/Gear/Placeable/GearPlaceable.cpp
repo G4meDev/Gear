@@ -145,7 +145,6 @@ void AGearPlaceable::SetSelectedBy(AGearBuilderPawn* Player)
 		}
 
 		OnRep_PlaceableState(OldState);
-		
 	}
 }
 
@@ -255,13 +254,16 @@ void AGearPlaceable::OnPreview_End()
 
 void AGearPlaceable::OnSelected_Start()
 {
-	PrebuildModules->SetHiddenInGame(false, true);
-
+	PrebuildModules->SetHiddenInGame(true, true);
+	SetActorHiddenInGame(true);
+	SetSelectionBoxEnabled(false);
 }
 
 void AGearPlaceable::OnSelected_End()
 {
 	PrebuildModules->SetHiddenInGame(true, true);
+	SetActorHiddenInGame(false);
+	SetSelectionBoxEnabled(false);
 }
 
 void AGearPlaceable::OnPlacing_Start()

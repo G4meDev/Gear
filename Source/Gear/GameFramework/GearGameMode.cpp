@@ -304,12 +304,10 @@ void AGearGameMode::DestroyAllVehicles(bool bIncludeSpectators)
 
 void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearBuilderPawn* Player)
 {
-	if (GearMatchState == EGearMatchState::SelectingPlaceables && IsValid(Placeable) && IsValid(Player) && !Player->HasSelectedPlaceable() && !Placeable->HasOwningPlayer())
+	if (GearMatchState == EGearMatchState::SelectingPlaceables && GearGameState->TimeFromLastTransition() > 2.0f &&  GearGameState->LastGameStateTransitionTime  && IsValid(Placeable) && IsValid(Player) && !Player->HasSelectedPlaceable() && !Placeable->HasOwningPlayer())
 	{
 		Player->SetSelectedPlaceable(Placeable);
-		FDetachmentTransformRules DetachmentRule(EDetachmentRule::KeepWorld, false);
-		Placeable->DetachFromActor(DetachmentRule);
-		GearGameState->BroadcastSelectedEvent_Multi(Player->GetPlayerState<AGearPlayerState>(), AGearPlaceable::StaticClass()->GetAuthoritativeClass());
+		GearGameState->BroadcastSelectedEvent_Multi(Player->GetPlayerState<AGearPlayerState>(), AGearPlaceable::StaticClass()->GetAuthoritativeClass(), Placeable);
 	}
 }
 

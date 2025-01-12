@@ -87,6 +87,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsCountDown();
 
+	float TimeFromLastTransition() const;
+
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
 
@@ -140,7 +142,7 @@ public:
 //---------------------------------------------------------------------------------------------------------------------------
 
 	UFUNCTION(NetMulticast, Reliable)
-	void BroadcastSelectedEvent_Multi(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass);
+	void BroadcastSelectedEvent_Multi(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass, AGearPlaceable* Placeable);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void BroadcastPlacedEvent_Multi(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass);
@@ -176,6 +178,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USoundBase* SelectedSound;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UNiagaraSystem* SelectedFX;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USoundBase* PlacedSound;

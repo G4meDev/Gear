@@ -21,6 +21,7 @@
 #include "Utils/GameVariablesBFL.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 AGearGameState::AGearGameState()
@@ -566,6 +567,11 @@ bool AGearGameState::IsCountDown()
 	return Time > 0 && Time < UGameVariablesBFL::GV_CountDownDuration();
 }
 
+float AGearGameState::TimeFromLastTransition() const
+{
+	return GetServerWorldTimeSeconds() - LastGameStateTransitionTime;
+}
+
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
@@ -614,10 +620,17 @@ void AGearGameState::RemovePlayerState(APlayerState* PlayerState)
 
 //---------------------------------------------------------------------------------------------------------------------------
 
-void AGearGameState::BroadcastSelectedEvent_Multi_Implementation(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass)
+void AGearGameState::BroadcastSelectedEvent_Multi_Implementation(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass, AGearPlaceable* Placeable)
 {
 	check(SelectedSound);
+	check(SelectedFX);
+
 	UGameplayStatics::PlaySound2D(GetWorld(), SelectedSound);
+
+	if (IsValid(Placeable))
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, SelectedFX, Placeable->PreviewRotationPivot->GetComponentLocation());
+	}
 }
 
 void AGearGameState::BroadcastPlacedEvent_Multi_Implementation(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass)

@@ -35,6 +35,8 @@ ASelectionPlatform::ASelectionPlatform()
 	Sockets.Add(Socket_4);
 	Sockets.Add(Socket_5);
 
+	SocketRotationSpeed = 100.0f;
+
 	bReplicates = true;
 	bAlwaysRelevant = true;
 }
@@ -49,4 +51,10 @@ void ASelectionPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	const FRotator DeltaRotator = FRotator(0, 1, 0) * SocketRotationSpeed * DeltaTime;
+
+	for (USceneComponent* Socket : Sockets)
+	{
+		Socket->SetWorldRotation(Socket->GetComponentRotation() + DeltaRotator);
+	}
 }
