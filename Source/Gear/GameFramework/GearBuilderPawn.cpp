@@ -49,6 +49,7 @@ AGearBuilderPawn::AGearBuilderPawn()
 
 	RemainingHazardCount = 0;
 
+	bAlwaysRelevant = true;
 	bReplicates = true;
 }
 

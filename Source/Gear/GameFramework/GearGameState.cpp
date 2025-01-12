@@ -638,10 +638,10 @@ void AGearGameState::BroadcastPlacedEvent_Multi_Implementation(AGearPlayerState*
 	check(PlacedSound);
 	UGameplayStatics::PlaySound2D(GetWorld(), PlacedSound);
 	
-	if (IsValid(NotifictionBoardWidget))
-	{
-		NotifictionBoardWidget->NotifyPlayerPlaced(PlayerState, PlaceableClass);
-	}
+// 	if (IsValid(NotifictionBoardWidget))
+// 	{
+// 		NotifictionBoardWidget->NotifyPlayerPlaced(PlayerState, PlaceableClass);
+// 	}
 }
 
 void AGearGameState::BroadcastEliminationEvent_Multi_Implementation(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason)
