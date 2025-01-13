@@ -22,6 +22,8 @@
 #include "InputAction.h"
 #include "Net/UnrealNetwork.h"
 
+#define LOCAL_MODULE_TAG TEXT("LocalModule")
+
 AGearBuilderPawn::AGearBuilderPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -286,6 +288,7 @@ AGearRoadModule* AGearBuilderPawn::SpawnRoadModuleLocally(TSubclassOf<AGearPlace
 			RoadModule->MarkNotReplicated();
 			UGameplayStatics::FinishSpawningActor(RoadModule, SpawnTransform);
 
+			RoadModule->Tags.Add(LOCAL_MODULE_TAG);
 			RoadModule->InitializePrebuildMaterials();
 			RoadModule->SetMainColliderEnabled(false);
 			RoadModule->PrebuildModules->SetHiddenInGame(false, true);
@@ -377,7 +380,7 @@ void AGearBuilderPawn::UpdateHazardMarkers()
 			for (AActor* RoadModuleActor : RoadModules)
 			{
 				AGearRoadModule* RoadModule = Cast<AGearRoadModule>(RoadModuleActor);
-				if (IsValid(RoadModule))
+				if (IsValid(RoadModule) && !RoadModule->ActorHasTag(LOCAL_MODULE_TAG))
 				{
 					TInlineComponentArray<UHazardSocketComponent*> HazardSockets;
 					RoadModule->GetComponents<UHazardSocketComponent>(HazardSockets);
