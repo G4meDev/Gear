@@ -367,6 +367,7 @@ void AGearBuilderPawn::UpdateHazardMarkers()
 		DestroyHazardMarkers();
 
 		TSubclassOf<AHazardSocketMarker> SocketMarkerClass = SelectedPlaceableClass->GetDefaultObject<AGearHazard>()->SocketMarkerClass;
+		EHazardSocketType HazardSocketType = SelectedPlaceableClass->GetDefaultObject<AGearHazard>()->HazardSocketType;
 
 		if (IsValid(SocketMarkerClass))
 		{
@@ -383,7 +384,7 @@ void AGearBuilderPawn::UpdateHazardMarkers()
 
 					for (UHazardSocketComponent* HazardSocket : HazardSockets)
 					{
-						if (IsValid(HazardSocket) && !HazardSocket->IsOccupied())
+						if (IsValid(HazardSocket) && !HazardSocket->IsOccupied() && HazardSocket->IsCompatibleWithType(HazardSocketType))
 						{
 							FTransform SpawnTransform = HazardSocket->GetComponentTransform();
 							AHazardSocketMarker* HazardSocketMarker = GetWorld()->SpawnActor<AHazardSocketMarker>(SocketMarkerClass, SpawnTransform.GetLocation(), SpawnTransform.Rotator());

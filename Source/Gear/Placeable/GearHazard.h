@@ -27,6 +27,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<class AHazardSocketMarker> SocketMarkerClass;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EHazardSocketType HazardSocketType;                                                                                                                                                                                                                         
 
 protected:
 	virtual void BeginPlay() override;

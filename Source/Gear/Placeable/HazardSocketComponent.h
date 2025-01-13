@@ -29,7 +29,7 @@ public:
 
 	void MarkOccupied();
 
-
+	bool IsCompatibleWithType(EHazardSocketType HazardType) const;
 
 protected:
 	

@@ -341,7 +341,8 @@ void AGearGameMode::RequestPlaceHazardForPlayer(AGearPlayerController* PC, class
 	if (GearMatchState == EGearMatchState::Placing && IsValid(PC) && IsValid(TargetSocket) && !TargetSocket->IsOccupied())
 	{
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
-		if (IsValid(BuilderPawn) && BuilderPawn->RemainingHazardCount > 0 && IsValid(BuilderPawn->SelectedPlaceableClass) && BuilderPawn->SelectedPlaceableClass->IsChildOf<AGearHazard>())
+		if (IsValid(BuilderPawn) && BuilderPawn->RemainingHazardCount > 0 && IsValid(BuilderPawn->SelectedPlaceableClass) 
+			&& BuilderPawn->SelectedPlaceableClass->IsChildOf<AGearHazard>() && TargetSocket->IsCompatibleWithType(BuilderPawn->SelectedPlaceableClass->GetDefaultObject<AGearHazard>()->HazardSocketType))
 		{
 			TSubclassOf<AGearPlaceable> SpawnClass = BuilderPawn->SelectedPlaceableClass;
 			AGearHazard* Hazard = AddHazard(SpawnClass, TargetSocket);

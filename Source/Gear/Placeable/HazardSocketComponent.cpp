@@ -60,3 +60,16 @@ void UHazardSocketComponent::MarkOccupied()
 {
 	bOccupied = true;
 }
+
+bool UHazardSocketComponent::IsCompatibleWithType(EHazardSocketType HazardType) const
+{
+	if (HazardType == EHazardSocketType::SmallHazard)
+	{
+		return SocketType == EHazardSocketType::BigHazard || SocketType == EHazardSocketType::SmallHazard;
+	}
+
+	else 
+	{
+		return SocketType == HazardType;
+	}
+}
