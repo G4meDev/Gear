@@ -102,8 +102,27 @@ void AGearPlayerController::UpdateAndInjectInputs()
 #elif PLATFORM_ANDROID
 
 	Touch1_InputHandler.Tick(this);
+	Touch2_InputHandler.Tick(this);
 
-	ScreenDragValue = Touch1_InputHandler.GetVelocity();
+	if (Touch1_InputHandler.IsHoldingTouch() && Touch2_InputHandler.IsHoldingTouch())
+	{
+		FVector2D Center = (Touch1_InputHandler.GetValue() + Touch2_InputHandler.GetValue()) / 2;
+
+		auto CalculateVelocityAlongCentroid = [&](const FTouchInputHandler& InputHandler)
+			{
+				FVector2D CentroidDir = Center - InputHandler.GetValue();
+				CentroidDir.Normalize();
+				return FVector2D::DotProduct(CentroidDir, InputHandler.GetVelocity());
+			};
+
+		PinchValue = CalculateVelocityAlongCentroid(Touch1_InputHandler) + CalculateVelocityAlongCentroid(Touch2_InputHandler);
+		PinchValue = -PinchValue;
+	}
+
+	else
+	{
+		ScreenDragValue = Touch1_InputHandler.IsHoldingTouch() ? Touch1_InputHandler.GetVelocity() : Touch2_InputHandler.GetVelocity();
+	}
 
 #endif
 

@@ -20,8 +20,8 @@ public:
 
 	void Tick(APlayerController* PC);
 
-	FVector2D GetVelocity() const;
-	FVector2D GetValue() const;
+	const FVector2D& GetVelocity() const;
+	const FVector2D& GetValue() const;
 
 	bool IsHoldingKey() const;
 };
@@ -43,8 +43,8 @@ public:
 
 	void Tick(APlayerController* PC);
 
-	FVector2D GetVelocity() const;
-	FVector2D GetValue() const;
+	const FVector2D& GetVelocity() const;
+	const FVector2D& GetValue() const;
 
 	bool IsHoldingTouch() const;
 };

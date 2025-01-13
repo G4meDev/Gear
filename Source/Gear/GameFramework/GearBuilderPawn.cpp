@@ -45,9 +45,9 @@ AGearBuilderPawn::AGearBuilderPawn()
 	Velocity = FVector2D::Zero();
 
 	PinchValue = 0.0f;
-	ZoomMovementStrength = 100.0f;
+	ZoomMovementStrength = 700.0f;
 
-	WorldConstraintPadding = FVector(10000.0f, 10000.0f, 500.0f);
+	WorldConstraintPadding = FVector(10000.0f, 10000.0f, 7000.0f);
 
 	BuilderPawnState = EBuilderPawnState::Preview;
 	bSelectedMirroredX = false;

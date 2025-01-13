@@ -47,12 +47,12 @@ void FMouseInputHandler::Tick(APlayerController* PC)
 	}
 }
 
-FVector2D FMouseInputHandler::GetVelocity() const
+const FVector2D& FMouseInputHandler::GetVelocity() const
 {
 	return Velocity;
 }
 
-FVector2D FMouseInputHandler::GetValue() const
+const FVector2D& FMouseInputHandler::GetValue() const
 {
 	return Value;
 }
@@ -107,12 +107,12 @@ void FTouchInputHandler::Tick(APlayerController* PC)
 	}
 }
 
-FVector2D FTouchInputHandler::GetVelocity() const
+const FVector2D& FTouchInputHandler::GetVelocity() const
 {
 	return Velocity;
 }
 
-FVector2D FTouchInputHandler::GetValue() const
+const FVector2D& FTouchInputHandler::GetValue() const
 {
 	return Value;
 }
