@@ -176,7 +176,7 @@ void AGearGameMode::SpawnSelectionPlatform()
 	FVector SpawnLocation = FVector
 		( (GearGameState->WorldMin.X + GearGameState->WorldMax.X) / 2
 		, (GearGameState->WorldMin.Y + GearGameState->WorldMax.Y) / 2
-		, GearGameState->WorldMax.Z + 500.0f);
+		, GearGameState->WorldMax.Z + 2000.0f);
 
 	SelectionPlatform = GetWorld()->SpawnActor<ASelectionPlatform>(SelectionPlatformClass, SpawnLocation, FRotator::ZeroRotator);
 }
