@@ -22,6 +22,7 @@
 #include "InputAction.h"
 #include "Net/UnrealNetwork.h"
 
+#define PREVIEW_MODULE_TAG TEXT("PreviewMoudle")
 #define LOCAL_MODULE_TAG TEXT("LocalModule")
 
 AGearBuilderPawn::AGearBuilderPawn()
@@ -380,7 +381,7 @@ void AGearBuilderPawn::UpdateHazardMarkers()
 			for (AActor* RoadModuleActor : RoadModules)
 			{
 				AGearRoadModule* RoadModule = Cast<AGearRoadModule>(RoadModuleActor);
-				if (IsValid(RoadModule) && !RoadModule->ActorHasTag(LOCAL_MODULE_TAG))
+				if (IsValid(RoadModule) && !RoadModule->ActorHasTag(LOCAL_MODULE_TAG) && !RoadModule->ActorHasTag(PREVIEW_MODULE_TAG))
 				{
 					TInlineComponentArray<UHazardSocketComponent*> HazardSockets;
 					RoadModule->GetComponents<UHazardSocketComponent>(HazardSockets);

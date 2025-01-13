@@ -23,6 +23,7 @@
 #include "Utils/GameVariablesBFL.h"
 #include "kismet/GameplayStatics.h"
 
+#define PREVIEW_MODULE_TAG TEXT("PreviewMoudle")
 #define SPAWNED_ACTOR_TAG "Spawned"
 
 AGearGameMode::AGearGameMode()
@@ -204,6 +205,7 @@ void AGearGameMode::SpawnNewPlaceables()
 		AGearPlaceable* PlaceableActor = GetWorld()->SpawnActor<AGearPlaceable>(SpawnClass, Socket->GetComponentLocation(), Socket->GetComponentRotation());
 		PlaceableActor->SetPreview();
 		PlaceableActor->AttachPlaceableToComponent(Socket);
+		PlaceableActor->Tags.Add(PREVIEW_MODULE_TAG);
 
 		PreviewPlaceables.Add(PlaceableActor);
 	}
