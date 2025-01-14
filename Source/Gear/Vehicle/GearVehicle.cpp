@@ -155,9 +155,10 @@ void AGearVehicle::Destroyed()
 		VehicleInputWidget = nullptr;
 	}
 
-	check(IsValid(EliminationFXActorClass));
-
-	GetWorld()->SpawnActor<AActor>(EliminationFXActorClass, GetActorLocation(), GetActorRotation());
+	if (IsValid(EliminationFXActorClass))
+	{
+		GetWorld()->SpawnActor<AActor>(EliminationFXActorClass, GetActorLocation(), GetActorRotation());
+	}
 
 	if (HasAuthority())
 	{
