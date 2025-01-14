@@ -764,6 +764,11 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 
 TSubclassOf<class AGearAbility> AGearGameMode::GetRandomAbility()
 {
+	if (AvaliableAbilities.Num() > 0)
+	{
+		return AvaliableAbilities[FMath::RandRange(0, AvaliableAbilities.Num() - 1)];
+	}
+
 	return nullptr;
 }
 

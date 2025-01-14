@@ -7,6 +7,8 @@
 #include "Vehicle/VehicleAudioComponent.h"
 
 #include "GameFramework/GearPlayerController.h"
+#include "UI/VehicleInputWidget.h"
+#include "Ability/GearAbility.h"
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearGameMode.h"
@@ -101,7 +103,7 @@ void AGearVehicle::NotifyControllerChanged()
 	APlayerController* PC = GetController<APlayerController>();
 	if (IsValid(PC) && PC->IsLocalController())
 	{
-		VehicleInputWidget = CreateWidget(GetWorld(), VehicleInputWidgetClass);
+		VehicleInputWidget = CreateWidget<UVehicleInputWidget>(GetWorld(), VehicleInputWidgetClass);
 		VehicleInputWidget->AddToViewport();
 
 #if WITH_EDITOR
@@ -156,6 +158,14 @@ void AGearVehicle::Destroyed()
 	check(IsValid(EliminationFXActorClass));
 
 	GetWorld()->SpawnActor<AActor>(EliminationFXActorClass, GetActorLocation(), GetActorRotation());
+
+	if (HasAuthority())
+	{
+		if (IsValid(Ability))
+		{
+			Ability->Destroy();
+		}
+	}
 
 	Super::Destroyed();
 }
@@ -388,4 +398,31 @@ bool AGearVehicle::IsWheelSkiding(int32 Index)
 float AGearVehicle::GetSteerAngle()
 {
 	return SteerAngle;
+}
+
+bool AGearVehicle::HasAbility()
+{
+	return IsValid(Ability);
+}
+
+void AGearVehicle::OnRep_Ability()
+{
+	if (IsValid(VehicleInputWidget))
+	{
+		VehicleInputWidget->AbilityChanged(Ability);
+	}
+}
+
+void AGearVehicle::GrantAbility(TSubclassOf<class AGearAbility> AbilityClass)
+{
+	if (HasAuthority() && IsValid(AbilityClass))
+	{
+		Ability = GetWorld()->SpawnActor<AGearAbility>(AbilityClass);
+		
+		ENetMode NetMode = GetNetMode();
+		if (NetMode == NM_Standalone || NetMode == NM_ListenServer)
+		{
+			OnRep_Ability();
+		}
+	}
 }

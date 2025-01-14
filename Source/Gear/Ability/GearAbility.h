@@ -10,14 +10,16 @@ UCLASS()
 class GEAR_API AGearAbility : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	AGearAbility();
 
 protected:
-	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UTexture2D* AbilityIcon;
 
 public:	
+	AGearAbility();
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+protected:
 };

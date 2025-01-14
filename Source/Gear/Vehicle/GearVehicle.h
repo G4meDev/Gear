@@ -75,6 +75,15 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetSteerAngle();
 
+	UFUNCTION(BlueprintPure)
+	bool HasAbility();
+
+	UFUNCTION()
+	void OnRep_Ability();
+
+	UFUNCTION(BlueprintCallable)
+	void GrantAbility(TSubclassOf<class AGearAbility> AbilityClass);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -93,10 +102,10 @@ protected:
 	UInputAction* SteerActionInput;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSubclassOf<UUserWidget> VehicleInputWidgetClass;
+	TSubclassOf<class UVehicleInputWidget> VehicleInputWidgetClass;
 
 	UPROPERTY()
-	UUserWidget* VehicleInputWidget;
+	class UVehicleInputWidget* VehicleInputWidget;
 
 	void Input_Steer(const FInputActionInstance& Instance);
 
@@ -140,6 +149,8 @@ protected:
 	UPROPERTY(Replicated)
 	float SteerAngle;
 
+	UPROPERTY(ReplicatedUsing=OnRep_Ability)
+	class AGearAbility* Ability;
 
 #if WITH_EDITORONLY_DATA
 
