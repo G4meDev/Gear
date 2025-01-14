@@ -42,6 +42,9 @@ public:
 
 	void VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint* TargetCheckpoint);
 
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<class AGearAbility> GetRandomAbility();
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -91,8 +94,6 @@ protected:
 	void SpawnSelectionPlatform();
 	void SpawnNewBuilderPawns();
 	void SpawnNewPlaceables();
-
-	bool LoadPlaceables();
 	
 	// --------------------------------------------------------------------------
 
@@ -104,9 +105,6 @@ protected:
 	EGearMatchState GearMatchState;
 
 	TArray<AGearPlaceable*> PreviewPlaceables;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UDataTable* PlaceableSpawnRulesDataTable;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> CheckpointModuleClass;
@@ -121,7 +119,11 @@ protected:
 	class ASelectionPlatform* SelectionPlatform;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<TSubclassOf<class AGearAbility>> AvaliableAbilities;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<TSubclassOf<AGearPlaceable>> AvaliablePlaceables;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float CheckpointDistance;
-	
-	TArray<FPlaceableDescription> AvaliablePlaceables;
 };

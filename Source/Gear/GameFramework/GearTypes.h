@@ -43,34 +43,6 @@ enum class EPrebuildState : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FPlaceableDescription : public FTableRowBase
-{
-	GENERATED_BODY()
-
-
-public:
-
-	UPROPERTY()
-	TSubclassOf<AGearPlaceable> Class;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString ClassPath;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bDepracated;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SpawnChance_Round_1 = 10.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SpawnChance_Round_2 = 10.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SpawnChance_Round_3 = 10.0f;
-};
-
-
-USTRUCT(BlueprintType)
 struct GEAR_API FGearHostInfo
 {
 	GENERATED_BODY()

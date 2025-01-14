@@ -45,12 +45,11 @@ void AGearGameMode::BeginPlay()
 	GearGameState = GetGameState<AGearGameState>();
 	check(IsValid(GearGameState));
 
-
 	bool bFailed = false;
 
-	if (!LoadPlaceables())
+	if (AvaliablePlaceables.Num() == 0)
 	{
-		UE_LOG(LogGameMode, Error, TEXT("Not enough hazards found"));
+		UE_LOG(LogGameMode, Error, TEXT("Not enough placeable found"));
 		bFailed = true;
 	}
 
@@ -200,7 +199,7 @@ void AGearGameMode::SpawnNewPlaceables()
 
 	for (USceneComponent* Socket : SelectionPlatform->Sockets)
 	{
-		TSubclassOf<AGearPlaceable>& SpawnClass = AvaliablePlaceables[FMath::RandRange(0, AvaliablePlaceables.Num() - 1)].Class;
+		TSubclassOf<AGearPlaceable>& SpawnClass = AvaliablePlaceables[FMath::RandRange(0, AvaliablePlaceables.Num() - 1)];
 
 		AGearPlaceable* PlaceableActor = GetWorld()->SpawnActor<AGearPlaceable>(SpawnClass, Socket->GetComponentLocation(), Socket->GetComponentRotation());
 		PlaceableActor->SetPreview();
@@ -209,43 +208,6 @@ void AGearGameMode::SpawnNewPlaceables()
 
 		PreviewPlaceables.Add(PlaceableActor);
 	}
-}
-
-bool AGearGameMode::LoadPlaceables()
-{
-	AvaliablePlaceables.Empty();
-
-	if (IsValid(PlaceableSpawnRulesDataTable))
-	{
-		TArray<FPlaceableDescription*> RawHazards;
-		PlaceableSpawnRulesDataTable->GetAllRows<FPlaceableDescription>("Reading hazard rules", RawHazards);
-
-		for (FPlaceableDescription* Desc : RawHazards)
-		{
-			if (Desc->bDepracated)
-			{
-				continue;
-			}
-
-			TSubclassOf<AGearPlaceable> HazardClass = StaticLoadClass(AGearPlaceable::StaticClass(), nullptr, *Desc->ClassPath);
-			if (IsValid(HazardClass))
-			{
-				FPlaceableDescription NewDesc = *Desc;
-				NewDesc.Class = HazardClass;
-				
-				AvaliablePlaceables.Add(NewDesc);
-			}
-		}
-
-		if (AvaliablePlaceables.Num() == 0)
-		{
-			return false;
-		}
-
-		return true;
-	}
-
-	return false;
 }
 
 bool AGearGameMode::IsEveryPlayerEliminated() const
@@ -798,6 +760,11 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 			DestroyVehicle(Vehicle);
 		}
 	}
+}
+
+TSubclassOf<class AGearAbility> AGearGameMode::GetRandomAbility()
+{
+	return nullptr;
 }
 
 bool AGearGameMode::CheckIsEveryPlayerReady()
