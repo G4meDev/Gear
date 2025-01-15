@@ -2,6 +2,8 @@
 
 
 #include "Ability/GearAbility.h"
+#include "Vehicle/GearVehicle.h"
+#include "Vehicle/GearDriver.h"
 #include "Net/UnrealNetwork.h"
 
 AGearAbility::AGearAbility()
@@ -52,5 +54,40 @@ EAbilityType AGearAbility::GetAbilityType()
 
 void AGearAbility::OnRep_OwningVehicle()
 {
+	UAnimInstance* AnimInstance = GetDriverBodyAnimInstance();
+	if (IsValid(AnimInstance) && IsValid(ItemGrabMontage))
+	{
+		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AGearAbility::OnMontageNotify);
+		AnimInstance->Montage_Play(ItemGrabMontage);
+	}
+}
 
+void AGearAbility::ActivateAbility()
+{
+	if (CanActivate())
+	{
+		UAnimInstance* AnimInstance = GetDriverBodyAnimInstance();
+		if (IsValid(AnimInstance) && IsValid(ActivationMontage))
+		{
+			AnimInstance->Montage_Play(ActivationMontage);
+		}
+	}
+}
+
+void AGearAbility::OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+	
+}
+
+UAnimInstance* AGearAbility::GetDriverBodyAnimInstance()
+{
+	USkeletalMeshComponent* DriverBody = IsValid(OwningVehice) ? OwningVehice->GetDriverBody() : nullptr;
+	UAnimInstance* AnimInstance = IsValid(DriverBody) ? DriverBody->GetAnimInstance() : nullptr;
+
+	return AnimInstance;
+}
+
+bool AGearAbility::CanActivate() const
+{
+	return true;
 }

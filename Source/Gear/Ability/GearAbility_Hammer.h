@@ -17,9 +17,16 @@ class GEAR_API AGearAbility_Hammer : public AGearAbility
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* HammerMesh;
-	
+
 public:
 	AGearAbility_Hammer();
 
 	virtual void OnRep_OwningVehicle() override;
+
+	virtual void ActivateAbility() override;
+
+protected:
+	virtual void OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload) override;
+
+	virtual bool CanActivate() const override;
 };

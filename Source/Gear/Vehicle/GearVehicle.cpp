@@ -357,6 +357,14 @@ bool AGearVehicle::IsSpectating()
 	return IsValid(GetGearGameState()) ? GearGameState->FurthestReachedCheckpoint + 1 < TargetCheckpoint : true;
 }
 
+USkeletalMeshComponent* AGearVehicle::GetDriverBody()
+{
+	if(IsValid(Driver))
+		return Driver->GetBodyMesh();
+
+	return nullptr;
+}
+
 void AGearVehicle::OnRep_GrantedInvincibility()
 {
 	if (HasInvincibility())

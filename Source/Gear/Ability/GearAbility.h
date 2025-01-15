@@ -23,6 +23,18 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EAbilityType AbilityType;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UAnimMontage* ItemGrabMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* ActivationMontage;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 MaxItemUsageAmount;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 RemainingItemUsage;
+
 	UPROPERTY(ReplicatedUsing=OnRep_OwningVehicle)
 	class AGearVehicle* OwningVehice;
 
@@ -39,5 +51,15 @@ public:
 	UFUNCTION()
 	virtual void OnRep_OwningVehicle();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void ActivateAbility();
+
+
 protected:
+	UFUNCTION()
+	virtual void OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
+
+	UAnimInstance* GetDriverBodyAnimInstance();
+
+	virtual bool CanActivate() const;
 };

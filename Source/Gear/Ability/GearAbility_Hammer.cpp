@@ -5,13 +5,14 @@
 #include "Vehicle/GearDriver.h"
 
 #define HAND_SOCKET_NAME TEXT("Hand")
+#define NOTIFY_ITEM_GRABBED_NAME TEXT("ItemGrabed")
 
 AGearAbility_Hammer::AGearAbility_Hammer()
 {
 	HammerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HammerMesh"));
 	HammerMesh->SetupAttachment(Root);
 	HammerMesh->SetCollisionProfileName(TEXT("NoCollision"));
-
+	HammerMesh->SetHiddenInGame(true);
 
 }
 
@@ -31,4 +32,26 @@ void AGearAbility_Hammer::OnRep_OwningVehicle()
 	
 
 
+}
+
+void AGearAbility_Hammer::ActivateAbility()
+{
+	Super::ActivateAbility();
+
+
+}
+
+void AGearAbility_Hammer::OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+	Super::OnMontageNotify(NotifyName, BranchingPointPayload);
+
+	if (NotifyName == NOTIFY_ITEM_GRABBED_NAME)
+	{
+		HammerMesh->SetHiddenInGame(false);
+	}
+}
+
+bool AGearAbility_Hammer::CanActivate() const
+{
+	return Super::CanActivate();
 }

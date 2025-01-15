@@ -45,7 +45,8 @@ public:
 
 	bool IsSpectating();
 
-
+	UFUNCTION(BlueprintPure)
+	USkeletalMeshComponent* GetDriverBody();
 
 	UFUNCTION()
 	void OnRep_GrantedInvincibility();
