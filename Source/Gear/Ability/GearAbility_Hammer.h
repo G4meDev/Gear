@@ -13,5 +13,13 @@ UCLASS()
 class GEAR_API AGearAbility_Hammer : public AGearAbility
 {
 	GENERATED_BODY()
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* HammerMesh;
 	
+public:
+	AGearAbility_Hammer();
+
+	virtual void OnRep_OwningVehicle() override;
 };

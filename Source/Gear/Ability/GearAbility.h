@@ -14,12 +14,24 @@ class GEAR_API AGearAbility : public AActor
 protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* Root;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UTexture2D* AbilityIcon;
+
+	UPROPERTY(ReplicatedUsing=OnRep_OwningVehicle)
+	class AGearVehicle* OwningVehice;
 
 public:	
 	AGearAbility();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	void SetOwningVehicle(AGearVehicle* InOwningVehice);
+
+
+	UFUNCTION()
+	virtual void OnRep_OwningVehicle();
 
 protected:
 };

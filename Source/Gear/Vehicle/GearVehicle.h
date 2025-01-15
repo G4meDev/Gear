@@ -84,6 +84,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GrantAbility(TSubclassOf<class AGearAbility> AbilityClass);
 
+	UFUNCTION(BlueprintPure)
+	AGearDriver* GetDriver();
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -134,6 +137,11 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AActor> EliminationFXActorClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AGearDriver> DriverClass;
+
+	AGearDriver* Driver;
 
 	void Input_Throttle(const FInputActionInstance& Instance);
 	void Input_Brake(const FInputActionInstance& Instance);

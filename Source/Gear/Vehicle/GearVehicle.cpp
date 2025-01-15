@@ -7,6 +7,7 @@
 #include "Vehicle/VehicleAudioComponent.h"
 
 #include "GameFramework/GearPlayerController.h"
+#include "Vehicle/GearDriver.h"
 #include "UI/VehicleInputWidget.h"
 #include "Ability/GearAbility.h"
 #include "GameFramework/GearPlayerState.h"
@@ -39,6 +40,7 @@ AGearVehicle::AGearVehicle()
 	TargetCheckpoint		= 1;
 	bGrantedInvincibility	= false;
 
+	bReplicates				= true;
 	bAlwaysRelevant			= true;
 }
 
@@ -48,12 +50,20 @@ void AGearVehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 	DOREPLIFETIME(AGearVehicle, bGrantedInvincibility);
 	DOREPLIFETIME(AGearVehicle, TargetCheckpoint);
+	DOREPLIFETIME(AGearVehicle, Ability);
 	DOREPLIFETIME_CONDITION(AGearVehicle, SteerAngle, COND_SkipOwner);
 }
 
 void AGearVehicle::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (IsValid(DriverClass))
+	{
+		Driver = GetWorld()->SpawnActor<AGearDriver>(DriverClass);
+		Driver->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		Driver->SetOwningVehicle(this);
+	}
 
 #if WITH_EDITOR
 	
@@ -85,7 +95,6 @@ void AGearVehicle::BeginPlay()
 			break;
 		}
 	}
-
 }
 
 // only server
@@ -153,6 +162,11 @@ void AGearVehicle::Destroyed()
 	{
 		VehicleInputWidget->RemoveFromParent();
 		VehicleInputWidget = nullptr;
+	}
+
+	if (IsValid(Driver))
+	{
+		Driver->Destroy();
 	}
 
 	if (IsValid(EliminationFXActorClass))
@@ -419,11 +433,12 @@ void AGearVehicle::GrantAbility(TSubclassOf<class AGearAbility> AbilityClass)
 	if (HasAuthority() && IsValid(AbilityClass))
 	{
 		Ability = GetWorld()->SpawnActor<AGearAbility>(AbilityClass);
-		
-		ENetMode NetMode = GetNetMode();
-		if (NetMode == NM_Standalone || NetMode == NM_ListenServer)
-		{
-			OnRep_Ability();
-		}
+		Ability->SetOwningVehicle(this);
+		OnRep_Ability();
 	}
+}
+
+AGearDriver* AGearVehicle::GetDriver()
+{
+	return Driver;
 }
