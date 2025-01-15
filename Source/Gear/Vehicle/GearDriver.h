@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/GearTypes.h"
 #include "GearDriver.generated.h"
 
 UCLASS()
@@ -41,4 +42,7 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	USkeletalMeshComponent* GetHeadMesh();
+
+	UFUNCTION(BlueprintPure)
+	EAbilityType GetAbilityType();
 };

@@ -2,6 +2,8 @@
 
 
 #include "Vehicle/GearDriver.h"
+#include "Vehicle/GearVehicle.h"
+#include "Ability/GearAbility.h"
 
 #define ITEM_SOCKET_NAME TEXT("hand_r_ItemSocket")
 
@@ -49,4 +51,9 @@ USkeletalMeshComponent* AGearDriver::GetBodyMesh()
 USkeletalMeshComponent* AGearDriver::GetHeadMesh()
 {
 	return HeadMesh;
+}
+
+EAbilityType AGearDriver::GetAbilityType()
+{
+	return IsValid(OwningVehicle) && IsValid(OwningVehicle->GetAbility()) ? OwningVehicle->GetAbility()->GetAbilityType() : EAbilityType::None;
 }

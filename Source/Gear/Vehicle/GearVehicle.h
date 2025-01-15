@@ -78,6 +78,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool HasAbility();
 
+	UFUNCTION(BlueprintPure)
+	AGearAbility* GetAbility();
+
 	UFUNCTION()
 	void OnRep_Ability();
 

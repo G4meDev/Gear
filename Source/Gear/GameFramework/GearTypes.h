@@ -157,3 +157,10 @@ enum class EElimanationReason : uint8
 	Falldown,
 	OutsideCameraFrustum
 };
+
+UENUM(BlueprintType)
+enum class EAbilityType : uint8
+{
+	None,
+	Hammer
+};

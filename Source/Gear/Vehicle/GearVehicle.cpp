@@ -420,6 +420,11 @@ bool AGearVehicle::HasAbility()
 	return IsValid(Ability);
 }
 
+AGearAbility* AGearVehicle::GetAbility()
+{
+	return Ability;
+}
+
 void AGearVehicle::OnRep_Ability()
 {
 	if (IsValid(VehicleInputWidget))

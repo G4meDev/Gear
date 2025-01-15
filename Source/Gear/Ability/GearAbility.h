@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/GearTypes.h"
 #include "GearAbility.generated.h"
 
 UCLASS()
@@ -19,6 +20,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UTexture2D* AbilityIcon;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EAbilityType AbilityType;
+
 	UPROPERTY(ReplicatedUsing=OnRep_OwningVehicle)
 	class AGearVehicle* OwningVehice;
 
@@ -29,6 +33,8 @@ public:
 
 	void SetOwningVehicle(AGearVehicle* InOwningVehice);
 
+	UFUNCTION(BlueprintPure)
+	EAbilityType GetAbilityType();
 
 	UFUNCTION()
 	virtual void OnRep_OwningVehicle();

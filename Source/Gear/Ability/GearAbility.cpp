@@ -45,6 +45,11 @@ void AGearAbility::SetOwningVehicle(AGearVehicle* InOwningVehice)
 	}
 }
 
+EAbilityType AGearAbility::GetAbilityType()
+{
+	return AbilityType;
+}
+
 void AGearAbility::OnRep_OwningVehicle()
 {
 
