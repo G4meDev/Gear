@@ -3,6 +3,8 @@
 
 #include "Vehicle/GearDriver.h"
 
+#define ITEM_SOCKET_NAME TEXT("hand_r_ItemSocket")
+
 AGearDriver::AGearDriver()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -32,4 +34,19 @@ void AGearDriver::Tick(float DeltaTime)
 void AGearDriver::SetOwningVehicle(AGearVehicle* InOwningVehicle)
 {
 	OwningVehicle = InOwningVehicle;
+}
+
+FName AGearDriver::GetItemSocketName()
+{
+	return ITEM_SOCKET_NAME;
+}
+
+USkeletalMeshComponent* AGearDriver::GetBodyMesh()
+{
+	return BodyMesh;
+}
+
+USkeletalMeshComponent* AGearDriver::GetHeadMesh()
+{
+	return HeadMesh;
 }

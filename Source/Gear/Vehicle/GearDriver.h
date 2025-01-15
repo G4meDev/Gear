@@ -32,5 +32,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void SetOwningVehicle(AGearVehicle* InOwningVehicle);
+
+	UFUNCTION(BlueprintPure)
+	FName GetItemSocketName();
+
+	UFUNCTION(BlueprintPure)
+	USkeletalMeshComponent* GetBodyMesh();
 	
+	UFUNCTION(BlueprintPure)
+	USkeletalMeshComponent* GetHeadMesh();
 };
