@@ -100,14 +100,20 @@ void AGearAbility_Hammer::Activate_Multi_Implementation(float AttackHitTime, FVe
 			PlayAttackMontage();
 		}
 
-		float TimerDelay = AttackHitTime - GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
-
-		UE_LOG(LogTemp, Warning, TEXT("WWWWWWWWWWWWWWWWWWWW : %f"), TimerDelay);
-
-		if (TimerDelay > 0)
-		{
-			GetWorld()->GetTimerManager().SetTimer(AttackHitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearAbility_Hammer::AttackHit, Location), TimerDelay, false);
-		}
+// 		UNetConnection* NetConnection = GetWorld()->GetGameState()->GetNetConnection();
+// 		GetWorld()->
+// 		APlayerState* a;
+// 
+// 		a->GetPingInMilliseconds()
+// 
+// 		float TimerDelay = AttackHitDelay - NetConnection->RTT
+// 
+// 		UE_LOG(LogTemp, Warning, TEXT("WWWWWWWWWWWWWWWWWWWW : %f"), TimerDelay);
+// 
+// 		if (TimerDelay > 0)
+// 		{
+// 			GetWorld()->GetTimerManager().SetTimer(AttackHitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearAbility_Hammer::AttackHit, Location), TimerDelay, false);
+// 		} 
 	}
 }
 

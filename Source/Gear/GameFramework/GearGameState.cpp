@@ -35,6 +35,15 @@ AGearGameState::AGearGameState()
 
 	WorldMin = FVector::ZeroVector;
 	WorldMax = FVector::ZeroVector;
+
+	ServerTimeDelay = 0.0f;
+}
+
+void AGearGameState::PostNetInit()
+{
+	Super::PostNetInit();
+
+
 }
 
 void AGearGameState::Tick(float DeltaSeconds)
@@ -624,7 +633,15 @@ void AGearGameState::RemovePlayerState(APlayerState* PlayerState)
 	}
 }
 
-//---------------------------------------------------------------------------------------------------------------------------
+void AGearGameState::SetServerTimeDelay(float InServerTimeDelay)
+{
+	ServerTimeDelay = InServerTimeDelay;
+}
+
+float AGearGameState::GetServerWorldTime()
+{
+	return GetWorld()->GetTimeSeconds() + ServerTimeDelay;
+}
 
 void AGearGameState::BroadcastSelectedEvent_Multi_Implementation(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass, AGearPlaceable* Placeable)
 {

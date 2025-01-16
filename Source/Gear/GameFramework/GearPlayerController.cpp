@@ -30,9 +30,26 @@ void AGearPlayerController::PostInitializeComponents()
 
 }
 
+void AGearPlayerController::PostNetInit()
+{
+	Super::PostNetInit();
+
+	if (!HasAuthority())
+	{
+		RequestWorldTime_Internal();
+		if (NetworkClockUpdateFrequency > 0.f)
+		{
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::RequestWorldTime_Internal, NetworkClockUpdateFrequency, true);
+		}
+	}
+}
+
 void AGearPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GearGameState = GetWorld()->GetGameState<AGearGameState>();
 
 	if (IsLocalController())
 	{
@@ -324,5 +341,48 @@ void AGearPlayerController::OnRemovePlayer(AGearPlayerState* GearPlayer)
 	if (IsValid(GearHUD))
 	{
 		GearHUD->RemovePlayer(GearPlayer);
+	}
+}
+
+// ------------------------------------------------------------------------------------------
+
+void AGearPlayerController::RequestWorldTime_Internal()
+{
+	ServerRequestWorldTime(GetWorld()->GetTimeSeconds());
+	UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!!!!!!!"));
+}
+
+void AGearPlayerController::ServerRequestWorldTime_Implementation(float ClientTimestamp)
+{
+	const float Timestamp = GetWorld()->GetTimeSeconds();
+	ClientUpdateWorldTime(ClientTimestamp, Timestamp);
+}
+
+void AGearPlayerController::ClientUpdateWorldTime_Implementation(float ClientTimestamp, float ServerTimestamp)
+{
+	const float RoundTripTime = GetWorld()->GetTimeSeconds() - ClientTimestamp;
+	RTTCircularBuffer.Add(RoundTripTime);
+	float AdjustedRTT = 0;
+	if (RTTCircularBuffer.Num() == 10)
+	{
+		TArray<float> tmp = RTTCircularBuffer;
+		tmp.Sort();
+		for (int i = 1; i < 9; ++i)
+		{
+			AdjustedRTT += tmp[i];
+		}
+		AdjustedRTT /= 8;
+		RTTCircularBuffer.RemoveAt(0);
+	}
+	else
+	{
+		AdjustedRTT = RoundTripTime;
+	}
+
+	float ServerWorldTimeDelta = ServerTimestamp - ClientTimestamp - AdjustedRTT / 2.f;
+
+	if (IsValid(GearGameState))
+	{
+		GearGameState->SetServerTimeDelay(ServerWorldTimeDelta);
 	}
 }

@@ -29,6 +29,8 @@ public:
 	
 	AGearGameState();
 
+	virtual void PostNetInit() override;
+
 	void Tick( float DeltaSeconds ) override;
 
 	void AllPlayerJoined_Start();
@@ -136,7 +138,12 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_RoadModuleSocketTransform, BlueprintReadOnly)
 	FTransform RoadModuleSocketTransform;
 
-//---------------------------------------------------------------------------------------------------------------------------
+	float ServerTimeDelay;
+
+	void SetServerTimeDelay(float InServerTimeDelay);
+
+	UFUNCTION(BlueprintPure)
+	float GetServerWorldTime();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void BroadcastSelectedEvent_Multi(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass, AGearPlaceable* Placeable);

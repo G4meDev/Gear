@@ -30,7 +30,11 @@ protected:
 
 	void PostInitializeComponents() override;
 
+	virtual void PostNetInit() override;
+
 	virtual void BeginPlay() override;
+
+	class AGearGameState* GearGameState;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputMappingContext* InputMappingContext;
@@ -99,4 +103,18 @@ public:
 	void ClientStateGameFinished(float StateStartTime);
 
 	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float ReachTime);
+
+// -------------------------------------------------------------------------------------------------------------------
+	UPROPERTY(EditDefaultsOnly, Category=GameState)
+	float NetworkClockUpdateFrequency = 1.0f;
+
+	TArray<float> RTTCircularBuffer;
+
+	void RequestWorldTime_Internal();
+
+	UFUNCTION(Server, Unreliable)
+	void ServerRequestWorldTime(float ClientTimestamp);
+
+	UFUNCTION(Client, Unreliable)
+	void ClientUpdateWorldTime(float ClientTimestamp, float ServerTimestamp);
 };
