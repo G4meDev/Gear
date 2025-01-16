@@ -39,6 +39,10 @@ public:
 	UMaterialInstanceDynamic* GetVehicleMaterial();
 
 	void GrantInvincibility();
+	
+	UFUNCTION(BlueprintPure)
+	bool IsInvincible();
+
 	void RemoveInvincibility();
 	bool HasInvincibility() const;
 	bool CanRemoveInvincibility();
@@ -104,9 +108,6 @@ protected:
 	virtual void Destroyed() override;
 
 	void UpdateVehicleInputs();
-
-	UFUNCTION(Server, Reliable)
-	void ActivateAbility_Server();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* SteerActionInput;

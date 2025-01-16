@@ -3,8 +3,10 @@
 
 #include "GameSystems/GearStatics.h"
 #include "Placeable/GearRoadModule.h"
+#include "Vehicle/GearVehicle.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Engine/OverlapResult.h"
 
 ERoadModuleTraceResult UGearStatics::TraceRoadModule(UObject* WorldContextObject, TSubclassOf<class AGearRoadModule> RoadModuleClass, const FTransform& SocketTransform)
 {
@@ -43,4 +45,28 @@ ERoadModuleTraceResult UGearStatics::TraceRoadModule(UObject* WorldContextObject
 		return ERoadModuleTraceResult::ExtentColliding;
 
 	return ERoadModuleTraceResult::NotColliding;
+}
+
+void UGearStatics::SphereOverlapForVehicles(UObject* WorldContextObject, TArray<class AGearVehicle*>& Vehicles, const FVector& Center, float Radius, TArray<AActor*> IgnoreActors, bool bIncludeInvincible)
+{
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionObjectQueryParams QueryParams;
+	QueryParams.AddObjectTypesToQuery(ECC_Vehicle);
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(Radius);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActors(IgnoreActors);
+
+	WorldContextObject->GetWorld()->OverlapMultiByObjectType(OverlapResults, Center, FQuat::Identity, QueryParams, SphereShape, Params);
+
+	for (const FOverlapResult& OverlapResult : OverlapResults)
+	{
+		AGearVehicle* GearVehicle = Cast<AGearVehicle>(OverlapResult.GetActor());
+		if (IsValid(GearVehicle))
+		{
+			if (bIncludeInvincible || !GearVehicle->IsInvincible())
+			{
+				Vehicles.Add(GearVehicle);
+			}
+		}
+	}
 }

@@ -235,12 +235,7 @@ void AGearVehicle::Input_Ability(const FInputActionInstance& Instance)
 {
 	if (HasAbility())
 	{
-		ActivateAbility_Server();
-
-		if (!HasAuthority())
-		{
-			Ability->ActivateAbility();
-		}
+		Ability->ActivateAbility();
 	}
 }
 
@@ -274,14 +269,6 @@ void AGearVehicle::UpdateVehicleInputs()
 	{
 		GetVehicleMovementComponent()->SetThrottleInput(ThrottleValue);
 		GetVehicleMovementComponent()->SetBrakeInput(BrakeValue);
-	}
-}
-
-void AGearVehicle::ActivateAbility_Server_Implementation()
-{
-	if (IsValid(Ability))
-	{
-		Ability->ActivateAbility();
 	}
 }
 
@@ -344,6 +331,11 @@ void AGearVehicle::GrantInvincibility()
 		bGrantedInvincibility = true;
 		InvincibilityStartTime = GetWorld()->GetTimeSeconds();
 	}
+}
+
+bool AGearVehicle::IsInvincible()
+{
+	return bGrantedInvincibility;
 }
 
 void AGearVehicle::RemoveInvincibility()
@@ -470,6 +462,7 @@ void AGearVehicle::GrantAbility(TSubclassOf<class AGearAbility> AbilityClass)
 	{
 		Ability = GetWorld()->SpawnActor<AGearAbility>(AbilityClass);
 		Ability->SetOwningVehicle(this);
+		Ability->SetOwner(this);
 		OnRep_Ability();
 	}
 }

@@ -24,6 +24,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackHitDelay;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackInnerRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackOuterRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ImpulseStrength;
+
 public:
 	AGearAbility_Hammer();
 
@@ -35,11 +44,14 @@ protected:
 
 	virtual bool CanActivate() const override;
 
-	UFUNCTION(NetMulticast, Reliable)
-	void Activate_Multi(float ActivationTime);
+	UFUNCTION(Server, Reliable)
+	void Activate_Server();
 
-	void PlayAttackMonrage();
+	UFUNCTION(NetMulticast, Reliable)
+	void Activate_Multi(float AttackHitTime, FVector Location);
+
+	void PlayAttackMontage();
 
 	FTimerHandle AttackHitTimerHandle;
-	void AttackHit();
+	void AttackHit(FVector Location);
 };
