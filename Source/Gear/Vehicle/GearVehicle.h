@@ -105,6 +105,9 @@ protected:
 
 	void UpdateVehicleInputs();
 
+	UFUNCTION(Server, Reliable)
+	void ActivateAbility_Server();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* SteerActionInput;
 
@@ -128,6 +131,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* BrakeActionInput;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInputAction* AbilityActionInput;
+
 	UChaosWheeledVehicleMovementComponent* ChaosMovementComponent;
 
 	UPROPERTY()
@@ -149,6 +155,8 @@ protected:
 
 	void Input_Throttle(const FInputActionInstance& Instance);
 	void Input_Brake(const FInputActionInstance& Instance);
+
+	void Input_Ability(const FInputActionInstance& Instance);
 
 	float ThrottleValue;
 	float BrakeValue;

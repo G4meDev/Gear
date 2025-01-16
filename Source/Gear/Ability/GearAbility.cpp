@@ -64,14 +64,7 @@ void AGearAbility::OnRep_OwningVehicle()
 
 void AGearAbility::ActivateAbility()
 {
-	if (CanActivate())
-	{
-		UAnimInstance* AnimInstance = GetDriverBodyAnimInstance();
-		if (IsValid(AnimInstance) && IsValid(ActivationMontage))
-		{
-			AnimInstance->Montage_Play(ActivationMontage);
-		}
-	}
+
 }
 
 void AGearAbility::OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)

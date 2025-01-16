@@ -18,15 +18,28 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* HammerMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackHitDelay;
+
 public:
 	AGearAbility_Hammer();
 
 	virtual void OnRep_OwningVehicle() override;
-
 	virtual void ActivateAbility() override;
 
 protected:
 	virtual void OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload) override;
 
 	virtual bool CanActivate() const override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Activate_Multi(float ActivationTime);
+
+	void PlayAttackMonrage();
+
+	FTimerHandle AttackHitTimerHandle;
+	void AttackHit();
 };

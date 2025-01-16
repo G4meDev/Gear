@@ -200,6 +200,8 @@ void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 
 		Input->BindAction(BrakeActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Brake);
 		Input->BindAction(BrakeActionInput, ETriggerEvent::Completed, this, &AGearVehicle::Input_Brake);
+
+		Input->BindAction(AbilityActionInput, ETriggerEvent::Triggered, this, &AGearVehicle::Input_Ability);
 	}
 }
 
@@ -227,6 +229,19 @@ void AGearVehicle::Input_Throttle(const FInputActionInstance& Instance)
 void AGearVehicle::Input_Brake(const FInputActionInstance& Instance)
 {
 	BrakeValue = Instance.GetValue().Get<float>();
+}
+
+void AGearVehicle::Input_Ability(const FInputActionInstance& Instance)
+{
+	if (HasAbility())
+	{
+		ActivateAbility_Server();
+
+		if (!HasAuthority())
+		{
+			Ability->ActivateAbility();
+		}
+	}
 }
 
 void AGearVehicle::Tick(float DeltaSeconds)
@@ -259,6 +274,14 @@ void AGearVehicle::UpdateVehicleInputs()
 	{
 		GetVehicleMovementComponent()->SetThrottleInput(ThrottleValue);
 		GetVehicleMovementComponent()->SetBrakeInput(BrakeValue);
+	}
+}
+
+void AGearVehicle::ActivateAbility_Server_Implementation()
+{
+	if (IsValid(Ability))
+	{
+		Ability->ActivateAbility();
 	}
 }
 

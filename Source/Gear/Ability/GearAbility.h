@@ -26,9 +26,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UAnimMontage* ItemGrabMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimMontage* ActivationMontage;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 MaxItemUsageAmount;
 
@@ -53,7 +50,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ActivateAbility();
-
 
 protected:
 	UFUNCTION()
