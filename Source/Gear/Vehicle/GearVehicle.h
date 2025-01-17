@@ -98,6 +98,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsOnGround();
 
+	UFUNCTION(BlueprintCallable)
+	void ReduceVelocityBeRatio(float Ratio);
+
 protected:
 
 	virtual void BeginPlay() override;

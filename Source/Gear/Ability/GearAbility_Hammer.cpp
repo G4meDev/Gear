@@ -23,9 +23,11 @@ AGearAbility_Hammer::AGearAbility_Hammer()
 	AttackRangeDecal->SetHiddenInGame(true);
 
 	AttackHitDelay = 0.12f;
-	AttackInnerRadius = 500.0f;
-	AttackOuterRadius = 1000.0f;
+	AttackInnerRadius = 256.0f;
+	AttackOuterRadius = 512.0f;
 	ImpulseStrength = 1000000.0f;
+	ForceZOffset = -100.0f;
+	VelocityReductionRatio = 0.7f;
 }
 
 void AGearAbility_Hammer::Tick(float DeltaTime)
@@ -85,7 +87,11 @@ bool AGearAbility_Hammer::CanActivate() const
 void AGearAbility_Hammer::ShowHammer()
 {
 	HammerMesh->SetHiddenInGame(false);
-	AttackRangeDecal->SetHiddenInGame(false);
+
+	if (IsValid(OwningVehice) && OwningVehice->IsLocallyControlled())
+	{
+		AttackRangeDecal->SetHiddenInGame(false);	
+	}
 }
 
 void AGearAbility_Hammer::Activate_Server_Implementation()
@@ -101,6 +107,11 @@ void AGearAbility_Hammer::Activate_Multi_Implementation()
 {
 	ShowHammer();
 	PlayAttackMontage();
+
+	if (IsValid(AttackEffectClass) && IsValid(OwningVehice))
+	{
+		GetWorld()->SpawnActor<AActor>(AttackEffectClass, OwningVehice->GetActorLocation(), OwningVehice->GetActorRotation());
+	}
 }
 
 void AGearAbility_Hammer::PlayAttackMontage()
@@ -114,7 +125,12 @@ void AGearAbility_Hammer::PlayAttackMontage()
 
 void AGearAbility_Hammer::AttackHit()
 {
-	FVector AttackLocation = GetActorLocation();
+	if (!OwningVehice)
+	{
+		return;
+	}
+
+	FVector AttackLocation = OwningVehice->GetActorLocation();
 
 	DrawDebugSphere(GetWorld(), AttackLocation, AttackInnerRadius, 8, FColor::Blue, false, 0.1f);
 	DrawDebugSphere(GetWorld(), AttackLocation, AttackOuterRadius, 8, FColor::Red, false, 0.1f);
@@ -128,7 +144,15 @@ void AGearAbility_Hammer::AttackHit()
 	{
 		if (IsValid(Vehicle) && Vehicle->IsOnGround())
 		{
-			Vehicle->GetMesh()->AddImpulse(FVector::UpVector * ImpulseStrength);
+			float Distance = FVector::Distance(AttackLocation, Vehicle->GetActorLocation());
+			float Alpha = (Distance - AttackInnerRadius) / (AttackOuterRadius - AttackInnerRadius);
+			Alpha = 1 - FMath::Clamp(Alpha, 0, 1);
+
+			FVector ForceDirection = (Vehicle->GetActorLocation() - AttackLocation - FVector::UpVector * ForceZOffset);
+			ForceDirection.Normalize();
+
+			Vehicle->ReduceVelocityBeRatio(VelocityReductionRatio);
+			Vehicle->GetMesh()->AddImpulse(ForceDirection * ImpulseStrength * Alpha);
 		}
 	}
 }

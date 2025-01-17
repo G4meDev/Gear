@@ -487,3 +487,12 @@ bool AGearVehicle::IsOnGround()
 
 	return false;
 }
+
+void AGearVehicle::ReduceVelocityBeRatio(float Ratio)
+{
+	if (IsValid(GetChaosMovementComponent()))
+	{
+		FVector Velocity = GetMesh()->GetComponentVelocity();		
+		GetMesh()->AddImpulse(FMath::Clamp(Ratio, 0, 1) * -Velocity, NAME_None, true);
+	}
+}

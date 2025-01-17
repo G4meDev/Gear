@@ -25,6 +25,9 @@ protected:
 	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AActor> AttackEffectClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackHitDelay;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -35,6 +38,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ImpulseStrength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ForceZOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float VelocityReductionRatio;
 
 public:
 	AGearAbility_Hammer();
