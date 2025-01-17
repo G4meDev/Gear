@@ -19,6 +19,9 @@ protected:
 	UStaticMeshComponent* HammerMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UDecalComponent* AttackRangeDecal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -35,6 +38,8 @@ protected:
 
 public:
 	AGearAbility_Hammer();
+
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void OnRep_OwningVehicle() override;
 	virtual void ActivateAbility() override;

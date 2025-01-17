@@ -4,6 +4,7 @@
 #include "Vehicle/GearVehicle.h"
 #include "Vehicle/GearDriver.h"
 #include "GameSystems/GearStatics.h"
+#include "Components/DecalComponent.h"
 #include "GameFramework/GearGameState.h"
 
 #define HAND_SOCKET_NAME TEXT("Hand")
@@ -17,10 +18,26 @@ AGearAbility_Hammer::AGearAbility_Hammer()
 	HammerMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	HammerMesh->SetHiddenInGame(true);
 
+	AttackRangeDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("AttckRangeDecal"));
+	AttackRangeDecal->SetupAttachment(Root);
+	AttackRangeDecal->SetHiddenInGame(true);
+
 	AttackHitDelay = 0.12f;
 	AttackInnerRadius = 500.0f;
 	AttackOuterRadius = 1000.0f;
 	ImpulseStrength = 1000000.0f;
+}
+
+void AGearAbility_Hammer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (IsValid(OwningVehice))
+	{
+		FQuat Quat = OwningVehice->GetActorTransform().TransformRotation(FQuat(FVector::RightVector, PI/2));
+
+		AttackRangeDecal->SetWorldLocationAndRotation(OwningVehice->GetActorLocation(), Quat.Rotator());
+	}
 }
 
 void AGearAbility_Hammer::OnRep_OwningVehicle()
@@ -68,6 +85,7 @@ bool AGearAbility_Hammer::CanActivate() const
 void AGearAbility_Hammer::ShowHammer()
 {
 	HammerMesh->SetHiddenInGame(false);
+	AttackRangeDecal->SetHiddenInGame(false);
 }
 
 void AGearAbility_Hammer::Activate_Server_Implementation()
