@@ -16,9 +16,11 @@ AGearDriver::AGearDriver()
 
 	BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
 	BodyMesh->SetupAttachment(Root);
+	BodyMesh->bReceivesDecals = false;
 
 	HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
 	HeadMesh->SetupAttachment(Root);
+	HeadMesh->bReceivesDecals = false;
 }
 
 void AGearDriver::BeginPlay()

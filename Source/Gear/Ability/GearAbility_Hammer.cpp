@@ -17,6 +17,7 @@ AGearAbility_Hammer::AGearAbility_Hammer()
 	HammerMesh->SetupAttachment(Root);
 	HammerMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	HammerMesh->SetHiddenInGame(true);
+	HammerMesh->bReceivesDecals = false;
 
 	AttackRangeDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("AttckRangeDecal"));
 	AttackRangeDecal->SetupAttachment(Root);

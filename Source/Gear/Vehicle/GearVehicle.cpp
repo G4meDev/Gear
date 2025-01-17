@@ -32,6 +32,8 @@ AGearVehicle::AGearVehicle()
 	VehicleAudioComponent = CreateDefaultSubobject<UVehicleAudioComponent>(TEXT("VehicleAudioComponent"));
 	VehicleAudioComponent->SetupAttachment(GetRootComponent());
 
+	GetMesh()->bReceivesDecals = false;
+
 	SteerValue				= 0.0f;
 	SteerAngle				= 0.0f;
 	ThrottleValue			= 0.0f;
