@@ -132,8 +132,8 @@ void AGearAbility_Hammer::AttackHit()
 
 	FVector AttackLocation = OwningVehice->GetActorLocation();
 
-	DrawDebugSphere(GetWorld(), AttackLocation, AttackInnerRadius, 8, FColor::Blue, false, 0.1f);
-	DrawDebugSphere(GetWorld(), AttackLocation, AttackOuterRadius, 8, FColor::Red, false, 0.1f);
+	//DrawDebugSphere(GetWorld(), AttackLocation, AttackInnerRadius, 8, FColor::Blue, false, 0.1f);
+	//DrawDebugSphere(GetWorld(), AttackLocation, AttackOuterRadius, 8, FColor::Red, false, 0.1f);
 
 	TArray<AActor*> IgnoreActors;
 	IgnoreActors.Add(OwningVehice);
