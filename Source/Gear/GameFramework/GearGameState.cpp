@@ -84,7 +84,10 @@ void AGearGameState::BeginPlay()
 	if (!IsValid(TrackSpline))
 	{
 		TrackSpline = Cast<ATrackSpline>(UGameplayStatics::GetActorOfClass(GetWorld(), ATrackSpline::StaticClass()));
-		check(TrackSpline);
+		if (!IsValid(TrackSpline))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("There is no track spline actor in level!"));
+		}
 	}
 
 	check(IsValid(NotifictionBoardClass));

@@ -95,6 +95,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	AGearDriver* GetDriver();
 
+	UFUNCTION(BlueprintPure)
+	bool IsOnGround();
+
 protected:
 
 	virtual void BeginPlay() override;

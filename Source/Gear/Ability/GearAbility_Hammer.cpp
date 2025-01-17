@@ -45,12 +45,7 @@ void AGearAbility_Hammer::ActivateAbility()
 {
 	Super::ActivateAbility();
 
-	if (CanActivate())
-	{
-		PlayAttackMontage();
-
-		Activate_Server();
-	}
+	Activate_Server();
 }
 
 void AGearAbility_Hammer::OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
@@ -59,7 +54,7 @@ void AGearAbility_Hammer::OnMontageNotify(FName NotifyName, const FBranchingPoin
 
 	if (NotifyName == NOTIFY_ITEM_GRABBED_NAME)
 	{
-		HammerMesh->SetHiddenInGame(false);
+		ShowHammer();
 	}
 
 	
@@ -70,51 +65,24 @@ bool AGearAbility_Hammer::CanActivate() const
 	return Super::CanActivate();
 }
 
+void AGearAbility_Hammer::ShowHammer()
+{
+	HammerMesh->SetHiddenInGame(false);
+}
+
 void AGearAbility_Hammer::Activate_Server_Implementation()
 {
 	if (CanActivate())
 	{
-		FVector ActivationLocation = GetActorLocation();
-		float ActivationTime = GetWorld()->GetTimeSeconds();
-
-		float HitTime = ActivationTime + AttackHitDelay;
-
-		UE_LOG(LogTemp, Warning, TEXT("SSSSSSSSSSSS : %f"), ActivationTime);
-
-		Activate_Multi(HitTime, ActivationLocation);
-
-		GetWorld()->GetTimerManager().SetTimer(AttackHitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearAbility_Hammer::AttackHit, ActivationLocation), AttackHitDelay, false);
+		GetWorld()->GetTimerManager().SetTimer(AttackHitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearAbility_Hammer::AttackHit), AttackHitDelay, false);
+		Activate_Multi();
 	}
 }
 
-void AGearAbility_Hammer::Activate_Multi_Implementation(float AttackHitTime, FVector Location)
+void AGearAbility_Hammer::Activate_Multi_Implementation()
 {
-	if (HasAuthority())
-	{
-		
-	}
-	else
-	{
-		if (!OwningVehice->IsLocallyControlled())
-		{
-			PlayAttackMontage();
-		}
-
-// 		UNetConnection* NetConnection = GetWorld()->GetGameState()->GetNetConnection();
-// 		GetWorld()->
-// 		APlayerState* a;
-// 
-// 		a->GetPingInMilliseconds()
-// 
-// 		float TimerDelay = AttackHitDelay - NetConnection->RTT
-// 
-// 		UE_LOG(LogTemp, Warning, TEXT("WWWWWWWWWWWWWWWWWWWW : %f"), TimerDelay);
-// 
-// 		if (TimerDelay > 0)
-// 		{
-// 			GetWorld()->GetTimerManager().SetTimer(AttackHitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearAbility_Hammer::AttackHit, Location), TimerDelay, false);
-// 		} 
-	}
+	ShowHammer();
+	PlayAttackMontage();
 }
 
 void AGearAbility_Hammer::PlayAttackMontage()
@@ -126,28 +94,23 @@ void AGearAbility_Hammer::PlayAttackMontage()
 	}
 }
 
-void AGearAbility_Hammer::AttackHit(FVector Location)
+void AGearAbility_Hammer::AttackHit()
 {
-	//if (HasAuthority())
-	if (true)
+	FVector AttackLocation = GetActorLocation();
+
+	DrawDebugSphere(GetWorld(), AttackLocation, AttackInnerRadius, 8, FColor::Blue, false, 0.1f);
+	DrawDebugSphere(GetWorld(), AttackLocation, AttackOuterRadius, 8, FColor::Red, false, 0.1f);
+
+	TArray<AActor*> IgnoreActors;
+	IgnoreActors.Add(OwningVehice);
+	TArray<AGearVehicle*> InRangeVehicles;
+	UGearStatics::SphereOverlapForVehicles(this, InRangeVehicles, AttackLocation, AttackOuterRadius, IgnoreActors);
+
+	for (AGearVehicle* Vehicle : InRangeVehicles)
 	{
-		FVector AttackLocation = Location;
-		//FVector AttackLocation = GetActorLocation();
-
-		DrawDebugSphere(GetWorld(), AttackLocation, AttackInnerRadius, 8, FColor::Blue, false, 0.1f);
-		DrawDebugSphere(GetWorld(), AttackLocation, AttackOuterRadius, 8, FColor::Red, false, 0.1f);
-
-		TArray<AActor*> IgnoreActors;
-		IgnoreActors.Add(OwningVehice);
-		TArray<AGearVehicle*> InRangeVehicles;
-		UGearStatics::SphereOverlapForVehicles(this, InRangeVehicles, AttackLocation, AttackOuterRadius, IgnoreActors);
-
-		for (AGearVehicle* Vehicle : InRangeVehicles)
+		if (IsValid(Vehicle) && Vehicle->IsOnGround())
 		{
-			if (IsValid(Vehicle))
-			{
-				Vehicle->GetMesh()->AddImpulse(FVector::UpVector * ImpulseStrength);
-			}
+			Vehicle->GetMesh()->AddImpulse(FVector::UpVector * ImpulseStrength);
 		}
 	}
 }

@@ -44,14 +44,16 @@ protected:
 
 	virtual bool CanActivate() const override;
 
+	void ShowHammer();
+
 	UFUNCTION(Server, Reliable)
 	void Activate_Server();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Activate_Multi(float AttackHitTime, FVector Location);
+	void Activate_Multi();
 
 	void PlayAttackMontage();
 
 	FTimerHandle AttackHitTimerHandle;
-	void AttackHit(FVector Location);
+	void AttackHit();
 };

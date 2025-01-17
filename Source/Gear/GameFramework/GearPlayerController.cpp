@@ -349,7 +349,6 @@ void AGearPlayerController::OnRemovePlayer(AGearPlayerState* GearPlayer)
 void AGearPlayerController::RequestWorldTime_Internal()
 {
 	ServerRequestWorldTime(GetWorld()->GetTimeSeconds());
-	UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!!!!!!!"));
 }
 
 void AGearPlayerController::ServerRequestWorldTime_Implementation(float ClientTimestamp)

@@ -471,3 +471,19 @@ AGearDriver* AGearVehicle::GetDriver()
 {
 	return Driver;
 }
+
+bool AGearVehicle::IsOnGround()
+{
+	if (IsValid(GetChaosMovementComponent()))
+	{
+		for (int i = 0; i < ChaosMovementComponent->GetNumWheels(); i++)
+		{
+			if (ChaosMovementComponent->GetWheelState(i).bInContact)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

@@ -105,7 +105,7 @@ public:
 	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float ReachTime);
 
 // -------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(EditDefaultsOnly, Category=GameState)
+	UPROPERTY(EditDefaultsOnly)
 	float NetworkClockUpdateFrequency = 1.0f;
 
 	TArray<float> RTTCircularBuffer;
