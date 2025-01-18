@@ -60,4 +60,16 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float FurthestReachedCheckpointTime);
+
+protected:
+	TArray<class UGearBaseWidget*> WidgetStack;
+
+	UFUNCTION(BlueprintCallable)
+	void AddWidget(UGearBaseWidget* Widget);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveWidget(UGearBaseWidget* Widget);
+
+	UFUNCTION(BlueprintCallable)
+	void ReconstructWidgetsOrder();
 };

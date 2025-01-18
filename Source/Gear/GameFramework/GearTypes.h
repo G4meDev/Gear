@@ -164,3 +164,10 @@ enum class EAbilityType : uint8
 	None,
 	Hammer
 };
+
+UENUM(BlueprintType)
+enum class EWidgetOrder: uint8
+{
+	LowPriority = 0,
+	PauseMenu
+};

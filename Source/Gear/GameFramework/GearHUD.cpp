@@ -5,3 +5,18 @@
 #include "GameFramework/GearPlayerState.h"
 #include "Blueprint/UserWidget.h"
 #include "Utils/GameVariablesBFL.h"
+
+void AGearHUD::AddWidget(UGearBaseWidget* Widget)
+{
+
+}
+
+void AGearHUD::RemoveWidget(UGearBaseWidget* Widget)
+{
+
+}
+
+void AGearHUD::ReconstructWidgetsOrder()
+{
+
+}
