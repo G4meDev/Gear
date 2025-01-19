@@ -166,8 +166,8 @@ enum class EAbilityType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EWidgetOrder: uint8
+enum class EWidgetOrder : uint8
 {
 	LowPriority = 0,
-	PauseMenu
+	PauseMenu = 1
 };

@@ -304,6 +304,7 @@ void AGearGameState::Racing_Start()
 	if (IsValid(GetLocalPlayer()))
 	{
 		LocalPlayer->ClientStateRacing_Start(LastGameStateTransitionTime);
+		LocalPlayer->SetViewTarget(VehicleCamera);
 	}
 }
 

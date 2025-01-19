@@ -53,7 +53,7 @@ void AGearHUD::AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidg
 		if (IsValid(Widget))
 		{
 			Widget->OwningHUD = this;
-			Widget->StartTime_Temp = InStartTime;
+			Widget->StartTime = InStartTime;
 			WidgetStack.Add(Widget);
 			ReconstructWidgetsOrder();
 		}
@@ -72,16 +72,16 @@ void AGearHUD::RemoveWidget(UGearBaseWidget*& Widget)
 
 void AGearHUD::ReconstructWidgetsOrder()
 {
-	WidgetStack.Sort(
+	WidgetStack.StableSort(
 		[](const UGearBaseWidget& A, const UGearBaseWidget& B)
 		{
 			return static_cast<uint8>(A.WidgetOrder) < static_cast<uint8>(B.WidgetOrder);
 		});
 
-	for (UGearBaseWidget* Widget : WidgetStack)
+	for (int i = 0; i < WidgetStack.Num(); i++)
 	{
-		Widget->RemoveFromParent();
-		Widget->AddToViewport();
+		WidgetStack[i]->RemoveFromParent();
+		WidgetStack[i]->AddToViewport();
 	}
 }
 

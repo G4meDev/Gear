@@ -23,12 +23,11 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EWidgetOrder WidgetOrder;
 
-
 	UPROPERTY(BlueprintReadOnly)
 	class AGearHUD* OwningHUD;
 
 	UPROPERTY(BlueprintReadOnly)
-	float StartTime_Temp;
+	float StartTime;
 
 	friend class AGearHUD;
 };
