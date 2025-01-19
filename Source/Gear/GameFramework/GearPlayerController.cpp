@@ -72,15 +72,6 @@ void AGearPlayerController::BeginPlay()
 		Touch2_InputHandler.Init(ETouchIndex::Touch2);
 
 #endif
-
-		for(APlayerState* State : GetWorld()->GetGameState()->PlayerArray)
-		{
-			AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(State);
-			if (IsValid(GearPlayer))
-			{
-				OnNewPlayer(GearPlayer);
-			}
-		}
 	}
 
 
@@ -337,7 +328,7 @@ void AGearPlayerController::RespondClientIsReady_Implementation()
 	IsReady = true;
 }
 
-void AGearPlayerController::OnNewPlayer(AGearPlayerState* GearPlayer)
+void AGearPlayerController::OnPlayerJoined(AGearPlayerState* GearPlayer)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
@@ -346,7 +337,7 @@ void AGearPlayerController::OnNewPlayer(AGearPlayerState* GearPlayer)
 	}
 }
 
-void AGearPlayerController::OnRemovePlayer(AGearPlayerState* GearPlayer)
+void AGearPlayerController::OnPlayerQuit(AGearPlayerState* GearPlayer)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))

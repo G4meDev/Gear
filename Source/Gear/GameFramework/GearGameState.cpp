@@ -238,6 +238,16 @@ void AGearGameState::Waiting_Start()
 	{
 		LocalPlayer->ClientStateWaiting_Start(LastGameStateTransitionTime);
 	}
+
+	for (APlayerState* Player : PlayerArray)
+	{
+		AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(Player);
+
+		if (IsValid(GearPlayer))
+		{
+			LocalPlayer->OnPlayerJoined(GearPlayer);
+		}
+	}
 }
 
 void AGearGameState::Waiting_End()
@@ -589,21 +599,12 @@ void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
 
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	if (IsValid(GetLocalPlayer()))
 	{
-		APlayerController* const PlayerController = Iterator->Get();
-		if (PlayerController && PlayerController->IsLocalController())
+		AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(PlayerState);
+		if (IsValid(GearPlayer))
 		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-
-			if (IsValid(GearController))
-			{
-				AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(PlayerState);
-				if (IsValid(GearPlayer))
-				{
-					GearController->OnNewPlayer(GearPlayer);
-				}
-			}
+			LocalPlayer->OnPlayerJoined(GearPlayer);
 		}
 	}
 }
@@ -612,21 +613,12 @@ void AGearGameState::RemovePlayerState(APlayerState* PlayerState)
 {
 	Super::RemovePlayerState(PlayerState);
 
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	if (IsValid(GetLocalPlayer()))
 	{
-		APlayerController* const PlayerController = Iterator->Get();
-		if (PlayerController && PlayerController->IsLocalController())
+		AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(PlayerState);
+		if (IsValid(GearPlayer))
 		{
-			AGearPlayerController* GearController = Cast<AGearPlayerController>(PlayerController);
-
-			if (IsValid(GearController))
-			{
-				AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(PlayerState);
-				if (IsValid(GearPlayer))
-				{
-					GearController->OnRemovePlayer(GearPlayer);
-				}
-			}
+			LocalPlayer->OnPlayerQuit(GearPlayer);
 		}
 	}
 }

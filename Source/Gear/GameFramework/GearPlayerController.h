@@ -71,8 +71,8 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void RespondClientIsReady();
 
-	void OnNewPlayer(AGearPlayerState* GearPlayer);
-	void OnRemovePlayer(AGearPlayerState* GearPlayer);
+	void OnPlayerJoined(AGearPlayerState* GearPlayer);
+	void OnPlayerQuit(AGearPlayerState* GearPlayer);
 
 
 	UFUNCTION(Server, Reliable)
