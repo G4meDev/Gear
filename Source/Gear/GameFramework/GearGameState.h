@@ -33,16 +33,24 @@ public:
 
 	void Tick( float DeltaSeconds ) override;
 
-	void AllPlayerJoined_Start();
-	void AllPlayerJoined_End();
-	void SelectingPlaceables_Start();
+	UFUNCTION(BlueprintPure)
+	class AGearPlayerController* GetLocalPlayer();
+
+
+	void Waiting_Start();
+	void Waiting_End();
+	void Selecting_Start();
+	void Selecting_End();
 	void Placing_Start();
 	void Placing_End();
 	void Racing_Start();
 	void Racing_End();
 	void Scoreboard_Start();
 	void Scoreboard_End();
-	void GameFinished();
+	void Finishboard_Start();
+	void Finishboard_End();
+
+	void NotifyAllPlayersJoined();
 
 	float GetEstimatedScoreboardLifespan() const;
 
@@ -171,7 +179,16 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AVehicleCamera> VehicleCameraClass;
+
+	UPROPERTY()
+	class AGearPlayerController* LocalPlayer;
 	
+	UFUNCTION()
+	void OnRep_EveryPlayerReady();
+
+	UPROPERTY(ReplicatedUsing=OnRep_EveryPlayerReady)
+	bool bEveryPlayerReady;
+
 //----------------------------------------------------------------------------------------------------------------------------
 
 	UPROPERTY(Replicated)

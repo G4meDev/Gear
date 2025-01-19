@@ -73,13 +73,6 @@ void AGearPlayerController::BeginPlay()
 
 #endif
 
-
-		AGearHUD* GearHUD = GetHUD<AGearHUD>();
-		if (IsValid(GearHUD))
-		{
-			GearHUD->ShowWaitingScreen();
-		}
-
 		for(APlayerState* State : GetWorld()->GetGameState()->PlayerArray)
 		{
 			AGearPlayerState* GearPlayer = Cast<AGearPlayerState>(State);
@@ -160,32 +153,6 @@ void AGearPlayerController::UpdateAndInjectInputs()
 	}
 }
 
-void AGearPlayerController::ClientStateAllPlayersJoined()
-{
-	AGearHUD* GearHUD = GetHUD<AGearHUD>();
-	if (IsValid(GearHUD))
-	{
-		GearHUD->AllPlayersJoined();
-	}
-}
-
-void AGearPlayerController::ClientStateAllPlayersJoined_End()
-{
-	AGearHUD* GearHUD = GetHUD<AGearHUD>();
-	if (IsValid(GearHUD))
-	{
-	}
-}
-
-void AGearPlayerController::ClientStateMatchStarted()
-{
-	AGearHUD* GearHUD = GetHUD<AGearHUD>();
-	if (IsValid(GearHUD))
-	{
-		GearHUD->RemoveWaitingScreen();
-	}
-}
-
 void AGearPlayerController::SelectPlaceable_Implementation(AGearPlaceable* Placeable)
 {
 	AGearBuilderPawn* BuilderPawn = GetPawn<AGearBuilderPawn>();
@@ -227,41 +194,66 @@ void AGearPlayerController::ClickedOnHazardSocketMarker(class AHazardSocketMarke
 	}
 }
 
-void AGearPlayerController::ClientStateSelectingPieces(float StateStartTime)
+void AGearPlayerController::ClientStateWaiting_Start(float StartTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->StartSelectingPieces(StateStartTime);
+		GearHUD->Waiting_Start(StartTime);
 	}
 }
 
-void AGearPlayerController::ClientStatePlacing(float StateStartTime)
+void AGearPlayerController::ClientStateWaiting_End()
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->StartPlacingPieces(StateStartTime);
+		GearHUD->Waiting_End();
 	}
 }
 
-
-
-void AGearPlayerController::ClientStatePlacing_Finish()
+void AGearPlayerController::ClientStateSelecting_Start(float StartTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->PlacingPieces_End();
+		GearHUD->Selecting_Start(StartTime);
 	}
 }
 
-void AGearPlayerController::ClientStateRacing_Start(float StateStartTime)
+void AGearPlayerController::ClientStateSelecting_End()
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->Racing_Start(StateStartTime);
+		GearHUD->Selecting_End();
+	}
+}
+
+void AGearPlayerController::ClientStatePlacing_Start(float StartTime)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->Placing_Start(StartTime);
+	}
+}
+
+void AGearPlayerController::ClientStatePlacing_End()
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->Placing_End();
+	}
+}
+
+void AGearPlayerController::ClientStateRacing_Start(float StartTime)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->Racing_Start(StartTime);
 	}
 
 
@@ -276,12 +268,13 @@ void AGearPlayerController::ClientStateRacing_End()
 	}
 }
 
-void AGearPlayerController::ClientStateScoreboard_Start(float StateStartTime, const TArray<FCheckpointResult>& RoundResults)
+void AGearPlayerController::ClientStateScoreboard_Start(float StartTime, const TArray<FCheckpointResult>& RoundResults)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->Scoreboard_Start(StateStartTime, RoundResults);
+		//GearHUD->Scoreboard_Start(StateStartTime, RoundResults);
+		GearHUD->Scoreboard_Start(StartTime);
 	}
 }
 
@@ -294,12 +287,21 @@ void AGearPlayerController::ClientStateScoreboard_End()
 	}
 }
 
-void AGearPlayerController::ClientStateGameFinished(float StateStartTime)
+void AGearPlayerController::ClientStateFinishboard_Start(float StartTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->GameFinished(StateStartTime);
+		GearHUD->Finishboard_Start(StartTime);
+	}
+}
+
+void AGearPlayerController::ClientStateFinishboard_End()
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->Finishboard_End();
 	}
 }
 
@@ -309,6 +311,15 @@ void AGearPlayerController::NotifyFurthestReachedCheckpoint(int32 FurthestReache
 	if (IsValid(GearHUD))
 	{
 		GearHUD->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsNum, ReachTime);
+	}
+}
+
+void AGearPlayerController::NotifyAllPlayerJoined()
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->AllPlayersJoined();
 	}
 }
 
@@ -331,7 +342,7 @@ void AGearPlayerController::OnNewPlayer(AGearPlayerState* GearPlayer)
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->AddPlayer(GearPlayer);
+		GearHUD->PlayerJoined(GearPlayer);
 	}
 }
 
@@ -340,7 +351,7 @@ void AGearPlayerController::OnRemovePlayer(AGearPlayerState* GearPlayer)
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->RemovePlayer(GearPlayer);
+		GearHUD->PlayerQuit(GearPlayer);
 	}
 }
 

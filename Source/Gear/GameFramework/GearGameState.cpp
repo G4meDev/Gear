@@ -26,7 +26,7 @@
 
 AGearGameState::AGearGameState()
 {
-	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
+	GearMatchState = EGearMatchState::None;
 
 	LastPlacedCheckpointModuleStackIndex = 0;
 	FurthestReachedDistace = 0.0f;
@@ -37,6 +37,26 @@ AGearGameState::AGearGameState()
 	WorldMax = FVector::ZeroVector;
 
 	ServerTimeDelay = 0.0f;
+	bEveryPlayerReady = false;
+}
+
+void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGearGameState, GearMatchState);
+	DOREPLIFETIME(AGearGameState, bEveryPlayerReady);
+	DOREPLIFETIME(AGearGameState, LastGameStateTransitionTime);
+	DOREPLIFETIME(AGearGameState, CheckpointsStack);
+	DOREPLIFETIME(AGearGameState, Vehicles);
+	DOREPLIFETIME(AGearGameState, CheckpointResults);
+	DOREPLIFETIME(AGearGameState, RoundNumber);
+	DOREPLIFETIME(AGearGameState, LastCountDownTime);
+	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpoint);
+	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpointTime);
+	DOREPLIFETIME(AGearGameState, RoadModuleSocketTransform);
+	DOREPLIFETIME(AGearGameState, WorldMin);
+	DOREPLIFETIME(AGearGameState, WorldMax);
 }
 
 void AGearGameState::PostNetInit()
@@ -59,22 +79,20 @@ void AGearGameState::Tick(float DeltaSeconds)
 	}
 }
 
-void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+class AGearPlayerController* AGearGameState::GetLocalPlayer()
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
-	DOREPLIFETIME(AGearGameState, GearMatchState);
-	DOREPLIFETIME(AGearGameState, LastGameStateTransitionTime);
-	DOREPLIFETIME(AGearGameState, CheckpointsStack);
-	DOREPLIFETIME(AGearGameState, Vehicles);
-	DOREPLIFETIME(AGearGameState, CheckpointResults);
-	DOREPLIFETIME(AGearGameState, RoundNumber);
-	DOREPLIFETIME(AGearGameState, LastCountDownTime);
-	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpoint);
-	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpointTime);
-	DOREPLIFETIME(AGearGameState, RoadModuleSocketTransform);
-	DOREPLIFETIME(AGearGameState, WorldMin);
-	DOREPLIFETIME(AGearGameState, WorldMax);
+	if (!IsValid(LocalPlayer))
+	{
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			if (Iterator->Get()->IsLocalController())
+			{
+				LocalPlayer = Cast<AGearPlayerController>(Iterator->Get());
+			}
+		}
+	}
+
+	return LocalPlayer;
 }
 
 void AGearGameState::BeginPlay()
@@ -125,13 +143,11 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 	switch (OldState)
 	{
 	case EGearMatchState::WaitingForPlayerToJoin:
-		break;
-
-	case EGearMatchState::AllPlayersJoined:
-		AllPlayerJoined_End();
+		Waiting_End();
 		break;
 
 	case EGearMatchState::SelectingPlaceables:
+		Selecting_End();
 		break;
 
 	case EGearMatchState::Placing:
@@ -147,7 +163,7 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		break;
 
 	case EGearMatchState::GameFinished:
-
+		Finishboard_End();
 		break;
 
 	default:
@@ -159,14 +175,11 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 	switch (GearMatchState)
 	{
 	case EGearMatchState::WaitingForPlayerToJoin:
-		break;
-
-	case EGearMatchState::AllPlayersJoined:
-		AllPlayerJoined_Start();
+		Waiting_Start();
 		break;
 
 	case EGearMatchState::SelectingPlaceables:
-		SelectingPlaceables_Start();
+		Selecting_Start();
 		break;
 
 	case EGearMatchState::Placing:
@@ -182,7 +195,7 @@ void AGearGameState::OnRep_GearMatchState(EGearMatchState OldState)
 		break;
 
 	case EGearMatchState::GameFinished:
-		GameFinished();
+		Finishboard_Start();
 		break;
 
 	default:
@@ -219,64 +232,51 @@ void AGearGameState::OnRep_RoadModuleSocketTransform()
 	}
 }
 
-void AGearGameState::AllPlayerJoined_Start()
+void AGearGameState::Waiting_Start()
 {
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* GearController = Cast<AGearPlayerController>(*Iterator);
-		if (IsValid(GearController) && GearController->IsLocalController())
-		{
-			GearController->ClientStateAllPlayersJoined();
-		}
+		LocalPlayer->ClientStateWaiting_Start(LastGameStateTransitionTime);
 	}
 }
 
-void AGearGameState::AllPlayerJoined_End()
+void AGearGameState::Waiting_End()
 {
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* GearController = Cast<AGearPlayerController>(*Iterator);
-		if (IsValid(GearController) && GearController->IsLocalController())
-		{
-			GearController->ClientStateAllPlayersJoined_End();
-		}
+		LocalPlayer->ClientStateWaiting_End();
 	}
 }
 
-void AGearGameState::SelectingPlaceables_Start()
+void AGearGameState::Selecting_Start()
 {
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController) && PlayerController->IsLocalController())
-		{
-			PlayerController->ClientStateMatchStarted();
-			PlayerController->ClientStateSelectingPieces(LastGameStateTransitionTime);
-		}
+		LocalPlayer->ClientStateSelecting_Start(LastGameStateTransitionTime);
+	}
+}
+
+void AGearGameState::Selecting_End()
+{
+	if (IsValid(GetLocalPlayer()))
+	{
+		LocalPlayer->ClientStateSelecting_End();
 	}
 }
 
 void AGearGameState::Placing_Start()
 {
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController) && PlayerController->IsLocalController())
-		{
-			PlayerController->ClientStatePlacing(LastGameStateTransitionTime);
-		}
+		LocalPlayer->ClientStatePlacing_Start(LastGameStateTransitionTime);
 	}
 }
 
 void AGearGameState::Placing_End()
 {
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController) && PlayerController->IsLocalController())
-		{
-			PlayerController->ClientStatePlacing_Finish();
-		}
+		LocalPlayer->ClientStatePlacing_End();
 	}
 }
 
@@ -291,14 +291,9 @@ void AGearGameState::Racing_Start()
 		VehicleCamera = GetWorld()->SpawnActor<AVehicleCamera>(VehicleCameraClass);
 	}
 
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController) && PlayerController->IsLocalController())
-		{
-			PlayerController->ClientStateRacing_Start(LastGameStateTransitionTime);
-			PlayerController->SetViewTarget(VehicleCamera);
-		}
+		LocalPlayer->ClientStateRacing_Start(LastGameStateTransitionTime);
 	}
 }
 
@@ -306,25 +301,17 @@ void AGearGameState::Racing_End()
 {
 	MarkActorsIdle();
 
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController) && PlayerController->IsLocalController())
-		{
-			PlayerController->ClientStateRacing_End();
-		}
+		LocalPlayer->ClientStateRacing_End();
 	}
 }
 
 void AGearGameState::Scoreboard_Start()
 {
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController) && PlayerController->IsLocalController())
-		{
-			PlayerController->ClientStateScoreboard_Start(LastGameStateTransitionTime, CheckpointResults);
-		}
+		LocalPlayer->ClientStateScoreboard_Start(LastGameStateTransitionTime, CheckpointResults);
 	}
 
 	for (APlayerState* PlayerState : PlayerArray)
@@ -343,25 +330,33 @@ void AGearGameState::Scoreboard_End()
 		VehicleCamera->Destroy();
 	}
 
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController) && PlayerController->IsLocalController())
-		{
-			PlayerController->ClientStateScoreboard_End();
-		}
+		LocalPlayer->ClientStateScoreboard_End();
 	}
 }
 
-void AGearGameState::GameFinished()
+void AGearGameState::Finishboard_Start()
 {
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	if (IsValid(GetLocalPlayer()))
 	{
-		AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-		if (IsValid(PlayerController) && PlayerController->IsLocalController())
-		{
-			PlayerController->ClientStateGameFinished(LastGameStateTransitionTime);
-		}
+		LocalPlayer->ClientStateFinishboard_Start(LastGameStateTransitionTime);
+	}
+}
+
+void AGearGameState::Finishboard_End()
+{
+	if (IsValid(GetLocalPlayer()))
+	{
+		LocalPlayer->ClientStateFinishboard_End();
+	}
+}
+
+void AGearGameState::NotifyAllPlayersJoined()
+{
+	if (IsValid(GetLocalPlayer()))
+	{
+		LocalPlayer->NotifyAllPlayerJoined();
 	}
 }
 
@@ -633,6 +628,14 @@ void AGearGameState::RemovePlayerState(APlayerState* PlayerState)
 				}
 			}
 		}
+	}
+}
+
+void AGearGameState::OnRep_EveryPlayerReady()
+{
+	if (bEveryPlayerReady)
+	{
+		NotifyAllPlayersJoined();
 	}
 }
 

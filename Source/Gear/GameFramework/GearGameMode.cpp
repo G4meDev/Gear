@@ -34,8 +34,7 @@ AGearGameMode::AGearGameMode()
 
 	bUseSeamlessTravel = true;
 
-	GearMatchState = EGearMatchState::WaitingForPlayerToJoin;
-	CheckpointDistance = 1000.0f;
+	CheckpointDistance = 1000.0f;	
 }
 
 void AGearGameMode::BeginPlay()
@@ -44,6 +43,7 @@ void AGearGameMode::BeginPlay()
 
 	GearGameState = GetGameState<AGearGameState>();
 	check(IsValid(GearGameState));
+	SetGearMatchState(EGearMatchState::WaitingForPlayerToJoin);
 
 	bool bFailed = false;
 
@@ -75,15 +75,15 @@ void AGearGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (GearMatchState == EGearMatchState::WaitingForPlayerToJoin)
+	if (GetGearMatchState() == EGearMatchState::WaitingForPlayerToJoin)
 	{
-		if (CheckIsEveryPlayerReady())
+		if (!GearGameState->bEveryPlayerReady && CheckIsEveryPlayerReady())
 		{
 			AllPlayerJoined();
 		}
 	}
 
-	else if (GearMatchState == EGearMatchState::SelectingPlaceables)
+	else if (GetGearMatchState() == EGearMatchState::SelectingPlaceables)
 	{
 		if (IsEveryPlayerSelectedPlaceables())
 		{
@@ -91,7 +91,7 @@ void AGearGameMode::Tick(float DeltaSeconds)
 		}
 	}
 
-	else if (GearMatchState == EGearMatchState::Placing)
+	else if (GetGearMatchState() == EGearMatchState::Placing)
 	{
 		if (IsEveryPlayerPlaced())
 		{
@@ -99,7 +99,7 @@ void AGearGameMode::Tick(float DeltaSeconds)
 		}
 	}
 
-	else if (GearMatchState == EGearMatchState::Racing)
+	else if (GetGearMatchState() == EGearMatchState::Racing)
 	{
 		RacingTick(DeltaSeconds);
 	}
@@ -268,7 +268,7 @@ void AGearGameMode::DestroyAllVehicles(bool bIncludeSpectators)
 
 void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable, AGearBuilderPawn* Player)
 {
-	if (GearMatchState == EGearMatchState::SelectingPlaceables && GearGameState->TimeFromLastTransition() > 2.0f &&  GearGameState->LastGameStateTransitionTime  && IsValid(Placeable) && IsValid(Player) && !Player->HasSelectedPlaceable() && !Placeable->HasOwningPlayer())
+	if (GetGearMatchState() == EGearMatchState::SelectingPlaceables && GearGameState->TimeFromLastTransition() > 2.0f &&  GearGameState->LastGameStateTransitionTime  && IsValid(Placeable) && IsValid(Player) && !Player->HasSelectedPlaceable() && !Placeable->HasOwningPlayer())
 	{
 		Player->SetSelectedPlaceable(Placeable);
 		GearGameState->BroadcastSelectedEvent_Multi(Player->GetPlayerState<AGearPlayerState>(), AGearPlaceable::StaticClass()->GetAuthoritativeClass(), Placeable);
@@ -277,7 +277,7 @@ void AGearGameMode::RequestSelectingPlaceableForPlayer(AGearPlaceable* Placeable
 
 void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, TSubclassOf<AGearRoadModule> RoadModule, bool bMirrorX)
 {
-	if (GearMatchState == EGearMatchState::Placing && IsValid(PC) && IsValid(RoadModule))
+	if (GetGearMatchState() == EGearMatchState::Placing && IsValid(PC) && IsValid(RoadModule))
 	{
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
 
@@ -302,7 +302,7 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 
 void AGearGameMode::RequestPlaceHazardForPlayer(AGearPlayerController* PC, class UHazardSocketComponent* TargetSocket)
 {
-	if (GearMatchState == EGearMatchState::Placing && IsValid(PC) && IsValid(TargetSocket) && !TargetSocket->IsOccupied())
+	if (GetGearMatchState() == EGearMatchState::Placing && IsValid(PC) && IsValid(TargetSocket) && !TargetSocket->IsOccupied())
 	{
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
 		if (IsValid(BuilderPawn) && BuilderPawn->RemainingHazardCount > 0 && IsValid(BuilderPawn->SelectedPlaceableClass) 
@@ -407,11 +407,16 @@ void AGearGameMode::HandleMatchAborted()
 
 void AGearGameMode::SetGearMatchState(EGearMatchState InGearMatchState)
 {
+	EGearMatchState OldState = GetGearMatchState();
+
 	GearGameState->GearMatchState = InGearMatchState;
 	GearGameState->LastGameStateTransitionTime = GearGameState->GetServerWorldTimeSeconds();
-	GearGameState->OnRep_GearMatchState(GearMatchState);
+	GearGameState->OnRep_GearMatchState(OldState);
+}
 
-	GearMatchState = InGearMatchState;
+EGearMatchState AGearGameMode::GetGearMatchState() const
+{
+	return GearGameState->GearMatchState;
 }
 
 void AGearGameMode::AssignPlaceablesToUnowningPlayers()
@@ -791,10 +796,12 @@ bool AGearGameMode::CheckIsEveryPlayerReady()
 }
 
 void AGearGameMode::AllPlayerJoined()
-{
+{	
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGearGameMode::StartNewRound, UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay());
 
+	GearGameState->bEveryPlayerReady = true;
+	GearGameState->OnRep_EveryPlayerReady();
+
 	UE_LOG(LogTemp, Warning, TEXT("all player joined"));
-	SetGearMatchState(EGearMatchState::AllPlayersJoined);
 }

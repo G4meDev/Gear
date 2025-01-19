@@ -54,6 +54,7 @@ protected:
 	void HandleMatchAborted() override;
 
 	void SetGearMatchState(EGearMatchState InGearMatchState);
+	EGearMatchState GetGearMatchState() const;
 
 	bool CheckIsEveryPlayerReady();
 	void AllPlayerJoined();
@@ -101,8 +102,6 @@ protected:
 	bool ShouldVehicleDie(AGearVehicle* Vehicle, EElimanationReason& EliminationReson);
 	void DestroyVehicle(AGearVehicle* Vehicle);
 	void DestroyAllVehicles(bool bIncludeSpectators = false);
-
-	EGearMatchState GearMatchState;
 
 	TArray<AGearPlaceable*> PreviewPlaceables;
 

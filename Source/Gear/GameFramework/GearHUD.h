@@ -9,6 +9,10 @@
 
 class AGearPlayerState;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllPlayersJoined);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerJoined, AGearPlayerState*, Player);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerQuit, AGearPlayerState*, Player);
+
 /**
  * 
  */
@@ -17,81 +21,7 @@ class GEAR_API AGearHUD : public AHUD
 {
 	GENERATED_BODY()
 	
-public:
-
-	AGearHUD();
-	virtual void BeginPlay() override;
-	virtual void Destroyed() override;
-	virtual void Tick(float DeltaSeconds) override;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void ShowWaitingScreen();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void RemoveWaitingScreen();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void AllPlayersJoined();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void StartSelectingPieces(float Time);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void StartPlacingPieces(float Time);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void PlacingPieces_End();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void Racing_Start(float Time);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void Racing_End();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void Scoreboard_Start(float Time, const TArray<FCheckpointResult>& RoundResults);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void Scoreboard_End();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void GameFinished(float Time);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void AddPlayer(AGearPlayerState* InPlayer);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void RemovePlayer(AGearPlayerState* InPlayer);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float FurthestReachedCheckpointTime);
-
-	void SelectingStart();
-
-	UFUNCTION(BlueprintCallable)
-	void Pause_Start();
-
-	UFUNCTION(BlueprintCallable)
-	void Pause_End();
-
-	UFUNCTION(BlueprintPure)
-	bool IsPaused();
-
 protected:
-	TArray<class UGearBaseWidget*> WidgetStack;
-
-	UFUNCTION(BlueprintCallable)
-	void AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidget*& Widget);
-
-	UFUNCTION(BlueprintCallable)
-	void RemoveWidget(UGearBaseWidget*& Widget);
-
-	UFUNCTION(BlueprintCallable)
-	void ReconstructWidgetsOrder();
-
-// -----------------------------------------------------------------------------------------
-
-	bool bPaused;
 
 	UPROPERTY(EditDefaultsOnly, Category=Classes)
 	TSubclassOf<UGearBaseWidget> ScreenMenuWidgetClass;
@@ -104,7 +34,101 @@ protected:
 	UGearBaseWidget* PauseWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> WaitingWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* WaitingWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
 	TSubclassOf<UGearBaseWidget> SelectingWidgetClass;
 	UPROPERTY()
 	UGearBaseWidget* SelectingWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> PlacingWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* PlacingWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> RacingWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* RacingWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> ScoreboardWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* ScoreboardWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> FinishboardWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* FinishboardWidget;
+
+	bool bPaused;
+
+public:
+
+	AGearHUD();
+	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FOnAllPlayersJoined OnAllPlayersJoined;
+
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FOnPlayerJoined OnPlayerJoined;
+
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FOnPlayerQuit OnPlayerQuit;
+
+
+protected:
+	TArray<class UGearBaseWidget*> WidgetStack;
+
+	UFUNCTION(BlueprintCallable)
+	void AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidget*& Widget, float InStartTime);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveWidget(UGearBaseWidget*& Widget);
+
+	UFUNCTION(BlueprintCallable)
+	void ReconstructWidgetsOrder();
+
+// -----------------------------------------------------------------------------------------
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float FurthestReachedCheckpointTime);
+
+	void Waiting_Start(float StartTime);
+	void Waiting_End();
+
+	void Selecting_Start(float StartTime);
+	void Selecting_End();
+
+	void Placing_Start(float StartTime);
+	void Placing_End();
+
+	void Racing_Start(float StartTime);
+	void Racing_End();
+
+	void Scoreboard_Start(float StartTime);
+	void Scoreboard_End();
+
+	void Finishboard_Start(float StartTime);
+	void Finishboard_End();
+
+	UFUNCTION(BlueprintCallable)
+	void Pause_Start(float StartTime);
+
+	UFUNCTION(BlueprintCallable)
+	void Pause_End();
+
+	UFUNCTION(BlueprintPure)
+	bool IsPaused();
+
+	void AllPlayersJoined();
+	void PlayerJoined(class AGearPlayerState* Player);
+	void PlayerQuit(class AGearPlayerState* Player);
+
+	friend class AGearPlayerController;
 };

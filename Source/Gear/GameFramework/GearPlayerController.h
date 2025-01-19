@@ -85,24 +85,28 @@ public:
 	void PlaceHazard(class UHazardSocketComponent* TargetSocket);
 
 	void ClickedOnHazardSocketMarker(class AHazardSocketMarker* HazardSocketMarker);
-
-	void ClientStateAllPlayersJoined();
-	void ClientStateAllPlayersJoined_End();
-	void ClientStateMatchStarted();
-	void ClientStateSelectingPieces(float StateStartTime);
-
-	void ClientStatePlacing(float StateStartTime);
-	void ClientStatePlacing_Finish();
 	
-	void ClientStateRacing_Start(float StateStartTime);
+	void ClientStateWaiting_Start(float StartTime);
+	void ClientStateWaiting_End();
+
+	void ClientStateSelecting_Start(float StartTime);
+	void ClientStateSelecting_End();
+
+	void ClientStatePlacing_Start(float StartTime);
+	void ClientStatePlacing_End();
+	
+	void ClientStateRacing_Start(float StartTime);
 	void ClientStateRacing_End();
 
-	void ClientStateScoreboard_Start(float StateStartTime, const TArray<FCheckpointResult>& RoundResults);
+	void ClientStateScoreboard_Start(float StartTime, const TArray<FCheckpointResult>& RoundResults);
 	void ClientStateScoreboard_End();
 
-	void ClientStateGameFinished(float StateStartTime);
+	void ClientStateFinishboard_Start(float StartTime);
+	void ClientStateFinishboard_End();
 
 	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float ReachTime);
+
+	void NotifyAllPlayerJoined();
 
 // -------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly)

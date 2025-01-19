@@ -17,7 +17,7 @@ void AGearHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AddWidget(ScreenMenuWidgetClass, ScreenMenuWidget);
+	AddWidget(ScreenMenuWidgetClass, ScreenMenuWidget, 0);
 }
 
 void AGearHUD::Destroyed()
@@ -41,29 +41,7 @@ void AGearHUD::Tick(float DeltaSeconds)
 
 }
 
-void AGearHUD::SelectingStart()
-{
-	AddWidget(SelectingWidgetClass, SelectingWidget);
-}
-
-void AGearHUD::Pause_Start()
-{
-	AddWidget(PauseWidgetClass, PauseWidget);
-	bPaused = true;
-}
-
-void AGearHUD::Pause_End()
-{
-	RemoveWidget(PauseWidget);
-	bPaused = false;
-}
-
-bool AGearHUD::IsPaused()
-{
-	return bPaused;
-}
-
-void AGearHUD::AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidget*& Widget)
+void AGearHUD::AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidget*& Widget, float InStartTime)
 {
 	if (!IsValid(Widget))
 	{
@@ -75,6 +53,7 @@ void AGearHUD::AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidg
 		if (IsValid(Widget))
 		{
 			Widget->OwningHUD = this;
+			Widget->StartTime_Temp = InStartTime;
 			WidgetStack.Add(Widget);
 			ReconstructWidgetsOrder();
 		}
@@ -104,4 +83,98 @@ void AGearHUD::ReconstructWidgetsOrder()
 		Widget->RemoveFromParent();
 		Widget->AddToViewport();
 	}
+}
+
+// -------------------------------------------------------------------------------------------------------
+
+void AGearHUD::Waiting_Start(float StartTime)
+{
+	AddWidget(WaitingWidgetClass, WaitingWidget, StartTime);
+}
+
+void AGearHUD::Waiting_End()
+{
+	RemoveWidget(WaitingWidget);
+}
+
+void AGearHUD::Selecting_Start(float StartTime)
+{
+	AddWidget(SelectingWidgetClass, SelectingWidget, StartTime);
+}
+
+void AGearHUD::Selecting_End()
+{
+	RemoveWidget(SelectingWidget);
+}
+
+void AGearHUD::Placing_Start(float StartTime)
+{
+	AddWidget(PlacingWidgetClass, PlacingWidget, StartTime);
+}
+
+void AGearHUD::Placing_End()
+{
+	RemoveWidget(PlacingWidget);
+}
+
+void AGearHUD::Racing_Start(float StartTime)
+{
+	AddWidget(RacingWidgetClass, RacingWidget, StartTime);
+}
+
+void AGearHUD::Racing_End()
+{
+	RemoveWidget(RacingWidget);
+}
+
+void AGearHUD::Scoreboard_Start(float StartTime)
+{
+	AddWidget(ScoreboardWidgetClass, ScoreboardWidget, StartTime);
+}
+
+void AGearHUD::Scoreboard_End()
+{
+	RemoveWidget(ScoreboardWidget);
+}
+
+void AGearHUD::Finishboard_Start(float StartTime)
+{
+	AddWidget(FinishboardWidgetClass, FinishboardWidget, StartTime);
+}
+
+void AGearHUD::Finishboard_End()
+{
+	RemoveWidget(FinishboardWidget);
+}
+
+void AGearHUD::Pause_Start(float StartTime)
+{
+	AddWidget(PauseWidgetClass, PauseWidget, StartTime);
+	bPaused = true;
+}
+
+void AGearHUD::Pause_End()
+{
+	RemoveWidget(PauseWidget);
+	bPaused = false;
+}
+
+bool AGearHUD::IsPaused()
+{
+	return bPaused;
+}
+
+void AGearHUD::AllPlayersJoined()
+{
+	OnAllPlayersJoined.Broadcast();
+}
+
+void AGearHUD::PlayerJoined(class AGearPlayerState* Player)
+{
+	OnPlayerJoined.Broadcast(Player);
+}
+
+void AGearHUD::PlayerQuit(class AGearPlayerState* Player)
+{
+	OnPlayerQuit.Broadcast(Player);
 }

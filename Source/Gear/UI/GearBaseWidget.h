@@ -26,6 +26,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	class AGearHUD* OwningHUD;
-	
+
+	UPROPERTY(BlueprintReadOnly)
+	float StartTime_Temp;
+
 	friend class AGearHUD;
 };

@@ -5,5 +5,7 @@
 
 void UGearBaseWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
+
 	WidgetOrder = EWidgetOrder::LowPriority;
 }

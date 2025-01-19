@@ -14,8 +14,8 @@ class AGearPlayerState;
 UENUM(BlueprintType)
 enum class EGearMatchState : uint8
 {
+	None,
 	WaitingForPlayerToJoin,
-	AllPlayersJoined,
 	SelectingPlaceables,
 	Placing,
 	Racing,
