@@ -19,6 +19,11 @@ class GEAR_API AGearHUD : public AHUD
 	
 public:
 
+	AGearHUD();
+	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
+	virtual void Tick(float DeltaSeconds) override;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowWaitingScreen();
 
@@ -61,15 +66,45 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float FurthestReachedCheckpointTime);
 
+	void SelectingStart();
+
+	UFUNCTION(BlueprintCallable)
+	void Pause_Start();
+
+	UFUNCTION(BlueprintCallable)
+	void Pause_End();
+
+	UFUNCTION(BlueprintPure)
+	bool IsPaused();
+
 protected:
 	TArray<class UGearBaseWidget*> WidgetStack;
 
 	UFUNCTION(BlueprintCallable)
-	void AddWidget(UGearBaseWidget* Widget);
+	void AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidget*& Widget);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveWidget(UGearBaseWidget* Widget);
+	void RemoveWidget(UGearBaseWidget*& Widget);
 
 	UFUNCTION(BlueprintCallable)
 	void ReconstructWidgetsOrder();
+
+// -----------------------------------------------------------------------------------------
+
+	bool bPaused;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> ScreenMenuWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* ScreenMenuWidget;
+	
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> PauseWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* PauseWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> SelectingWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* SelectingWidget;
 };

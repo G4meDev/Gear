@@ -22,5 +22,10 @@ public:
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EWidgetOrder WidgetOrder;
+
+
+	UPROPERTY(BlueprintReadOnly)
+	class AGearHUD* OwningHUD;
 	
+	friend class AGearHUD;
 };
