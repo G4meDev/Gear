@@ -94,6 +94,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ReconstructWidgetsOrder();
 
+	void SetVisilityOfWidgetsInStack(bool bVisible);
+
 // -----------------------------------------------------------------------------------------
 
 	UFUNCTION(BlueprintImplementableEvent)

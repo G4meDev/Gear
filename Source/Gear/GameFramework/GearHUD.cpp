@@ -52,10 +52,17 @@ void AGearHUD::AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidg
 
 		if (IsValid(Widget))
 		{
+			if (IsPaused())
+			{
+				Widget->SetVisibility(ESlateVisibility::Hidden);
+			}
+
 			Widget->OwningHUD = this;
 			Widget->StartTime = InStartTime;
 			WidgetStack.Add(Widget);
-			ReconstructWidgetsOrder();
+			
+			Widget->AddToViewport();
+			//ReconstructWidgetsOrder();
 		}
 	}
 }
@@ -82,6 +89,14 @@ void AGearHUD::ReconstructWidgetsOrder()
 	{
 		WidgetStack[i]->RemoveFromParent();
 		WidgetStack[i]->AddToViewport();
+	}
+}
+
+void AGearHUD::SetVisilityOfWidgetsInStack(bool bVisible)
+{
+	for (UGearBaseWidget* Widget : WidgetStack)
+	{
+		Widget->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
 	}
 }
 
@@ -149,6 +164,7 @@ void AGearHUD::Finishboard_End()
 
 void AGearHUD::Pause_Start(float StartTime)
 {
+	SetVisilityOfWidgetsInStack(false);
 	AddWidget(PauseWidgetClass, PauseWidget, StartTime);
 	bPaused = true;
 }
@@ -156,6 +172,7 @@ void AGearHUD::Pause_Start(float StartTime)
 void AGearHUD::Pause_End()
 {
 	RemoveWidget(PauseWidget);
+	SetVisilityOfWidgetsInStack(true);
 	bPaused = false;
 }
 
