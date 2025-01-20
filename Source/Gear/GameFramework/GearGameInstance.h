@@ -64,6 +64,16 @@ protected:
 
 	TSharedPtr<SWidget> LoadingScreenWidget;
 	
+	
+	UPROPERTY(EditDefaultsOnly)
+	USoundClass* BaseSoundClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	USoundClass* MusicSoundClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundMix* BaseSoundMix;
+
 private:
 	UPROPERTY()
 	UGearSaveGame* GearSave;

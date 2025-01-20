@@ -12,6 +12,7 @@
 #include "Components/SplineComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameUserSettings.h"
+#include "Sound/SoundClass.h"
 
 #define SAVE_SLOT_NAME "Save"
 #define SAVE_USER_INDEX 0
@@ -119,7 +120,11 @@ void UGearGameInstance::ApplyUserSettings()
 	if (IsValid(GearSave))
 	{
 		FString ScalabilityStr = "Scalability " + FString::FromInt(GearSave->QualityLevel - 1);
-		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), ScalabilityStr);		
+		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), ScalabilityStr);
+		
+		UGameplayStatics::SetBaseSoundMix(GetWorld(), BaseSoundMix);
+		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), BaseSoundMix, BaseSoundClass, GearSave->SoundAmplitude);
+		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), BaseSoundMix, MusicSoundClass, GearSave->MusicAmplitude);
 	}
 }
 
