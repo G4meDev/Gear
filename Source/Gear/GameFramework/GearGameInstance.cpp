@@ -121,7 +121,12 @@ void UGearGameInstance::ApplyUserSettings()
 	{
 		FString ScalabilityStr = "Scalability " + FString::FromInt(GearSave->QualityLevel - 1);
 		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), ScalabilityStr);
+	
+		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("r.Mobile.FSR.enabled 1"));
+		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("r.Mobile.FSR.RCAS.enabled 1"));
+		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("r.Mobile.FSR.Upsampling.enabled 1"));
 		
+
 		UGameplayStatics::SetBaseSoundMix(GetWorld(), BaseSoundMix);
 		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), BaseSoundMix, BaseSoundClass, GearSave->SoundAmplitude);
 		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), BaseSoundMix, MusicSoundClass, GearSave->MusicAmplitude);
