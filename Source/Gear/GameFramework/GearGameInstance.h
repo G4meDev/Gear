@@ -39,6 +39,25 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveLoadingScreen();
 
+
+	UFUNCTION(BlueprintCallable)
+	void SetSoundAmplitude(float Amplitude);
+
+	UFUNCTION(BlueprintCallable)
+	void SetMusicAmplitude(float Amplitude);
+
+	UFUNCTION(BlueprintCallable)
+	void SetQualityLevel(int32 Level);
+
+	UFUNCTION(BlueprintPure)
+	float GetSoundAmplitude();
+
+	UFUNCTION(BlueprintPure)
+	float GetMusicAmplitude();
+
+	UFUNCTION(BlueprintPure)
+	int32 GetQualityLevel();
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
@@ -56,6 +75,11 @@ private:
 	bool TryLoadGame();
 	bool TrySaveGame();
 	void TrySaveGameAsync();
+
+	FTimerHandle DirtySettingSaveTimerHandle;
+	void MarkUserSettingsDirty();
+
+	void ApplyUserSettings();
 
 	FString ValidtePlayerNameChange(const FString& NewName, const FString& OldName);
 

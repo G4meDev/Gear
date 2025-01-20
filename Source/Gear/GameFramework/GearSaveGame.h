@@ -18,10 +18,22 @@ class GEAR_API UGearSaveGame : public USaveGame
 public:
 	UGearSaveGame() 
 		: PlayerName(DEFAULT_PLAYER_NAME)
+		, SoundAmplitude(0.5f)
+		, MusicAmplitude(0.5f)
+		, QualityLevel(2)
 	{
 
 	}
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	FString PlayerName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	float SoundAmplitude;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	float MusicAmplitude;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	int32 QualityLevel;
 };

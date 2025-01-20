@@ -11,9 +11,11 @@
 #include "Utils/DataHelperBFL.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/GameUserSettings.h"
 
 #define SAVE_SLOT_NAME "Save"
 #define SAVE_USER_INDEX 0
+#define DIRTY_SAVE_DELAY 1.0f
 
 void UGearGameInstance::Init()
 {
@@ -31,6 +33,7 @@ void UGearGameInstance::Init()
 	FWorldDelegates::OnSeamlessTravelTransition.AddUObject(this, &UGearGameInstance::OnSeamlessTravelTransition);
 
 	InitPersistantData();
+	ApplyUserSettings();
 }
 
 void UGearGameInstance::Shutdown()
@@ -102,6 +105,21 @@ void UGearGameInstance::OnAsyncSaveFinished(const FString& SlotName, int32 UserI
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("failed to async save game"));
+	}
+}
+
+void UGearGameInstance::MarkUserSettingsDirty()
+{
+	GetTimerManager().ClearTimer(DirtySettingSaveTimerHandle);
+	GetTimerManager().SetTimer(DirtySettingSaveTimerHandle, FTimerDelegate::CreateUObject(this, &ThisClass::TrySaveGameAsync), DIRTY_SAVE_DELAY, false);
+}
+
+void UGearGameInstance::ApplyUserSettings()
+{
+	if (IsValid(GearSave))
+	{
+		FString ScalabilityStr = "Scalability " + FString::FromInt(GearSave->QualityLevel - 1);
+		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), ScalabilityStr);		
 	}
 }
 
@@ -179,6 +197,66 @@ void UGearGameInstance::RemoveLoadingScreen()
 	}
 
 	ChangePerformanceSettings(false);
+}
+
+void UGearGameInstance::SetSoundAmplitude(float Amplitude)
+{
+	if (IsValid(GearSave))
+	{
+		GearSave->SoundAmplitude = FMath::Clamp(Amplitude, 0, 1);
+		ApplyUserSettings();
+		MarkUserSettingsDirty();
+	}
+}
+
+void UGearGameInstance::SetMusicAmplitude(float Amplitude)
+{
+	if (IsValid(GearSave))
+	{
+		GearSave->MusicAmplitude = FMath::Clamp(Amplitude, 0, 1);
+		ApplyUserSettings();
+		MarkUserSettingsDirty();		
+	}
+}
+
+void UGearGameInstance::SetQualityLevel(int32 Level)
+{
+	if (IsValid(GearSave))
+	{
+		GearSave->QualityLevel = FMath::Clamp(Level, 1, 4);
+		ApplyUserSettings();
+		MarkUserSettingsDirty();
+	}
+}
+
+float UGearGameInstance::GetSoundAmplitude()
+{
+	if (IsValid(GearSave))
+	{
+		return GearSave->SoundAmplitude;
+	}
+
+	return 0.5f;
+}
+
+float UGearGameInstance::GetMusicAmplitude()
+{
+	if (IsValid(GearSave))
+	{
+		return GearSave->MusicAmplitude;
+	}
+
+	return 0.5f;
+}
+
+int32 UGearGameInstance::GetQualityLevel()
+{
+	if (IsValid(GearSave))
+	{
+		return GearSave->QualityLevel;
+	}
+
+	return 2;
 }
 
 void UGearGameInstance::ChangePerformanceSettings(bool bEnabingLoadingScreen)
