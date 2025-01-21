@@ -629,7 +629,8 @@ void AGearGameMode::StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicl
 	if (bNeedsCountDown)
 	{
 		GearGameState->LastCountDownTime = GetWorld()->GetTimeSeconds();
-		Checkpoint->StartCountDown(GetWorld()->GetTimeSeconds());
+		Checkpoint->LastStartTime = GetWorld()->GetTimeSeconds();
+		Checkpoint->OnRep_LastStartTime();
 
 		UE_LOG(LogTemp, Warning, TEXT("start count down"));
 	}

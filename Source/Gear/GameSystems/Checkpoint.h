@@ -18,39 +18,19 @@ class GEAR_API ACheckpoint : public AActor
 	
 public:	
 	ACheckpoint();
-
-	void Init(float InWidth, float InHeight, float InLength, float InLateralSeperationRatio, float InLongitudinalSeperation);
-
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Width;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Height;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Length;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float LateralSeperationRatio;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float LongitudinalSeperation;
 
 	UPROPERTY()
 	TArray<UVehicleStart*> StartPoints;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int CheckpointIndex;
-
+	
 	UPROPERTY(ReplicatedUsing=OnRep_LastStartTime, BlueprintReadWrite, EditAnywhere)
 	float LastStartTime;
 
 	UFUNCTION()
 	void OnRep_LastStartTime();
-	
-	void StartCountDown(float StartTime);
 
 	UVehicleStart* GetVehicleStart();
 
@@ -74,6 +54,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* Root;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USkeletalMeshComponent* StartlineMesh;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UBoxComponent* LapHitbox;
@@ -113,4 +96,21 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USoundBase* CheerSound;
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UAnimationAsset* CloseAnimation;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UAnimationAsset* OpenAnimation;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UAnimationAsset* OpeningAnimation;
+
+	UPROPERTY()
+	UMaterialInstanceDynamic* StartlineMaterial;
+
+	void SetLightIndex(int Index);
+
+	void SetState(int State);
 };

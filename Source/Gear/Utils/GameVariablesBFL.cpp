@@ -10,7 +10,12 @@ float UGameVariablesBFL::GV_AllPlayerJoinToGameStartDelay()
 
 float UGameVariablesBFL::GV_CountDownDuration()
 {
-	return 2.0f;
+	return 4.0f;
+}
+
+float UGameVariablesBFL::GV_InformationPanelDuration()
+{
+	return 1.0f;
 }
 
 float UGameVariablesBFL::GV_InvincibilityDuration()

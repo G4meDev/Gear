@@ -311,6 +311,7 @@ void AGearGameState::Racing_Start()
 void AGearGameState::Racing_End()
 {
 	MarkActorsIdle();
+	ClearCheckpointsCountdown();
 
 	if (IsValid(GetLocalPlayer()))
 	{
@@ -492,6 +493,14 @@ void AGearGameState::MarkActorsEnabled()
 	}
 }
 
+void AGearGameState::ClearCheckpointsCountdown()
+{
+	for (ACheckpoint* Checkpoint : CheckpointsStack)
+	{
+		Checkpoint->LastStartTime = -1;
+	}
+}
+
 void AGearGameState::ClearOccupiedVehicleStarts()
 {
 	UE_LOG(LogTemp, Warning, TEXT("cleared occupied vehicle starts"));
@@ -582,7 +591,7 @@ void AGearGameState::UpdateFurthestReachedCheckpoint(int32 CheckpointIndex)
 bool AGearGameState::IsCountDown()
 {
 	float Time = GetServerWorldTimeSeconds() - LastCountDownTime;
-	return Time > 0 && Time < UGameVariablesBFL::GV_CountDownDuration();
+	return Time > 0 && Time < UGameVariablesBFL::GV_CountDownDuration() + UGameVariablesBFL::GV_InformationPanelDuration();
 }
 
 float AGearGameState::TimeFromLastTransition() const
