@@ -26,6 +26,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static FString FormatTimeLong(float Time);
+
+	UFUNCTION(BlueprintPure)
+	static FString FormatTime2M2S(float Time);
 	
 	UFUNCTION(BlueprintPure)
 	static float RelativeToUnitPeriodWithCap(float RelativeTime, float Period, float Cap);

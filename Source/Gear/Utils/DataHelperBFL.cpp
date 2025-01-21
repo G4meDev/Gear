@@ -77,6 +77,15 @@ FString UDataHelperBFL::FormatTimeLong(float Time)
 	return FString::Printf(TEXT("%.2i:%.3f"), Minutes, Seconds);
 }
 
+FString UDataHelperBFL::FormatTime2M2S(float Time)
+{
+	int32 Minutes;
+	float Seconds;
+	ConvertSecondsToMS(Time, Minutes, Seconds);
+
+	return FString::Printf(TEXT("%.2i:%.3f"), Minutes, Seconds);
+}
+
 float UDataHelperBFL::RelativeToUnitPeriodWithCap(float RelativeTime, float Period, float Cap)
 {
 	float Result = FMath::Fmod(RelativeTime, Period);
