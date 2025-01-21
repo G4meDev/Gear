@@ -97,6 +97,8 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USoundBase* CheerSound;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USoundBase* CountDownSound;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UAnimationAsset* CloseAnimation;

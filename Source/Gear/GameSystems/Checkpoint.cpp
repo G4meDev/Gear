@@ -160,14 +160,22 @@ void ACheckpoint::SetState(int State)
 		StartlineMesh->PlayAnimation(OpenAnimation, false);
 	}
 
-	else if (State == 4)
-	{
-		StartlineMesh->PlayAnimation(OpeningAnimation, false);
-	}
-
 	else
 	{
-		StartlineMesh->PlayAnimation(CloseAnimation, false);
+		if (IsValid(CountDownSound))
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), CountDownSound);
+		}
+
+		if (State == 4)
+		{
+			StartlineMesh->PlayAnimation(OpeningAnimation, false);
+		}
+
+		else
+		{
+			StartlineMesh->PlayAnimation(CloseAnimation, false);
+		}
 	}
 }
 
