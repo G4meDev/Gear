@@ -79,13 +79,7 @@ protected:
 	UBoxComponent* LapHitbox;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UStaticMeshComponent* StartLineMesh;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInstancedStaticMeshComponent* StartPositionMeshes;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USkeletalMeshComponent* HandMesh;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UNiagaraComponent* CheerParticleComponent;

@@ -26,19 +26,10 @@ ACheckpoint::ACheckpoint()
 	LapHitbox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	LapHitbox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECR_Overlap);
 
-	StartLineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StartLineMesh"));
-	StartLineMesh->SetupAttachment(Root);
-	StartLineMesh->SetRelativeLocation(FVector::UpVector * 1.0f);
-	StartLineMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 	StartPositionMeshes = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("StartPositionMesh"));
 	StartPositionMeshes->SetupAttachment(Root);
 	StartPositionMeshes->SetRelativeLocation(FVector::UpVector * 1.0f);
 	StartPositionMeshes->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	HandMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HandMesh"));
-	HandMesh->SetupAttachment(Root);
-	HandMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	CheerParticleComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("CheerParticleComponent"));
 	CheerParticleComponent->SetupAttachment(Root);
@@ -85,7 +76,7 @@ ACheckpoint::ACheckpoint()
 	StartPoints.Add(StartPonit_3);
 	StartPoints.Add(StartPonit_4);
 
-	Init(200.0f, 300.0f, 750.0f, 0.65f, 500.0f);
+	//Init(200.0f, 300.0f, 750.0f, 0.65f, 500.0f);
 
 	CheckpointIndex = 0;
 
@@ -104,7 +95,6 @@ void ACheckpoint::Init(float InWidth, float InHeight, float InLength, float InLa
 	LateralSeperationRatio = InLateralSeperationRatio;
 	LongitudinalSeperation = InLongitudinalSeperation;
 
-	StartLineMesh->SetRelativeScale3D(FVector(Width, Length, 100.0f) / 100.0f);
 	LapHitbox->SetBoxExtent(FVector(Width, Length, Height) / 2);
 	LapHitbox->SetRelativeLocation(FVector::UpVector * LapHitbox->GetUnscaledBoxExtent().Z);
 
