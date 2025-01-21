@@ -80,8 +80,6 @@ public:
 	void MarkActorsIdle();
 	void MarkActorsEnabled();
 
-	void ClearCheckpointsCountdown();
-
 	void ClearOccupiedVehicleStarts();
 	void ClearCheckpointResults();
 

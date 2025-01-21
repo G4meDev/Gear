@@ -188,8 +188,6 @@ void ACheckpoint::OnRep_LastStartTime()
 			float Time = LastStartTime + UGameVariablesBFL::GV_InformationPanelDuration() + i * Step;
 			float TimerDelay = Time - GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
 
-			UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!!!! _ %f"), TimerDelay);
-
 			if (TimerDelay > 0)
 			{
 				FTimerHandle TimerHandle;

@@ -210,6 +210,15 @@ void AGearGameMode::SpawnNewPlaceables()
 	}
 }
 
+void AGearGameMode::ResetCheckpointsState()
+{
+	for (ACheckpoint* Checkpoint : GearGameState->CheckpointsStack)
+	{
+		Checkpoint->LastStartTime = -1;
+		Checkpoint->OnRep_LastStartTime();
+	}
+}
+
 bool AGearGameMode::IsEveryPlayerEliminated() const
 {
 	for (AGearVehicle* V : GearGameState->Vehicles)
@@ -693,6 +702,8 @@ void AGearGameMode::StartScoreboard()
 		FTimerDelegate::CreateUObject(this, &AGearGameMode::ScoreboardLifespanFinished), GearGameState->GetEstimatedScoreboardLifespan(), false);
 
 	DestroyActors();
+
+	ResetCheckpointsState();
 
 	UE_LOG(LogTemp, Warning, TEXT("start scoreboard"));
 	SetGearMatchState(EGearMatchState::Scoreboard);

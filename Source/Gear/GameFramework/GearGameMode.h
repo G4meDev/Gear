@@ -96,6 +96,8 @@ protected:
 	void SpawnNewBuilderPawns();
 	void SpawnNewPlaceables();
 	
+	void ResetCheckpointsState();
+
 	// --------------------------------------------------------------------------
 
 	bool IsEveryPlayerEliminated() const;

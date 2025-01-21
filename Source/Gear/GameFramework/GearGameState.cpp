@@ -311,7 +311,6 @@ void AGearGameState::Racing_Start()
 void AGearGameState::Racing_End()
 {
 	MarkActorsIdle();
-	ClearCheckpointsCountdown();
 
 	if (IsValid(GetLocalPlayer()))
 	{
@@ -490,14 +489,6 @@ void AGearGameState::MarkActorsEnabled()
 				Hazard->SetEnabled();
 			}
 		}
-	}
-}
-
-void AGearGameState::ClearCheckpointsCountdown()
-{
-	for (ACheckpoint* Checkpoint : CheckpointsStack)
-	{
-		Checkpoint->LastStartTime = -1;
 	}
 }
 
