@@ -18,6 +18,7 @@ void AGearHUD::BeginPlay()
 	Super::BeginPlay();
 
 	AddWidget(ScreenMenuWidgetClass, ScreenMenuWidget, 0);
+	AddWidget(NotifictionWidgetClass, NotifictionWidget, 0);
 }
 
 void AGearHUD::Destroyed()
@@ -199,4 +200,14 @@ void AGearHUD::PlayerQuit(class AGearPlayerState* Player)
 void AGearHUD::ReachedNewCheckpoint(int32 FurthesCheckpointNum, int32 CheckpointsNum, float ReachTime)
 {
 	OnReachedNewCheckpoint.Broadcast(FurthesCheckpointNum, CheckpointsNum, ReachTime);
+}
+
+void AGearHUD::PlayerEliminated(AGearPlayerState* Player, EElimanationReason ElimanationReason)
+{
+	OnPlayerEliminated.Broadcast(Player, ElimanationReason);
+}
+
+void AGearHUD::ReachedCheckpoint(AGearPlayerState* Player, class ACheckpoint* Checkpoint, int32 Position)
+{
+	OnReachedCheckpoint.Broadcast(Player, Checkpoint, Position);
 }

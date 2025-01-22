@@ -346,6 +346,24 @@ void AGearPlayerController::OnPlayerQuit(AGearPlayerState* GearPlayer)
 	}
 }
 
+void AGearPlayerController::OnPlayerEliminated(AGearPlayerState* EliminatedPlayer, EElimanationReason ElimanationReason)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->PlayerEliminated(EliminatedPlayer, ElimanationReason);
+	}
+}
+
+void AGearPlayerController::OnReachedCheckpoint(AGearPlayerState* ReachedPlayer, class ACheckpoint* Checkpoint, int32 Position)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->ReachedCheckpoint(ReachedPlayer, Checkpoint, Position);
+	}
+}
+
 // ------------------------------------------------------------------------------------------
 
 void AGearPlayerController::RequestWorldTime_Internal()

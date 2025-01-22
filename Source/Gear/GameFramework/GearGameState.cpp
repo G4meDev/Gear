@@ -107,11 +107,6 @@ void AGearGameState::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("There is no track spline actor in level!"));
 		}
 	}
-
-	check(IsValid(NotifictionBoardClass));
-
-	NotifictionBoardWidget = CreateWidget<UNotifictionBoardWidget>(GetWorld(),  NotifictionBoardClass);
-	NotifictionBoardWidget->AddToViewport();
 }
 
 void AGearGameState::Destroyed()
@@ -121,12 +116,6 @@ void AGearGameState::Destroyed()
 	if (IsValid(TrackSpline))
 	{
 		TrackSpline->Destroy();
-	}
-
-	if (IsValid(NotifictionBoardWidget))
-	{
-		NotifictionBoardWidget->RemoveFromParent();
-		NotifictionBoardWidget = nullptr;
 	}
 }
 
@@ -668,17 +657,17 @@ void AGearGameState::BroadcastPlacedEvent_Multi_Implementation(AGearPlayerState*
 
 void AGearGameState::BroadcastEliminationEvent_Multi_Implementation(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason)
 {
-	if (IsValid(NotifictionBoardWidget))
+	if (IsValid(GetLocalPlayer()))
 	{
-		NotifictionBoardWidget->NotifyElimination(PlayerState, ElimanationReason);
+		LocalPlayer->OnPlayerEliminated(PlayerState, ElimanationReason);
 	}
 }
 
 void AGearGameState::BroadcastReachedCheckpointEvent_Multi_Implementation(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position)
 {
-	if (IsValid(NotifictionBoardWidget))
+	if (IsValid(GetLocalPlayer()))
 	{
-		NotifictionBoardWidget->NotifyReachedCheckpoint(PlayerState, Checkpoint, Position);
+		LocalPlayer->OnReachedCheckpoint(PlayerState, Checkpoint, Position);
 	}
 }
 

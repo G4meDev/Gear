@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/GearBaseWidget.h"
 #include "GameFramework/GearTypes.h"
 #include "NotifictionBoardWidget.generated.h"
 
@@ -11,18 +12,9 @@
  * 
  */
 UCLASS()
-class GEAR_API UNotifictionBoardWidget : public UUserWidget
+class GEAR_API UNotifictionBoardWidget : public UGearBaseWidget
 {
 	GENERATED_BODY()
 	
 public:
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void NotifyPlayerPlaced(class AGearPlayerState* Player, TSubclassOf<class AGearPlaceable> Placeable);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void NotifyElimination(class AGearPlayerState* PlayerState, EElimanationReason ElimanationReason);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void NotifyReachedCheckpoint(AGearPlayerState* PlayerState, class ACheckpoint* Checkpoint, int32 Position);
 };

@@ -8,11 +8,14 @@
 #include "GearHUD.generated.h"
 
 class AGearPlayerState;
+class ACheckpoint;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllPlayersJoined);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerJoined, AGearPlayerState*, Player);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerQuit, AGearPlayerState*, Player);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReachedNewCheckpoint, int32, FurthesCheckpointNum, int32 , CheckpointsNum, float, ReachTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerEliminated, AGearPlayerState*, Player, EElimanationReason, ElimanationReason);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReachedCheckpoint, AGearPlayerState*, Player, ACheckpoint*, Checkpoint, int32, Position);
 
 /**
  * 
@@ -33,6 +36,11 @@ protected:
 	TSubclassOf<UGearBaseWidget> PauseWidgetClass;
 	UPROPERTY()
 	UGearBaseWidget* PauseWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> NotifictionWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* NotifictionWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category=Classes)
 	TSubclassOf<UGearBaseWidget> WaitingWidgetClass;
@@ -85,6 +93,12 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FOnReachedNewCheckpoint OnReachedNewCheckpoint;
 
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FOnPlayerEliminated OnPlayerEliminated;
+
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FOnReachedCheckpoint OnReachedCheckpoint;
+
 protected:
 	TArray<class UGearBaseWidget*> WidgetStack;
 
@@ -133,6 +147,8 @@ protected:
 	void PlayerQuit(class AGearPlayerState* Player);
 
 	void ReachedNewCheckpoint(int32 FurthesCheckpointNum, int32 CheckpointsNum, float ReachTime);
+	void PlayerEliminated(AGearPlayerState* Player, EElimanationReason ElimanationReason);
+	void ReachedCheckpoint(AGearPlayerState* Player, class ACheckpoint* Checkpoint, int32 Position);
 
 	friend class AGearPlayerController;
 };

@@ -194,12 +194,6 @@ protected:
 	FVector WorldMin;
 	UPROPERTY(Replicated)
 	FVector WorldMax;
-
- 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
- 	TSubclassOf<UUserWidget> NotifictionBoardClass;
-
-	UPROPERTY()
-	class UNotifictionBoardWidget* NotifictionBoardWidget;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USoundBase* SelectedSound;

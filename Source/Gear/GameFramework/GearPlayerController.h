@@ -74,6 +74,9 @@ public:
 	void OnPlayerJoined(AGearPlayerState* GearPlayer);
 	void OnPlayerQuit(AGearPlayerState* GearPlayer);
 
+	void OnPlayerEliminated(AGearPlayerState* EliminatedPlayer, EElimanationReason ElimanationReason);
+	void OnReachedCheckpoint(AGearPlayerState* ReachedPlayer, class ACheckpoint* Checkpoint, int32 Position);
+
 
 	UFUNCTION(Server, Reliable)
 	void SelectPlaceable(AGearPlaceable* Placeable);
