@@ -758,7 +758,7 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 		AGearPlayerState* Player = Vehicle->GetPlayerState<AGearPlayerState>();
 		int32 Position = GearGameState->CheckpointResults[CheckpointIndex - 1].PlayerList.Num();
 
-		GearGameState->BroadcastReachedCheckpointEvent_Multi(Player, TargetCheckpoint, Position);
+		GearGameState->BroadcastReachedCheckpointEvent_Multi(Player, TargetCheckpoint, Position, GearGameState->CheckpointsStack.Num(), GearGameState->GetServerWorldTimeSeconds());
 		TargetCheckpoint->PlayerReachedCheckpoint_Multi(Player, Position);
 
 		if (CheckpointIndex > GearGameState->FurthestReachedCheckpoint)

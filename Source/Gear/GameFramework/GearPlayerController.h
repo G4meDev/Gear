@@ -75,7 +75,7 @@ public:
 	void OnPlayerQuit(AGearPlayerState* GearPlayer);
 
 	void OnPlayerEliminated(AGearPlayerState* EliminatedPlayer, EElimanationReason ElimanationReason);
-	void OnReachedCheckpoint(AGearPlayerState* ReachedPlayer, class ACheckpoint* Checkpoint, int32 Position);
+	void OnReachedCheckpoint(AGearPlayerState* ReachedPlayer, class ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime);
 
 
 	UFUNCTION(Server, Reliable)

@@ -162,7 +162,7 @@ public:
 	void BroadcastEliminationEvent_Multi(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void BroadcastReachedCheckpointEvent_Multi(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position);
+	void BroadcastReachedCheckpointEvent_Multi(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime);
 
 	UFUNCTION()
 	void OnRep_FurthestReachedCheckpoint();

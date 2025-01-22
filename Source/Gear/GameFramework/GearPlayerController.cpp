@@ -296,15 +296,6 @@ void AGearPlayerController::ClientStateFinishboard_End()
 	}
 }
 
-void AGearPlayerController::NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float ReachTime)
-{
-	AGearHUD* GearHUD = GetHUD<AGearHUD>();
-	if (IsValid(GearHUD))
-	{
-		GearHUD->ReachedNewCheckpoint(FurthestReachedCheckpoint, CheckpointsNum, ReachTime);
-	}
-}
-
 void AGearPlayerController::NotifyAllPlayerJoined()
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
@@ -355,12 +346,12 @@ void AGearPlayerController::OnPlayerEliminated(AGearPlayerState* EliminatedPlaye
 	}
 }
 
-void AGearPlayerController::OnReachedCheckpoint(AGearPlayerState* ReachedPlayer, class ACheckpoint* Checkpoint, int32 Position)
+void AGearPlayerController::OnReachedCheckpoint(AGearPlayerState* ReachedPlayer, class ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->ReachedCheckpoint(ReachedPlayer, Checkpoint, Position);
+		GearHUD->ReachedCheckpoint(ReachedPlayer, Checkpoint, Position, AllCheckpointNum, ReachTime);
 	}
 }
 

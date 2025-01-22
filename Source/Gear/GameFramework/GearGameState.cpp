@@ -663,21 +663,15 @@ void AGearGameState::BroadcastEliminationEvent_Multi_Implementation(AGearPlayerS
 	}
 }
 
-void AGearGameState::BroadcastReachedCheckpointEvent_Multi_Implementation(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position)
+void AGearGameState::BroadcastReachedCheckpointEvent_Multi_Implementation(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime)
 {
 	if (IsValid(GetLocalPlayer()))
 	{
-		LocalPlayer->OnReachedCheckpoint(PlayerState, Checkpoint, Position);
+		LocalPlayer->OnReachedCheckpoint(PlayerState, Checkpoint, Position, AllCheckpointNum, ReachTime);
 	}
 }
 
 void AGearGameState::OnRep_FurthestReachedCheckpoint()
 {
-	if (GearMatchState == EGearMatchState::Racing)
-	{
-		if (IsValid(GetLocalPlayer()))
-		{
-			LocalPlayer->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsStack.Num(), FurthestReachedCheckpointTime);
-		}
-	}
+	
 }

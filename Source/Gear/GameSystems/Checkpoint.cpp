@@ -101,6 +101,7 @@ void ACheckpoint::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACheckpoint, LastStartTime);
+	DOREPLIFETIME(ACheckpoint, CheckpointIndex);
 }
 
 void ACheckpoint::BeginPlay()

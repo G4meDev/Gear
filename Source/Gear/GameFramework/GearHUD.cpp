@@ -197,17 +197,12 @@ void AGearHUD::PlayerQuit(class AGearPlayerState* Player)
 	OnPlayerQuit.Broadcast(Player);
 }
 
-void AGearHUD::ReachedNewCheckpoint(int32 FurthesCheckpointNum, int32 CheckpointsNum, float ReachTime)
-{
-	OnReachedNewCheckpoint.Broadcast(FurthesCheckpointNum, CheckpointsNum, ReachTime);
-}
-
 void AGearHUD::PlayerEliminated(AGearPlayerState* Player, EElimanationReason ElimanationReason)
 {
 	OnPlayerEliminated.Broadcast(Player, ElimanationReason);
 }
 
-void AGearHUD::ReachedCheckpoint(AGearPlayerState* Player, class ACheckpoint* Checkpoint, int32 Position)
+void AGearHUD::ReachedCheckpoint(AGearPlayerState* Player, class ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime)
 {
-	OnReachedCheckpoint.Broadcast(Player, Checkpoint, Position);
+	OnReachedCheckpoint.Broadcast(Player, Checkpoint, Position, AllCheckpointNum, ReachTime);
 }

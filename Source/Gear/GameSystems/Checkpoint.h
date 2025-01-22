@@ -23,7 +23,7 @@ public:
 	UPROPERTY()
 	TArray<UVehicleStart*> StartPoints;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
 	int CheckpointIndex;
 	
 	UPROPERTY(ReplicatedUsing=OnRep_LastStartTime, BlueprintReadWrite, EditAnywhere)
