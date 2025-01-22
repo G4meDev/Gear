@@ -301,7 +301,7 @@ void AGearPlayerController::NotifyFurthestReachedCheckpoint(int32 FurthestReache
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsNum, ReachTime);
+		GearHUD->ReachedNewCheckpoint(FurthestReachedCheckpoint, CheckpointsNum, ReachTime);
 	}
 }
 

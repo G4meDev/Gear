@@ -195,3 +195,8 @@ void AGearHUD::PlayerQuit(class AGearPlayerState* Player)
 {
 	OnPlayerQuit.Broadcast(Player);
 }
+
+void AGearHUD::ReachedNewCheckpoint(int32 FurthesCheckpointNum, int32 CheckpointsNum, float ReachTime)
+{
+	OnReachedNewCheckpoint.Broadcast(FurthesCheckpointNum, CheckpointsNum, ReachTime);
+}

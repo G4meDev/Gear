@@ -12,6 +12,7 @@ class AGearPlayerState;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllPlayersJoined);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerJoined, AGearPlayerState*, Player);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerQuit, AGearPlayerState*, Player);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReachedNewCheckpoint, int32, FurthesCheckpointNum, int32 , CheckpointsNum, float, ReachTime);
 
 /**
  * 
@@ -81,6 +82,8 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FOnPlayerQuit OnPlayerQuit;
 
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FOnReachedNewCheckpoint OnReachedNewCheckpoint;
 
 protected:
 	TArray<class UGearBaseWidget*> WidgetStack;
@@ -97,9 +100,6 @@ protected:
 	void SetVisilityOfWidgetsInStack(bool bVisible);
 
 // -----------------------------------------------------------------------------------------
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void NotifyFurthestReachedCheckpoint(int32 FurthestReachedCheckpoint, int32 CheckpointsNum, float FurthestReachedCheckpointTime);
 
 	void Waiting_Start(float StartTime);
 	void Waiting_End();
@@ -131,6 +131,8 @@ protected:
 	void AllPlayersJoined();
 	void PlayerJoined(class AGearPlayerState* Player);
 	void PlayerQuit(class AGearPlayerState* Player);
+
+	void ReachedNewCheckpoint(int32 FurthesCheckpointNum, int32 CheckpointsNum, float ReachTime);
 
 	friend class AGearPlayerController;
 };

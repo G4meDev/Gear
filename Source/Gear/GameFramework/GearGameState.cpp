@@ -686,13 +686,9 @@ void AGearGameState::OnRep_FurthestReachedCheckpoint()
 {
 	if (GearMatchState == EGearMatchState::Racing)
 	{
-		for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+		if (IsValid(GetLocalPlayer()))
 		{
-			AGearPlayerController* PlayerController = Cast<AGearPlayerController>(*It);
-			if (IsValid(PlayerController) && PlayerController->IsLocalController())
-			{
-				PlayerController->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsStack.Num(), FurthestReachedCheckpointTime);
-			}
+			LocalPlayer->NotifyFurthestReachedCheckpoint(FurthestReachedCheckpoint, CheckpointsStack.Num(), FurthestReachedCheckpointTime);
 		}
 	}
 }
