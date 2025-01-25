@@ -13,6 +13,7 @@
 #include "GameFramework/GearPlayerState.h"
 #include "GameFramework/GearGameState.h"
 #include "GameFramework/GearGameMode.h"
+#include "GameFramework/GearHUD.h"
 #include "Vehicle/VehicleCamera.h"
 #include "GameSystems/TrackSpline.h"
 #include "ChaosVehicleMovementComponent.h"
@@ -106,6 +107,13 @@ void AGearVehicle::PossessedBy(AController* NewController)
 
 }
 
+void AGearVehicle::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	ReceiveControllerChangedDelegate.AddDynamic(this, &AGearVehicle::OnControllerChanged);
+}
+
 // server and owning client
 void AGearVehicle::NotifyControllerChanged()
 {
@@ -114,8 +122,11 @@ void AGearVehicle::NotifyControllerChanged()
 	APlayerController* PC = GetController<APlayerController>();
 	if (IsValid(PC) && PC->IsLocalController())
 	{
-		VehicleInputWidget = CreateWidget<UVehicleInputWidget>(GetWorld(), VehicleInputWidgetClass);
-		VehicleInputWidget->AddToViewport();
+// 		AGearHUD* HUD = PC->GetHUD<AGearHUD>();
+// 		if (IsValid(HUD))
+// 		{
+// 			HUD->AddVehicleInputWidget();
+// 		}
 
 #if WITH_EDITOR
 
@@ -160,10 +171,14 @@ void AGearVehicle::Destroyed()
 		return;
 #endif
 
-	if (IsValid(VehicleInputWidget))
+	APlayerController* PC = GetController<APlayerController>();
+	if (IsValid(PC) && PC->IsLocalController())
 	{
-		VehicleInputWidget->RemoveFromParent();
-		VehicleInputWidget = nullptr;
+// 		AGearHUD* HUD = PC->GetHUD<AGearHUD>();
+// 		if (IsValid(HUD))
+// 		{
+// 			HUD->RemoveVehicleInputWidget();
+// 		}
 	}
 
 	if (IsValid(Driver))
@@ -185,6 +200,29 @@ void AGearVehicle::Destroyed()
 	}
 
 	Super::Destroyed();
+}
+
+void AGearVehicle::OnControllerChanged(APawn* Pawn, AController* OldController, AController* NewController)
+{
+	if (IsValid(NewController) && NewController->IsLocalController())
+	{
+		APlayerController* PC = Cast<APlayerController>(NewController);
+		AGearHUD* HUD = PC ? PC->GetHUD<AGearHUD>() : nullptr;
+		if (IsValid(HUD))
+		{
+			HUD->AddVehicleInputWidget(this);
+		}
+	}
+
+	else if (IsValid(OldController) && OldController->IsLocalController())
+	{
+		APlayerController* PC = Cast<APlayerController>(OldController);
+		AGearHUD* HUD = PC ? PC->GetHUD<AGearHUD>() : nullptr;
+		if (IsValid(HUD))
+		{
+			HUD->RemoveVehicleInputWidget();
+		}
+	}
 }
 
 void AGearVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -452,10 +490,10 @@ AGearAbility* AGearVehicle::GetAbility()
 
 void AGearVehicle::OnRep_Ability()
 {
-	if (IsValid(VehicleInputWidget))
-	{
-		VehicleInputWidget->AbilityChanged(Ability);
-	}
+// 	if (IsValid(VehicleInputWidget))
+// 	{
+// 		VehicleInputWidget->AbilityChanged(Ability);
+// 	}
 }
 
 void AGearVehicle::GrantAbility(TSubclassOf<class AGearAbility> AbilityClass)

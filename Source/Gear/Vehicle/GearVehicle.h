@@ -47,6 +47,7 @@ public:
 	bool HasInvincibility() const;
 	bool CanRemoveInvincibility();
 
+	UFUNCTION(BlueprintPure)
 	bool IsSpectating();
 
 	UFUNCTION(BlueprintPure)
@@ -107,22 +108,21 @@ protected:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual void PostInitializeComponents() override;
+
 	virtual void NotifyControllerChanged() override;
 
 	virtual void OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState) override;
 
 	virtual void Destroyed() override;
 
+	UFUNCTION()
+	void OnControllerChanged(APawn* Pawn, AController* OldController, AController* NewController);
+
 	void UpdateVehicleInputs();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UInputAction* SteerActionInput;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSubclassOf<class UVehicleInputWidget> VehicleInputWidgetClass;
-
-	UPROPERTY()
-	class UVehicleInputWidget* VehicleInputWidget;
 
 	void Input_Steer(const FInputActionInstance& Instance);
 

@@ -5,6 +5,7 @@
 #include "GameFramework/GearPlayerState.h"
 #include "Components/PanelWidget.h"
 #include "UI/GearBaseWidget.h"
+#include "UI/VehicleInputWidget.h"
 #include "Utils/GameVariablesBFL.h"
 #include "Blueprint/UserWidget.h"
 
@@ -40,6 +41,22 @@ void AGearHUD::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+}
+
+void AGearHUD::AddVehicleInputWidget(class AGearVehicle* OwningVehicle)
+{
+	AddWidget(VehicleInputWidgetClass, VehicleInputWidget, 0);
+
+	UVehicleInputWidget* InputWidget = Cast<UVehicleInputWidget>(VehicleInputWidget);
+	if (IsValid(InputWidget))
+	{
+		InputWidget->OwningVehicle = OwningVehicle;
+	}
+}
+
+void AGearHUD::RemoveVehicleInputWidget()
+{
+	RemoveWidget(VehicleInputWidget);
 }
 
 void AGearHUD::AddWidget(TSubclassOf<UGearBaseWidget> WidgetClass, UGearBaseWidget*& Widget, float InStartTime)

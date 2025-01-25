@@ -48,6 +48,11 @@ protected:
 	UGearBaseWidget* WaitingWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category=Classes)
+	TSubclassOf<UGearBaseWidget> VehicleInputWidgetClass;
+	UPROPERTY()
+	UGearBaseWidget* VehicleInputWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category=Classes)
 	TSubclassOf<UGearBaseWidget> SelectingWidgetClass;
 	UPROPERTY()
 	UGearBaseWidget* SelectingWidget;
@@ -98,6 +103,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FOnRaceStart OnRaceStart;
+
+	void AddVehicleInputWidget(class AGearVehicle* OwningVehicle);
+	void RemoveVehicleInputWidget();
 
 protected:
 	TArray<class UGearBaseWidget*> WidgetStack;
