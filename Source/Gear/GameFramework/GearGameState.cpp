@@ -585,6 +585,28 @@ void AGearGameState::GetWorldBounds(FVector& World_Min, FVector& World_Max)
 	World_Max = WorldMax;
 }
 
+int32 AGearGameState::GetSpectatingPlayerCount()
+{
+	int32 Count = 0;
+	for (AGearVehicle* Vehicle : Vehicles)
+	{
+		Count = Vehicle->IsSpectating() ? Count + 1 : Count;
+	}
+
+	return Count;
+}
+
+int32 AGearGameState::GetDrivingPlayerCount()
+{
+	int32 Count = 0;
+	for (AGearVehicle* Vehicle : Vehicles)
+	{
+		Count = Vehicle->IsSpectating() ? Count : Count + 1;
+	}
+
+	return Count;
+}
+
 void AGearGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
@@ -655,11 +677,11 @@ void AGearGameState::BroadcastPlacedEvent_Multi_Implementation(AGearPlayerState*
 // 	}
 }
 
-void AGearGameState::BroadcastEliminationEvent_Multi_Implementation(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason)
+void AGearGameState::BroadcastEliminationEvent_Multi_Implementation(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason, float EliminationTime, int32 RemainingPlayersCount)
 {
 	if (IsValid(GetLocalPlayer()))
 	{
-		LocalPlayer->OnPlayerEliminated(PlayerState, ElimanationReason);
+		LocalPlayer->OnPlayerEliminated(PlayerState, ElimanationReason, EliminationTime, RemainingPlayersCount);
 	}
 }
 
@@ -668,6 +690,14 @@ void AGearGameState::BroadcastReachedCheckpointEvent_Multi_Implementation(AGearP
 	if (IsValid(GetLocalPlayer()))
 	{
 		LocalPlayer->OnReachedCheckpoint(PlayerState, Checkpoint, Position, AllCheckpointNum, ReachTime);
+	}
+}
+
+void AGearGameState::BroadcastRaceStartEvent_Multi_Implementation(float StartTime, bool bWithCountDown)
+{
+	if (IsValid(GetLocalPlayer()))
+	{
+		LocalPlayer->OnRaceStart(StartTime, bWithCountDown);
 	}
 }
 

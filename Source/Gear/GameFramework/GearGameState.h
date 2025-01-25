@@ -100,6 +100,12 @@ public:
 
 	void GetWorldBounds(FVector& World_Min, FVector& World_Max);
 
+	UFUNCTION(BlueprintPure)
+	int32 GetSpectatingPlayerCount();
+
+	UFUNCTION(BlueprintPure)
+	int32 GetDrivingPlayerCount();
+
 	UPROPERTY(ReplicatedUsing=OnRep_GearMatchState)
 	EGearMatchState GearMatchState;
 
@@ -159,10 +165,13 @@ public:
 	void BroadcastPlacedEvent_Multi(AGearPlayerState* PlayerState, TSubclassOf<AGearPlaceable> PlaceableClass);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void BroadcastEliminationEvent_Multi(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason);
+	void BroadcastEliminationEvent_Multi(AGearPlayerState* PlayerState, EElimanationReason ElimanationReason, float EliminationTime, int32 RemainingPlayersCount);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void BroadcastReachedCheckpointEvent_Multi(AGearPlayerState* PlayerState, ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void BroadcastRaceStartEvent_Multi(float StartTime, bool bWithCountDown);
 
 	UFUNCTION()
 	void OnRep_FurthestReachedCheckpoint();

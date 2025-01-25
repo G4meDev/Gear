@@ -197,12 +197,17 @@ void AGearHUD::PlayerQuit(class AGearPlayerState* Player)
 	OnPlayerQuit.Broadcast(Player);
 }
 
-void AGearHUD::PlayerEliminated(AGearPlayerState* Player, EElimanationReason ElimanationReason)
+void AGearHUD::PlayerEliminated(AGearPlayerState* Player, EElimanationReason ElimanationReason, float EliminationTime, int32 RemainingPlayersCount)
 {
-	OnPlayerEliminated.Broadcast(Player, ElimanationReason);
+	OnPlayerEliminated.Broadcast(Player, ElimanationReason, EliminationTime, RemainingPlayersCount);
 }
 
 void AGearHUD::ReachedCheckpoint(AGearPlayerState* Player, class ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime)
 {
 	OnReachedCheckpoint.Broadcast(Player, Checkpoint, Position, AllCheckpointNum, ReachTime);
+}
+
+void AGearHUD::RaceStart(float StartTime, bool bWithCountDown)
+{
+	OnRaceStart.Broadcast(StartTime, bWithCountDown);
 }

@@ -337,12 +337,12 @@ void AGearPlayerController::OnPlayerQuit(AGearPlayerState* GearPlayer)
 	}
 }
 
-void AGearPlayerController::OnPlayerEliminated(AGearPlayerState* EliminatedPlayer, EElimanationReason ElimanationReason)
+void AGearPlayerController::OnPlayerEliminated(AGearPlayerState* EliminatedPlayer, EElimanationReason ElimanationReason, float EliminationTime, int32 RemainingPlayersCount)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))
 	{
-		GearHUD->PlayerEliminated(EliminatedPlayer, ElimanationReason);
+		GearHUD->PlayerEliminated(EliminatedPlayer, ElimanationReason, EliminationTime, RemainingPlayersCount);
 	}
 }
 
@@ -352,6 +352,15 @@ void AGearPlayerController::OnReachedCheckpoint(AGearPlayerState* ReachedPlayer,
 	if (IsValid(GearHUD))
 	{
 		GearHUD->ReachedCheckpoint(ReachedPlayer, Checkpoint, Position, AllCheckpointNum, ReachTime);
+	}
+}
+
+void AGearPlayerController::OnRaceStart(float StartTime, bool bWithCountDown)
+{
+	AGearHUD* GearHUD = GetHUD<AGearHUD>();
+	if (IsValid(GearHUD))
+	{
+		GearHUD->RaceStart(StartTime, bWithCountDown);
 	}
 }
 

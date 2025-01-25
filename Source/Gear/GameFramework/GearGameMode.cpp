@@ -126,7 +126,7 @@ void AGearGameMode::RacingTick(float DeltaSeconds)
 
 			if (bShouldVehicleDie)
 			{
-				GearGameState->BroadcastEliminationEvent_Multi(Vehicle->GetPlayerState<AGearPlayerState>(), ElimanationReason);
+				GearGameState->BroadcastEliminationEvent_Multi(Vehicle->GetPlayerState<AGearPlayerState>(), ElimanationReason, GearGameState->GetServerWorldTimeSeconds(), GearGameState->GetDrivingPlayerCount() - 1); 
 				DestroyVehicle(Vehicle);
 			}
 
@@ -672,6 +672,8 @@ void AGearGameMode::StartRacingAtCheckpoint(ACheckpoint* Checkpoint, AGearVehicl
 	}
 
 	GearGameState->LastCheckpointStartTime = GetWorld()->GetTimeSeconds();
+
+	GearGameState->BroadcastRaceStartEvent_Multi(GearGameState->GetServerWorldTimeSeconds(), bNeedsCountDown);
 }
 
 void AGearGameMode::StartRacing()

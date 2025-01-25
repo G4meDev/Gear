@@ -13,8 +13,9 @@ class ACheckpoint;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllPlayersJoined);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerJoined, AGearPlayerState*, Player);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerQuit, AGearPlayerState*, Player);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerEliminated, AGearPlayerState*, Player, EElimanationReason, ElimanationReason);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnPlayerEliminated, AGearPlayerState*, Player, EElimanationReason, ElimanationReason, float, EliminationTime, int32, RemainingPlayersCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnReachedCheckpoint, AGearPlayerState*, Player, ACheckpoint*, Checkpoint, int32, Position, int32, AllCheckpointNum, float, ReachTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRaceStart, float, StartTime, bool, bWithCountDown);
 
 /**
  * 
@@ -95,6 +96,9 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FOnReachedCheckpoint OnReachedCheckpoint;
 
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FOnRaceStart OnRaceStart;
+
 protected:
 	TArray<class UGearBaseWidget*> WidgetStack;
 
@@ -142,8 +146,10 @@ protected:
 	void PlayerJoined(class AGearPlayerState* Player);
 	void PlayerQuit(class AGearPlayerState* Player);
 
-	void PlayerEliminated(AGearPlayerState* Player, EElimanationReason ElimanationReason);
+	void PlayerEliminated(AGearPlayerState* Player, EElimanationReason ElimanationReason, float EliminationTime, int32 RemainingPlayersCount);
 	void ReachedCheckpoint(AGearPlayerState* Player, class ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime);
 
+	void RaceStart(float StartTime, bool bWithCountDown);
+	
 	friend class AGearPlayerController;
 };

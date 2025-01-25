@@ -74,9 +74,10 @@ public:
 	void OnPlayerJoined(AGearPlayerState* GearPlayer);
 	void OnPlayerQuit(AGearPlayerState* GearPlayer);
 
-	void OnPlayerEliminated(AGearPlayerState* EliminatedPlayer, EElimanationReason ElimanationReason);
+	void OnPlayerEliminated(AGearPlayerState* EliminatedPlayer, EElimanationReason ElimanationReason, float EliminationTime, int32 RemainingPlayersCount);
 	void OnReachedCheckpoint(AGearPlayerState* ReachedPlayer, class ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime);
 
+	void OnRaceStart(float StartTime, bool bWithCountDown);
 
 	UFUNCTION(Server, Reliable)
 	void SelectPlaceable(AGearPlaceable* Placeable);
