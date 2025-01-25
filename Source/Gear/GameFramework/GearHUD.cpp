@@ -228,3 +228,8 @@ void AGearHUD::RaceStart(float StartTime, bool bWithCountDown)
 {
 	OnRaceStart.Broadcast(StartTime, bWithCountDown);
 }
+
+void AGearHUD::AbilityStateChanged(class AGearAbility* Ability)
+{
+	OnAbilityStateChanged.Broadcast(Ability);
+}

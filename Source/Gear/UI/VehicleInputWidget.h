@@ -16,9 +16,6 @@ class GEAR_API UVehicleInputWidget : public UGearBaseWidget
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent)
-	void AbilityChanged(class AGearAbility* Ability);
-
 	UPROPERTY(BlueprintReadOnly)
 	class AGearVehicle* OwningVehicle;
 };

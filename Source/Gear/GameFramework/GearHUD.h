@@ -16,6 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerQuit, AGearPlayerState*, Pl
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnPlayerEliminated, AGearPlayerState*, Player, EElimanationReason, ElimanationReason, float, EliminationTime, int32, RemainingPlayersCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnReachedCheckpoint, AGearPlayerState*, Player, ACheckpoint*, Checkpoint, int32, Position, int32, AllCheckpointNum, float, ReachTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRaceStart, float, StartTime, bool, bWithCountDown);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityStateChanged, class AGearAbility*, Ability);
 
 /**
  * 
@@ -104,6 +105,9 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FOnRaceStart OnRaceStart;
 
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FOnAbilityStateChanged OnAbilityStateChanged;
+
 	void AddVehicleInputWidget(class AGearVehicle* OwningVehicle);
 	void RemoveVehicleInputWidget();
 
@@ -158,6 +162,9 @@ protected:
 	void ReachedCheckpoint(AGearPlayerState* Player, class ACheckpoint* Checkpoint, int32 Position, int32 AllCheckpointNum, float ReachTime);
 
 	void RaceStart(float StartTime, bool bWithCountDown);
+
+	void AbilityStateChanged(class AGearAbility* Ability);
 	
 	friend class AGearPlayerController;
+	friend class AGearVehicle;
 };

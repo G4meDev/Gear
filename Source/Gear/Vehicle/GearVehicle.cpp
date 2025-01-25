@@ -490,10 +490,12 @@ AGearAbility* AGearVehicle::GetAbility()
 
 void AGearVehicle::OnRep_Ability()
 {
-// 	if (IsValid(VehicleInputWidget))
-// 	{
-// 		VehicleInputWidget->AbilityChanged(Ability);
-// 	}
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	AGearHUD* HUD = PC ? PC->GetHUD<AGearHUD>() : nullptr;
+	if (IsValid(HUD))
+	{
+		HUD->AbilityStateChanged(Ability);
+	}
 }
 
 void AGearVehicle::GrantAbility(TSubclassOf<class AGearAbility> AbilityClass)
