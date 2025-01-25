@@ -18,7 +18,7 @@ protected:
 	USceneComponent* Root;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UTexture2D* AbilityIcon;
+	FButtonStyle AbilityIconStyle;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EAbilityType AbilityType;

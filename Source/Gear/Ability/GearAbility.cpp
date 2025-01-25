@@ -13,8 +13,6 @@ AGearAbility::AGearAbility()
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
-	AbilityIcon = nullptr;
-
 	bReplicates = true;
 	bAlwaysRelevant = true;
 }
