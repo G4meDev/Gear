@@ -45,17 +45,17 @@ float UGameVariablesBFL::GV_RacingEndDelay()
 
 int32 UGameVariablesBFL::GV_FinishingCheckpointScore()
 {
-	return 150;
+	return 4;
 }
 
 int32 UGameVariablesBFL::GV_FirstFinishAdditionalScore()
 {
-	return 100;
+	return 1;
 }
 
 int32 UGameVariablesBFL::GV_WinningRequiredScore()
 {
-	return 3000;
+	return 80;
 }
 
 float UGameVariablesBFL::GV_ScoreboardTimeStep()
