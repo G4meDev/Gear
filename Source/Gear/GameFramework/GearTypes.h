@@ -135,6 +135,26 @@ public:
 	}
 };
 
+USTRUCT(BlueprintType)
+struct FRoundResult 
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FCheckpointResult> CheckpointArray;
+
+	FCheckpointResult& operator[](int i)
+	{
+		return CheckpointArray[i];
+	}
+
+	void Add(const FCheckpointResult& CheckpointResult)
+	{
+		CheckpointArray.Add(CheckpointResult);
+	}
+};
+
 UENUM()
 enum class ERoadModuleTraceResult : uint8
 {

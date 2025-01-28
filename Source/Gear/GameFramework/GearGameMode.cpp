@@ -700,12 +700,12 @@ void AGearGameMode::StartScoreboard()
 	GetWorld()->GetTimerManager().ClearTimer(RacingTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(RacingEndDelayTimerHandle);
 
+	DestroyActors();
+	ResetCheckpointsState();
+	GearGameState->RoundsResult.Add(GearGameState->OngoingRoundResult);
+
 	GetWorld()->GetTimerManager().SetTimer(ScoreboardTimerHandle,
 		FTimerDelegate::CreateUObject(this, &AGearGameMode::ScoreboardLifespanFinished), GearGameState->GetEstimatedScoreboardLifespan(), false);
-
-	DestroyActors();
-
-	ResetCheckpointsState();
 
 	UE_LOG(LogTemp, Warning, TEXT("start scoreboard"));
 	SetGearMatchState(EGearMatchState::Scoreboard);
@@ -748,17 +748,14 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 
 	if (Vehicle->TargetCheckpoint == TargetCheckpoint->CheckpointIndex)
 	{
-		AGearPlayerState* GearPlayerState = Vehicle->GetPlayerState<AGearPlayerState>();
-		check(GearPlayerState);
-
+		AGearPlayerState* Player = Vehicle->GetPlayerState<AGearPlayerState>();
 		const int CheckpointIndex = TargetCheckpoint->CheckpointIndex;
 
-		GearGameState->CheckpointResults[CheckpointIndex - 1].Add(GearPlayerState);
+		GearGameState->OngoingRoundResult[CheckpointIndex - 1].Add(Player);
 		Vehicle->TargetCheckpoint = CheckpointIndex + 1;
-		UE_LOG(LogTemp, Warning, TEXT("%s is %i player to reached checkpoint number %i"), *GearPlayerState->GetPlayerName(), GearGameState->CheckpointResults[CheckpointIndex - 1].PlayerList.Num(), CheckpointIndex);
+		UE_LOG(LogTemp, Warning, TEXT("%s is %i player to reached checkpoint number %i"), *Player->GetPlayerName(), GearGameState->OngoingRoundResult[CheckpointIndex - 1].PlayerList.Num(), CheckpointIndex);
 
-		AGearPlayerState* Player = Vehicle->GetPlayerState<AGearPlayerState>();
-		int32 Position = GearGameState->CheckpointResults[CheckpointIndex - 1].PlayerList.Num();
+		int32 Position = GearGameState->OngoingRoundResult[CheckpointIndex - 1].PlayerList.Num();
 
 		GearGameState->BroadcastReachedCheckpointEvent_Multi(Player, TargetCheckpoint, Position, GearGameState->CheckpointsStack.Num(), GearGameState->GetServerWorldTimeSeconds());
 		TargetCheckpoint->PlayerReachedCheckpoint_Multi(Player, Position);
@@ -775,7 +772,7 @@ void AGearGameMode::VehicleReachedCheckpoint(AGearVehicle* Vehicle, ACheckpoint*
 
 		if (GearGameState->CheckpointsStack.Top() == TargetCheckpoint)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s finished race"), *GearPlayerState->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s finished race"), *Player->GetName());
 			DestroyVehicle(Vehicle);
 		}
 	}

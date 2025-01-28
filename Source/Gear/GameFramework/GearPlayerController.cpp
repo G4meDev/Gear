@@ -259,7 +259,7 @@ void AGearPlayerController::ClientStateRacing_End()
 	}
 }
 
-void AGearPlayerController::ClientStateScoreboard_Start(float StartTime, const TArray<FCheckpointResult>& RoundResults)
+void AGearPlayerController::ClientStateScoreboard_Start(float StartTime)
 {
 	AGearHUD* GearHUD = GetHUD<AGearHUD>();
 	if (IsValid(GearHUD))

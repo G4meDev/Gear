@@ -49,7 +49,7 @@ void AGearGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AGearGameState, LastGameStateTransitionTime);
 	DOREPLIFETIME(AGearGameState, CheckpointsStack);
 	DOREPLIFETIME(AGearGameState, Vehicles);
-	DOREPLIFETIME(AGearGameState, CheckpointResults);
+	DOREPLIFETIME(AGearGameState, RoundsResult);
 	DOREPLIFETIME(AGearGameState, RoundNumber);
 	DOREPLIFETIME(AGearGameState, LastCountDownTime);
 	DOREPLIFETIME(AGearGameState, FurthestReachedCheckpoint);
@@ -311,16 +311,16 @@ void AGearGameState::Scoreboard_Start()
 {
 	if (IsValid(GetLocalPlayer()))
 	{
-		LocalPlayer->ClientStateScoreboard_Start(LastGameStateTransitionTime, CheckpointResults);
+		LocalPlayer->ClientStateScoreboard_Start(LastGameStateTransitionTime);
 	}
 
-	for (APlayerState* PlayerState : PlayerArray)
-	{
-		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(PlayerState);
-		check(GearPlayerState);
-
-		GearPlayerState->UpdateRoundScore(CheckpointResults);
-	}
+// 	for (APlayerState* PlayerState : PlayerArray)
+// 	{
+// 		AGearPlayerState* GearPlayerState = Cast<AGearPlayerState>(PlayerState);
+// 		check(GearPlayerState);
+// 
+// 		GearPlayerState->UpdateRoundScore(CheckpointResults);
+// 	}
 }
 
 void AGearGameState::Scoreboard_End()
@@ -362,7 +362,43 @@ void AGearGameState::NotifyAllPlayersJoined()
 
 float AGearGameState::GetEstimatedScoreboardLifespan() const
 {	
-	return (CheckpointResults.Num() + 3) * UGameVariablesBFL::GV_ScoreboardTimeStep();
+	//return (CheckpointResults.Num() + 3) * UGameVariablesBFL::GV_ScoreboardTimeStep();
+
+	int32 MaxCheckpointSteps = 0;
+
+	for (TObjectPtr<APlayerState> PlayerState : PlayerArray)
+	{
+		AGearPlayerState* Player = Cast<AGearPlayerState>(PlayerState.Get());
+	
+		if (IsValid(Player))
+		{
+			int NumPassedCheckpoint = 0;
+			int NumGoldCheckpoint = 0;
+
+			for (const FCheckpointResult& Result : RoundsResult.Last().CheckpointArray)
+			{
+				int PlayerIndex = Result.PlayerList.Find(Player);
+
+				if (PlayerIndex > INDEX_NONE)
+				{
+					NumPassedCheckpoint++;
+				}
+
+				if (PlayerIndex == 0)
+				{
+					NumGoldCheckpoint++;
+				}
+			}
+
+			MaxCheckpointSteps = FMath::Max(MaxCheckpointSteps, NumPassedCheckpoint * UGameVariablesBFL::GV_FinishingCheckpointScore() 
+				+ NumGoldCheckpoint * UGameVariablesBFL::GV_FirstFinishAdditionalScore());
+		}
+	}
+
+	float Result = UGameVariablesBFL::GV_ScoreboardTimeDelay() * 2 + UGameVariablesBFL::GV_ScoreboardTimeStep() * MaxCheckpointSteps;
+	UE_LOG(LogTemp, Warning, TEXT("esstimated %f seconds for scoreboard"), Result);
+	
+	return Result;
 }
 
 bool AGearGameState::FindStartRoadModuleAndAddToStack()
@@ -494,11 +530,11 @@ void AGearGameState::ClearOccupiedVehicleStarts()
 void AGearGameState::ClearCheckpointResults()
 {
 	const int AvaliableCheckpointNum = CheckpointsStack.Num() - 1;
-	CheckpointResults.Empty(AvaliableCheckpointNum);
+	OngoingRoundResult.CheckpointArray.Empty(AvaliableCheckpointNum);
 
 	for (int i = 0; i < AvaliableCheckpointNum; i++)
 	{
-		CheckpointResults.AddDefaulted();
+		OngoingRoundResult.CheckpointArray.AddDefaulted();
 	}
 }
 

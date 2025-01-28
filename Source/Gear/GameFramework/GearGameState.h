@@ -124,8 +124,11 @@ public:
 	UPROPERTY(Replicated)
 	TArray<AGearVehicle*> Vehicles;
 
-	UPROPERTY(Replicated)
-	TArray<FCheckpointResult> CheckpointResults;
+	UPROPERTY()
+	FRoundResult OngoingRoundResult;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	TArray<FRoundResult> RoundsResult;
 
 	UPROPERTY()
 	AVehicleCamera* VehicleCamera;

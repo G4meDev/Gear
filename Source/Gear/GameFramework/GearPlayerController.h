@@ -102,7 +102,7 @@ public:
 	void ClientStateRacing_Start(float StartTime);
 	void ClientStateRacing_End();
 
-	void ClientStateScoreboard_Start(float StartTime, const TArray<FCheckpointResult>& RoundResults);
+	void ClientStateScoreboard_Start(float StartTime);
 	void ClientStateScoreboard_End();
 
 	void ClientStateFinishboard_Start(float StartTime);

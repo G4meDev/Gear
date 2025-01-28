@@ -60,12 +60,12 @@ int32 UGameVariablesBFL::GV_WinningRequiredScore()
 
 float UGameVariablesBFL::GV_ScoreboardTimeStep()
 {
-	return 2.0f;
+	return 0.5f;
 }
 
 float UGameVariablesBFL::GV_ScoreboardTimeDelay()
 {
-	return 0.7f;
+	return 2.0f;
 }
 
 float UGameVariablesBFL::GV_TransitionDuration()
