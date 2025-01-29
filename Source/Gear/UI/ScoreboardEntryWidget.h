@@ -17,18 +17,23 @@ class GEAR_API UScoreboardEntryWidget : public UUserWidget
 protected:
 
 	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<class AGearPlayerState> Player;
+	TObjectPtr<class UScoreboardWidget> OwningScoreboard;
 
-	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<class UGearBaseWidget> OwningScoreboard;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<class UImage> ColorBadgeImage;
 
 public:
 
-	UFUNCTION(BlueprintCallable)
-	void InitWidget(UGearBaseWidget* InOwningScoreboard);
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<class AGearPlayerState> Player;
+
+	void InitWidget(UScoreboardWidget* InOwningScoreboard);
 
 protected:
 	
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	UFUNCTION(BlueprintPure)
+	ESlateVisibility GetWidgetVisibility();
 };
