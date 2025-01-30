@@ -25,6 +25,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UImage> CheckpointSegmentImage;
 
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<class UWidgetAnimation> ShakeAnim;
+
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<class UScoreboardCheckpoint> OwningScoreboardCheckpoint; 
 

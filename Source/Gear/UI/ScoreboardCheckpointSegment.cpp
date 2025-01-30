@@ -13,6 +13,11 @@ void UScoreboardCheckpointSegment::InitWidget(UScoreboardCheckpoint* InOwningSco
 
 void UScoreboardCheckpointSegment::SetSegmentState(bool bVisible, bool bTransparent, bool bGold)
 {
+	if (CheckpointSegmentImage->GetVisibility() == ESlateVisibility::Hidden && bVisible && bTransparent)
+	{
+		PlayAnimation(ShakeAnim);
+	}
+
 	CheckpointSegmentImage->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
 
 	if (bVisible)
