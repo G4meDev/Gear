@@ -9,6 +9,27 @@ void UScoreboardCheckpoint::InitWidget(UScoreboardEntryWidget* InOwningScoreboar
 	OwningScoreboardEntry = InOwningScoreboardEntry;
 }
 
+UScoreboardCheckpointSegment* UScoreboardCheckpoint::GetCheckpointSegmentAtIndex(int32 Index)
+{
+	switch (Index)
+	{
+	case 0:
+		return CheckpointSegment_1;
+
+	case 1:
+		return CheckpointSegment_2;
+
+	case 2:
+		return CheckpointSegment_3;
+
+	case 3:
+		return CheckpointSegment_4;
+
+	default:
+		return nullptr;
+	}
+}
+
 void UScoreboardCheckpoint::NativeConstruct()
 {
 	Super::NativeConstruct();

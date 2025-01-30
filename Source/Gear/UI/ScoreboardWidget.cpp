@@ -5,22 +5,24 @@
 #include "UI/ScoreboardEntryWidget.h"
 #include "GameFramework/GearHUD.h"
 #include "GameFramework/GearPlayerState.h"
+#include "GameFramework/GearGameState.h"
+#include "Utils/GameVariablesBFL.h"
 #include "Kismet/GameplayStatics.h"
 
 void UScoreboardWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	if (IsValid(GetWorld()))
+	{
+		GearGameState = GetWorld()->GetGameState<AGearGameState>();
+	}
+
 	if (IsValid(OwningHUD))
 	{
 		OwningHUD->OnPlayerJoined.AddDynamic(this, &UScoreboardWidget::AddPlayer);
 		OwningHUD->OnPlayerQuit.AddDynamic(this, &UScoreboardWidget::RemovePlayer);
 	}
-
-	Entry_1->InitWidget(this);
-	Entry_2->InitWidget(this);
-	Entry_3->InitWidget(this);
-	Entry_4->InitWidget(this);
 
 	TArray<AActor*> PlayerActors;
 	UGameplayStatics::GetAllActorsOfClass(this, AGearPlayerState::StaticClass(), PlayerActors);
@@ -39,6 +41,11 @@ void UScoreboardWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	if (IsValid(GearGameState))
+	{
+		float RelativeTime = GearGameState->GetServerWorldTimeSeconds() - StartTime;
+		CurrentStep = FMath::Floor((RelativeTime - UGameVariablesBFL::GV_ScoreboardTimeDelay()) / UGameVariablesBFL::GV_ScoreboardTimeStep());
+	}
 }
 
 void UScoreboardWidget::NativeDestruct()
@@ -58,7 +65,7 @@ void UScoreboardWidget::AddPlayer(AGearPlayerState* Player)
 		{
 			if (IsValid(Entry) && !IsValid(Entry->Player))
 			{
-				Entry->Player = Player;
+				Entry->InitWidgetForPlayer(this, Player);
 				return true;
 			}
 

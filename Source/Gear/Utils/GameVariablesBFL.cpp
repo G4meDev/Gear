@@ -55,7 +55,7 @@ int32 UGameVariablesBFL::GV_FirstFinishAdditionalScore()
 
 int32 UGameVariablesBFL::GV_WinningRequiredScore()
 {
-	return 80;
+	return 40;
 }
 
 float UGameVariablesBFL::GV_ScoreboardTimeStep()

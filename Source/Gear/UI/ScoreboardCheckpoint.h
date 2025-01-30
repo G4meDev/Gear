@@ -34,6 +34,8 @@ protected:
 public:
 	void InitWidget(UScoreboardEntryWidget* InOwningScoreboardEntry);
 
+	class UScoreboardCheckpointSegment* GetCheckpointSegmentAtIndex(int32 Index);
+
 protected:
 	virtual void NativeConstruct() override;
 

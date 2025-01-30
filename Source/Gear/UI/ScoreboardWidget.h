@@ -30,6 +30,11 @@ protected:
 
 public:
 
+	int32 CurrentStep;
+
+	UPROPERTY()
+	class AGearGameState* GearGameState;
+
 protected:
 	
 	virtual void NativeConstruct() override;

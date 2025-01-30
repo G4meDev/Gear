@@ -16,6 +16,12 @@ class GEAR_API UScoreboardCheckpointSegment : public UUserWidget
 	
 protected:
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FSlateBrush CheckpointSegmentBrush;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FSlateBrush GoldCheckpointSegmentBrush;
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UImage> CheckpointSegmentImage;
 
@@ -25,6 +31,8 @@ protected:
 public:
 	
 	void InitWidget(UScoreboardCheckpoint* InOwningScoreboardCheckpoint);
+
+	void SetSegmentState(bool bVisible, bool bTransparent, bool bGold);
 
 protected:
 
