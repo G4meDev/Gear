@@ -16,6 +16,7 @@ void UScoreboardWidget::NativeConstruct()
 	if (IsValid(GetWorld()))
 	{
 		GearGameState = GetWorld()->GetGameState<AGearGameState>();
+		EstimatedLifeSpan = GearGameState->GetEstimatedScoreboardLifespan();
 	}
 
 	if (IsValid(OwningHUD))
@@ -44,7 +45,28 @@ void UScoreboardWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	if (IsValid(GearGameState))
 	{
 		float RelativeTime = GearGameState->GetServerWorldTimeSeconds() - StartTime;
-		CurrentStep = FMath::Floor((RelativeTime - UGameVariablesBFL::GV_ScoreboardTimeDelay()) / UGameVariablesBFL::GV_ScoreboardTimeStep());
+		
+		RelativeTime -= UGameVariablesBFL::GV_ScoreboardTimeDelay();
+		RelativeTime = FMath::Min(EstimatedLifeSpan - UGameVariablesBFL::GV_ScoreboardTimeStep() - 2 * UGameVariablesBFL::GV_ScoreboardTimeDelay(), RelativeTime);
+
+		if (RelativeTime < 0)
+		{
+			CurrentStep = -1;
+		}
+		else
+		{
+			CurrentStep = FMath::Floor(RelativeTime  / UGameVariablesBFL::GV_ScoreboardTimeStep());
+		}
+
+		if (CurrentStep != LastFrameStep)
+		{
+			if (IsValid(StepSound))
+			{
+				UGameplayStatics::PlaySound2D(this, StepSound);
+			}
+
+			LastFrameStep = CurrentStep;
+		}
 	}
 }
 

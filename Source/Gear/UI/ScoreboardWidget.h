@@ -28,9 +28,15 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UScoreboardEntryWidget> Entry_4;
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	USoundBase* StepSound;
+
+	float EstimatedLifeSpan = FLT_MAX;
+
 public:
 
-	int32 CurrentStep;
+	int32 CurrentStep = -1;
+	int32 LastFrameStep = -1;
 
 	UPROPERTY()
 	class AGearGameState* GearGameState;
