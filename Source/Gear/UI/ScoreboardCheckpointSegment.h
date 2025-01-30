@@ -16,10 +16,10 @@ class GEAR_API UScoreboardCheckpointSegment : public UUserWidget
 	
 protected:
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FSlateBrush CheckpointSegmentBrush;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FSlateBrush GoldCheckpointSegmentBrush;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))

@@ -13,17 +13,18 @@ void UScoreboardCheckpointSegment::InitWidget(UScoreboardCheckpoint* InOwningSco
 
 void UScoreboardCheckpointSegment::SetSegmentState(bool bVisible, bool bTransparent, bool bGold)
 {
-	if (CheckpointSegmentImage->GetVisibility() == ESlateVisibility::Hidden && bVisible && bTransparent)
+	bool bShoulsPlayAnim = CheckpointSegmentImage->GetVisibility() == ESlateVisibility::Hidden && bVisible && bTransparent;
+
+	if (bVisible && CheckpointSegmentImage->GetVisibility() == ESlateVisibility::Hidden)
 	{
-		PlayAnimation(ShakeAnim);
+		CheckpointSegmentImage->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
+		CheckpointSegmentImage->SetColorAndOpacity(bTransparent ? FLinearColor::White : FLinearColor(0.5f, 0.5f, 0.5f, 1.0f));
+		CheckpointSegmentImage->SetBrush(bGold ? GoldCheckpointSegmentBrush : CheckpointSegmentBrush);
 	}
 
-	CheckpointSegmentImage->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
-
-	if (bVisible)
+	if (bShoulsPlayAnim)
 	{
-		CheckpointSegmentImage->SetColorAndOpacity(bTransparent ? FLinearColor(1.0f, 1.0f, 1.0f, 0.5f) : FLinearColor::White);
-		CheckpointSegmentImage->SetBrush(bGold ? GoldCheckpointSegmentBrush : CheckpointSegmentBrush);
+		PlayAnimation(ShakeAnim);
 	}
 }
 
@@ -35,6 +36,6 @@ void UScoreboardCheckpointSegment::NativeConstruct()
 
 void UScoreboardCheckpointSegment::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	Super::Tick(MyGeometry, InDeltaTime);
+	Super::NativeTick(MyGeometry, InDeltaTime);
 
 }
