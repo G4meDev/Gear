@@ -93,7 +93,7 @@ UAnimInstance* AGearAbility::GetDriverBodyAnimInstance()
 	return AnimInstance;
 }
 
-bool AGearAbility::CanActivate() const
+bool AGearAbility::CanActivate()
 {
 	return true;
 }

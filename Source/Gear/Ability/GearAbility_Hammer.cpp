@@ -32,6 +32,8 @@ AGearAbility_Hammer::AGearAbility_Hammer()
 	VelocityReductionRatio = 0.7f;
 
 	RemainingItemUsage = 3;
+	AbilityCooldown = 0.4f;
+	LastActivationTime = FLT_MIN;
 }
 
 void AGearAbility_Hammer::Destroyed()
@@ -46,6 +48,7 @@ void AGearAbility_Hammer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AGearAbility_Hammer, RemainingItemUsage, COND_InitialOrOwner);
+	DOREPLIFETIME_CONDITION(AGearAbility_Hammer, LastActivationTime, COND_InitialOrOwner);
 }
 
 void AGearAbility_Hammer::Tick(float DeltaTime)
@@ -102,9 +105,11 @@ void AGearAbility_Hammer::OnMontageNotify(FName NotifyName, const FBranchingPoin
 	
 }
 
-bool AGearAbility_Hammer::CanActivate() const
+bool AGearAbility_Hammer::CanActivate()
 {
-	return RemainingItemUsage > 0;
+	bool bInCooldown = GetWorld()->GetGameState()->GetServerWorldTimeSeconds() - LastActivationTime < AbilityCooldown; 
+	bool bOnGround = IsValid(OwningVehice) ? OwningVehice->IsOnGround() : false;
+	return bOnGround && RemainingItemUsage > 0 && !bInCooldown;
 }
 
 void AGearAbility_Hammer::ShowHammer()
@@ -122,6 +127,7 @@ void AGearAbility_Hammer::Activate_Server_Implementation()
 	if (CanActivate())
 	{
 		RemainingItemUsage--;
+		LastActivationTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
 
 		GetWorld()->GetTimerManager().SetTimer(AttackHitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearAbility_Hammer::AttackHit), AttackHitDelay, false);
 		Activate_Multi();

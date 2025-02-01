@@ -45,8 +45,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float VelocityReductionRatio;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AbilityCooldown;
+
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
 	int32 RemainingItemUsage;
+
+	UPROPERTY(Replicated)
+	float LastActivationTime;
 
 public:
 	AGearAbility_Hammer();
@@ -58,11 +64,10 @@ public:
 	virtual void ActivateAbility() override;
 
 	virtual float GetWidgetValue() override;
+	virtual bool CanActivate() override;
 
 protected:
 	virtual void OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload) override;
-
-	virtual bool CanActivate() const override;
 
 	void ShowHammer();
 

@@ -52,11 +52,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual float GetWidgetValue();
 
+	UFUNCTION(BlueprintPure)
+	virtual bool CanActivate();
+
 protected:
 	UFUNCTION()
 	virtual void OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 
 	UAnimInstance* GetDriverBodyAnimInstance();
-
-	virtual bool CanActivate() const;
 };
