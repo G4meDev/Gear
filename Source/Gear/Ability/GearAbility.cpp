@@ -65,6 +65,11 @@ void AGearAbility::ActivateAbility()
 
 }
 
+float AGearAbility::GetWidgetValue()
+{
+	return 1.0f;
+}
+
 void AGearAbility::OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	

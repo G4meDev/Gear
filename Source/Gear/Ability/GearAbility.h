@@ -18,7 +18,10 @@ protected:
 	USceneComponent* Root;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FButtonStyle AbilityIconStyle;
+	FSlateBrush AbilityPaddingBrush;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FButtonStyle AbilityButtonStyle;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EAbilityType AbilityType;
@@ -50,6 +53,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ActivateAbility();
+
+	UFUNCTION(BlueprintPure)
+	virtual float GetWidgetValue();
 
 protected:
 	UFUNCTION()
