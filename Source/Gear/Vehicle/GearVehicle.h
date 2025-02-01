@@ -93,6 +93,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GrantAbility(TSubclassOf<class AGearAbility> AbilityClass);
 
+	UFUNCTION(BlueprintCallable)
+	void ClearAbility();
+
 	UFUNCTION(BlueprintPure)
 	AGearDriver* GetDriver();
 

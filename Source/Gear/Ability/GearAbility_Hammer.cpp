@@ -34,6 +34,13 @@ AGearAbility_Hammer::AGearAbility_Hammer()
 	RemainingItemUsage = 3;
 }
 
+void AGearAbility_Hammer::Destroyed()
+{
+	Super::Destroyed();
+
+
+}
+
 void AGearAbility_Hammer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -122,6 +129,7 @@ void AGearAbility_Hammer::Activate_Server_Implementation()
 		if (RemainingItemUsage <= 0)
 		{
 			//TODO: Destroy Ability
+			SetLifeSpan(AttackHitDelay);
 		}
 	}
 }

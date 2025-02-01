@@ -50,6 +50,7 @@ protected:
 
 public:
 	AGearAbility_Hammer();
+	virtual void Destroyed() override;
 
 	virtual void Tick(float DeltaTime) override;
 

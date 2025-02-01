@@ -509,6 +509,15 @@ void AGearVehicle::GrantAbility(TSubclassOf<class AGearAbility> AbilityClass)
 	}
 }
 
+void AGearVehicle::ClearAbility()
+{
+	if (HasAuthority())
+	{
+		Ability = nullptr;
+		OnRep_Ability();
+	}
+}
+
 AGearDriver* AGearVehicle::GetDriver()
 {
 	return Driver;

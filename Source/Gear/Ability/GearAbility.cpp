@@ -30,6 +30,16 @@ void AGearAbility::BeginPlay()
 	
 }
 
+void AGearAbility::Destroyed()
+{
+	if (HasAuthority() && IsValid(OwningVehice))
+	{
+		OwningVehice->ClearAbility();
+	}
+
+	Super::Destroyed();
+}
+
 void AGearAbility::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
