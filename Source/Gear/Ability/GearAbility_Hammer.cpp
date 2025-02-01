@@ -6,6 +6,7 @@
 #include "GameSystems/GearStatics.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/GearGameState.h"
+#include "Net/UnrealNetwork.h"
 
 #define HAND_SOCKET_NAME TEXT("Hand")
 #define NOTIFY_ITEM_GRABBED_NAME TEXT("ItemGrabed")
@@ -29,6 +30,15 @@ AGearAbility_Hammer::AGearAbility_Hammer()
 	ImpulseStrength = 1000000.0f;
 	ForceZOffset = -100.0f;
 	VelocityReductionRatio = 0.7f;
+
+	RemainingItemUsage = 3;
+}
+
+void AGearAbility_Hammer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AGearAbility_Hammer, RemainingItemUsage, COND_InitialOrOwner);
 }
 
 void AGearAbility_Hammer::Tick(float DeltaTime)
@@ -68,6 +78,11 @@ void AGearAbility_Hammer::ActivateAbility()
 	Activate_Server();
 }
 
+float AGearAbility_Hammer::GetWidgetValue()
+{
+	return RemainingItemUsage;
+}
+
 void AGearAbility_Hammer::OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	Super::OnMontageNotify(NotifyName, BranchingPointPayload);
@@ -82,7 +97,7 @@ void AGearAbility_Hammer::OnMontageNotify(FName NotifyName, const FBranchingPoin
 
 bool AGearAbility_Hammer::CanActivate() const
 {
-	return Super::CanActivate();
+	return RemainingItemUsage > 0;
 }
 
 void AGearAbility_Hammer::ShowHammer()
@@ -99,8 +114,15 @@ void AGearAbility_Hammer::Activate_Server_Implementation()
 {
 	if (CanActivate())
 	{
+		RemainingItemUsage--;
+
 		GetWorld()->GetTimerManager().SetTimer(AttackHitTimerHandle, FTimerDelegate::CreateUObject(this, &AGearAbility_Hammer::AttackHit), AttackHitDelay, false);
 		Activate_Multi();
+
+		if (RemainingItemUsage <= 0)
+		{
+			//TODO: Destroy Ability
+		}
 	}
 }
 

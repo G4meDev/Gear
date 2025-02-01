@@ -45,6 +45,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float VelocityReductionRatio;
 
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	int32 RemainingItemUsage;
+
 public:
 	AGearAbility_Hammer();
 
@@ -52,6 +55,8 @@ public:
 
 	virtual void OnRep_OwningVehicle() override;
 	virtual void ActivateAbility() override;
+
+	virtual float GetWidgetValue() override;
 
 protected:
 	virtual void OnMontageNotify(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload) override;

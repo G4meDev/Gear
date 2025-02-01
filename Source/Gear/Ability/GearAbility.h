@@ -29,12 +29,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UAnimMontage* ItemGrabMontage;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 MaxItemUsageAmount;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 RemainingItemUsage;
-
 	UPROPERTY(ReplicatedUsing=OnRep_OwningVehicle)
 	class AGearVehicle* OwningVehice;
 
