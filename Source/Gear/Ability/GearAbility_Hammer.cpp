@@ -134,7 +134,6 @@ void AGearAbility_Hammer::Activate_Server_Implementation()
 
 		if (RemainingItemUsage <= 0)
 		{
-			//TODO: Destroy Ability
 			SetLifeSpan(AttackHitDelay);
 		}
 	}
