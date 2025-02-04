@@ -3,6 +3,7 @@
 
 #include "Vehicle/GearDriver.h"
 #include "Vehicle/GearVehicle.h"
+#include "Vehicle/DriverHead.h"
 #include "Ability/GearAbility.h"
 
 #define ITEM_SOCKET_NAME TEXT("hand_r_ItemSocket")
@@ -17,10 +18,6 @@ AGearDriver::AGearDriver()
 	BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
 	BodyMesh->SetupAttachment(Root);
 	BodyMesh->bReceivesDecals = false;
-
-	HeadMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
-	HeadMesh->SetupAttachment(Root);
-	HeadMesh->bReceivesDecals = false;
 }
 
 void AGearDriver::BeginPlay()
@@ -33,6 +30,27 @@ void AGearDriver::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AGearDriver::Destroyed()
+{
+	DestroyDriverHead();
+}
+
+void AGearDriver::ChangeDriverHead(TSubclassOf<class ADriverHead> DriverHeadClass)
+{
+	DestroyDriverHead();
+
+	if (IsValid(DriverHeadClass))
+	{
+		DriverHead = GetWorld()->SpawnActor<ADriverHead>(DriverHeadClass, GetActorTransform());
+		
+		if (IsValid(DriverHead))
+		{
+			DriverHead->SetOwningDriver(this);
+			DriverHead->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		}
+	}
 }
 
 void AGearDriver::SetOwningVehicle(AGearVehicle* InOwningVehicle)
@@ -50,12 +68,16 @@ USkeletalMeshComponent* AGearDriver::GetBodyMesh()
 	return BodyMesh;
 }
 
-USkeletalMeshComponent* AGearDriver::GetHeadMesh()
-{
-	return HeadMesh;
-}
-
 EAbilityType AGearDriver::GetAbilityType()
 {
 	return IsValid(OwningVehicle) && IsValid(OwningVehicle->GetAbility()) ? OwningVehicle->GetAbility()->GetAbilityType() : EAbilityType::None;
+}
+
+void AGearDriver::DestroyDriverHead()
+{
+	if (IsValid(DriverHead))
+	{
+		DriverHead->Destroy();
+		DriverHead = nullptr;
+	}	
 }

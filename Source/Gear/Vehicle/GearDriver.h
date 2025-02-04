@@ -21,7 +21,7 @@ protected:
 	USkeletalMeshComponent* BodyMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USkeletalMeshComponent* HeadMesh;
+	class ADriverHead* DriverHead;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AGearVehicle* OwningVehicle;
@@ -31,6 +31,10 @@ public:
 	AGearDriver();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void Destroyed() override;
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeDriverHead(TSubclassOf<class ADriverHead> DriverHeadClass);
 
 	void SetOwningVehicle(AGearVehicle* InOwningVehicle);
 
@@ -39,10 +43,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	USkeletalMeshComponent* GetBodyMesh();
-	
-	UFUNCTION(BlueprintPure)
-	USkeletalMeshComponent* GetHeadMesh();
 
 	UFUNCTION(BlueprintPure)
 	EAbilityType GetAbilityType();
+
+protected:
+	void DestroyDriverHead();
 };
