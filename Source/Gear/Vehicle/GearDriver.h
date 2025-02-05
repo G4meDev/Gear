@@ -26,9 +26,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AGearVehicle* OwningVehicle;
 
+	UPROPERTY()
+	UMaterialInstanceDynamic* BodyMID;
+
 public:	
 
 	AGearDriver();
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroyed() override;
@@ -46,6 +50,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	EAbilityType GetAbilityType();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangePlayerCustomization(const FPlayerCustomization& PlayerCustomization);
 
 protected:
 	void DestroyDriverHead();

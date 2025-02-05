@@ -2,7 +2,10 @@
 
 
 #include "Utils/DataHelperBFL.h"
+#include "Vehicle/DriverHead.h"
 #include "Kismet/KismetMathLibrary.h"
+
+#define HEADPATH_BOX TEXT("/Game/Driver/DriverHead_Box/BP_DriverHead_Box.BP_DriverHead_Box_C")
 
 FColor UDataHelperBFL::ResolveColorCode(EPlayerColorCode ColorCode)
 {
@@ -59,6 +62,17 @@ FColor UDataHelperBFL::ResolveColorCode(EPlayerColorCode ColorCode)
 		default:
 			check(false);
 			return FColor::Black;
+	}
+}
+
+UClass* UDataHelperBFL::GetHeadClassFromType(EDriverHead DriverHeadType)
+{
+	switch (DriverHeadType)
+	{
+	case EDriverHead::Box:
+		return StaticLoadClass(ADriverHead::StaticClass(), nullptr, HEADPATH_BOX);
+	default:
+		return nullptr;
 	}
 }
 

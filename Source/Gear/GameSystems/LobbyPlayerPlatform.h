@@ -17,7 +17,13 @@ protected:
 	USceneComponent* Root;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* DriverSocket;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USkeletalMeshComponent* Vehicle; 
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<class AGearDriver> DriverClass;
 
 	UPROPERTY()
 	class AGearDriver* Driver;

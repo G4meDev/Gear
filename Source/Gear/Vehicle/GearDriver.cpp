@@ -8,6 +8,11 @@
 
 #define ITEM_SOCKET_NAME TEXT("hand_r_ItemSocket")
 
+#define MAT_NAME_CLOTH_COLOR TEXT("ClothColor")
+#define MAT_NAME_PANT_COLOR TEXT("PantColor")
+#define MAT_NAME_HAND_COLOR TEXT("HandColor")
+#define MAT_NAME_SHOE_COLOR TEXT("ShoeColor")
+
 AGearDriver::AGearDriver()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -18,6 +23,13 @@ AGearDriver::AGearDriver()
 	BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
 	BodyMesh->SetupAttachment(Root);
 	BodyMesh->bReceivesDecals = false;
+}
+
+void AGearDriver::PostInitializeComponents()
+{
+	BodyMID = BodyMesh->CreateDynamicMaterialInstance(0);
+
+
 }
 
 void AGearDriver::BeginPlay()
@@ -71,6 +83,17 @@ USkeletalMeshComponent* AGearDriver::GetBodyMesh()
 EAbilityType AGearDriver::GetAbilityType()
 {
 	return IsValid(OwningVehicle) && IsValid(OwningVehicle->GetAbility()) ? OwningVehicle->GetAbility()->GetAbilityType() : EAbilityType::None;
+}
+
+void AGearDriver::ChangePlayerCustomization(const FPlayerCustomization& PlayerCustomization)
+{
+	if (IsValid(BodyMID))
+	{
+// 		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR,  PlayerCustomization.ClothColor);
+// 		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR, PlayerCustomization.ClothColor);
+// 		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR, PlayerCustomization.ClothColor);
+// 		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR, PlayerCustomization.ClothColor);
+	}
 }
 
 void AGearDriver::DestroyDriverHead()

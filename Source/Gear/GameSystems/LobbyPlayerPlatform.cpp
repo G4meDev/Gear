@@ -16,6 +16,9 @@ ALobbyPlayerPlatform::ALobbyPlayerPlatform()
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
+	DriverSocket = CreateDefaultSubobject<USceneComponent>(TEXT("DriverSocket"));
+	DriverSocket->SetupAttachment(Root);
+
 	Vehicle = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Vehicle"));
 	Vehicle->SetupAttachment(Root);
 	Vehicle->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -73,17 +76,20 @@ void ALobbyPlayerPlatform::SetOwningPlayer(class ALobbyPlayerState* InOwningPlay
 		OwningPlayer->OnPlayerCustomizationChanged.RemoveDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationChanged);
 	}
 
+	ClearPlatform();
 	OwningPlayer = InOwningPlayer;
 
 	if (IsValid(OwningPlayer))
 	{
 		Vehicle->SetHiddenInGame(false);
 		OwningPlayer->OnPlayerCustomizationChanged.AddDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationChanged);
-	}
 
-	else
-	{
-		ClearPlatform();
+		Driver = GetWorld()->SpawnActor<AGearDriver>(DriverClass);
+		if (IsValid(Driver))
+		{
+			Driver->AttachToComponent(DriverSocket, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			Driver->ChangeDriverHead(UDataHelperBFL::GetHeadClassFromType(OwningPlayer->GetPlayerCustomization().HeadType));
+		}
 	}
 }
 
