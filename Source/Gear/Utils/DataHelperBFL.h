@@ -18,7 +18,7 @@ class GEAR_API UDataHelperBFL : public UBlueprintFunctionLibrary
 	
 public:
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	static FColor ResolveColorCode(EPlayerColorCode ColorCode);
 
 	UFUNCTION(BlueprintPure)
