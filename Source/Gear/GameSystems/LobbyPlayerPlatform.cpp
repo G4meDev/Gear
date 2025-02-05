@@ -5,6 +5,7 @@
 #include "GameFramework/LobbyPlayerState.h"
 #include "Vehicle/GearVehicle.h"
 #include "Vehicle/GearDriver.h"
+#include "Utils/DataHelperBFL.h"
 
 
 
@@ -19,6 +20,16 @@ ALobbyPlayerPlatform::ALobbyPlayerPlatform()
 	Vehicle->SetupAttachment(Root);
 	Vehicle->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Vehicle->SetHiddenInGame(true);
+}
+
+void ALobbyPlayerPlatform::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (IsValid(Vehicle))
+	{
+		VehicleMID = Vehicle->CreateDynamicMaterialInstance(0);
+	}
 }
 
 void ALobbyPlayerPlatform::BeginPlay()
@@ -57,15 +68,32 @@ class ALobbyPlayerState* ALobbyPlayerPlatform::GetOwningPlayer()
 
 void ALobbyPlayerPlatform::SetOwningPlayer(class ALobbyPlayerState* InOwningPlayer)
 {
+	if (IsValid(OwningPlayer))
+	{
+		OwningPlayer->OnPlayerCustomizationChanged.RemoveDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationChanged);
+	}
+
 	OwningPlayer = InOwningPlayer;
 
 	if (IsValid(OwningPlayer))
 	{
 		Vehicle->SetHiddenInGame(false);
+		OwningPlayer->OnPlayerCustomizationChanged.AddDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationChanged);
 	}
 
 	else
 	{
 		ClearPlatform();
+	}
+}
+
+void ALobbyPlayerPlatform::PlayerCustomizationChanged()
+{
+	if (IsValid(OwningPlayer))
+	{
+		if (IsValid(VehicleMID))
+		{
+			VehicleMID->SetVectorParameterValue(TEXT("Color"), UDataHelperBFL::ResolveColorCode(OwningPlayer->GetPlayerCustomization().TricycleColor).ReinterpretAsLinear());
+		}
 	}
 }

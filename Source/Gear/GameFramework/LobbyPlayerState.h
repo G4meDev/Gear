@@ -7,6 +7,8 @@
 #include "GameFramework/GearTypes.h"
 #include "LobbyPlayerState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerCustomizationChanged);
+
 /**
  * 
  */
@@ -27,6 +29,12 @@ protected:
 	UPROPERTY(Replicated)
 	float PlayerJoinTime;
 
+	UFUNCTION()
+	void OnRep_PlayerCustomization();
+
+	UPROPERTY(ReplicatedUsing=OnRep_PlayerCustomization)
+	FPlayerCustomization PlayerCusstomization;
+
 	friend class ALobbyGameState;
 
 public:
@@ -41,9 +49,35 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
 
-
 	UFUNCTION(BlueprintPure)
 	float GetPlayerJoinTime();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerCustomizationChanged OnPlayerCustomizationChanged;
+
+	UFUNCTION(BlueprintPure)
+	FPlayerCustomization GetPlayerCustomization();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPlayerCustomization_Server(const FPlayerCustomization& InPlayerCustomization);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPlayerHeadType_Server(EDriverHead HeadType);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPlayerTricycleColor_Server(EPlayerColorCode Color);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPlayerClothColor_Server(EPlayerColorCode Color);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPlayerPantColor_Server(EPlayerColorCode Color);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPlayerHandColor_Server(EPlayerColorCode Color);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPlayerShoeColor_Server(EPlayerColorCode Color);
 
 protected:
 };

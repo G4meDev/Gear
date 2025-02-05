@@ -25,12 +25,14 @@ protected:
 	UPROPERTY()
 	class ALobbyPlayerState* OwningPlayer;
 
-	void SetOwningPlayer(class ALobbyPlayerState* InOwningPlayer);
+	UPROPERTY()
+	UMaterialInstanceDynamic* VehicleMID;
 
 	friend class ALobbyGameState;
 
 public:	
 	ALobbyPlayerPlatform();
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroyed() override;
@@ -41,4 +43,8 @@ public:
 
 protected:
 
+	void SetOwningPlayer(class ALobbyPlayerState* InOwningPlayer);
+
+	UFUNCTION()
+	void PlayerCustomizationChanged();
 };

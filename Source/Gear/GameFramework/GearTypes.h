@@ -191,3 +191,39 @@ enum class EWidgetOrder : uint8
 	LowPriority = 0,
 	PauseMenu = 1
 };
+
+UENUM(BlueprintType)
+enum class EDriverHead: uint8
+{
+	Box
+};
+
+USTRUCT(BlueprintType)
+struct FPlayerCustomization
+{
+	GENERATED_BODY()
+
+public:
+	FPlayerCustomization()
+	{
+
+	};
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EDriverHead HeadType;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EPlayerColorCode TricycleColor;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EPlayerColorCode ClothColor;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EPlayerColorCode PantColor;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EPlayerColorCode HandColor;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EPlayerColorCode ShoeColor;
+};

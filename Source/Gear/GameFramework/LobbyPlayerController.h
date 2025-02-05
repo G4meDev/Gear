@@ -18,7 +18,13 @@ class GEAR_API ALobbyPlayerController : public APlayerController
 	GENERATED_BODY()
 
 protected:
+
+	virtual void PostNetInit() override;
 	void BeginPlay() override;
+
+	void OnRep_PlayerState() override;
+
+	void AddLobbyMenu();
 	
 	UFUNCTION(Server, Reliable)
 	void Server_SetPlayerName(const FString& PlayerName);
@@ -28,6 +34,9 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnRemovePlayer(ALobbyPlayerState* InPlayer);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UUserWidget> LobbyWidgetClass;
 
 public:
 

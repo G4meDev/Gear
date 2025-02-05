@@ -14,6 +14,7 @@ void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(ALobbyPlayerState, ColorCode);
 	DOREPLIFETIME(ALobbyPlayerState, PlayerJoinTime);
+	DOREPLIFETIME(ALobbyPlayerState, PlayerCusstomization);
 }
 
 ALobbyPlayerState::ALobbyPlayerState()
@@ -52,6 +53,53 @@ void ALobbyPlayerState::OnRep_ColorCode()
 
 }
 
+FPlayerCustomization ALobbyPlayerState::GetPlayerCustomization()
+{
+	return PlayerCusstomization;
+}
+
+void ALobbyPlayerState::SetPlayerCustomization_Server_Implementation(const FPlayerCustomization& InPlayerCustomization)
+{
+	PlayerCusstomization = InPlayerCustomization;
+	OnRep_PlayerCustomization();
+}
+
+void ALobbyPlayerState::SetPlayerHeadType_Server_Implementation(EDriverHead HeadType)
+{
+	PlayerCusstomization.HeadType = HeadType;
+	OnRep_PlayerCustomization();
+}
+
+void ALobbyPlayerState::SetPlayerTricycleColor_Server_Implementation(EPlayerColorCode Color)
+{
+	PlayerCusstomization.TricycleColor = Color;
+	OnRep_PlayerCustomization();
+}
+
+void ALobbyPlayerState::SetPlayerClothColor_Server_Implementation(EPlayerColorCode Color)
+{
+	PlayerCusstomization.ClothColor = Color;
+	OnRep_PlayerCustomization();
+}
+
+void ALobbyPlayerState::SetPlayerPantColor_Server_Implementation(EPlayerColorCode Color)
+{
+	PlayerCusstomization.PantColor = Color;
+	OnRep_PlayerCustomization();
+}
+
+void ALobbyPlayerState::SetPlayerHandColor_Server_Implementation(EPlayerColorCode Color)
+{
+	PlayerCusstomization.HandColor = Color;
+	OnRep_PlayerCustomization();
+}
+
+void ALobbyPlayerState::SetPlayerShoeColor_Server_Implementation(EPlayerColorCode Color)
+{
+	PlayerCusstomization.ShoeColor = Color;
+	OnRep_PlayerCustomization();
+}
+
 float ALobbyPlayerState::GetPlayerJoinTime()
 {
 	return PlayerJoinTime;
@@ -67,4 +115,9 @@ void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)
 		GearPlayerState->ColorCode = ColorCode;
 		GearPlayerState->OnRep_ColorCode();
 	}
+}
+
+void ALobbyPlayerState::OnRep_PlayerCustomization()
+{
+	OnPlayerCustomizationChanged.Broadcast();
 }

@@ -6,6 +6,15 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/LobbyPlayerState.h"
 #include "GameFramework/LobbyGameState.h"
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+
+void ALobbyPlayerController::PostNetInit()
+{
+	Super::PostNetInit();
+
+
+}
 
 void ALobbyPlayerController::BeginPlay()
 {
@@ -15,8 +24,35 @@ void ALobbyPlayerController::BeginPlay()
 	{
 		UGearGameInstance* GearGameIntance = Cast<UGearGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 		Server_SetPlayerName(GearGameIntance->GetPlayerName());
+
+		if (HasAuthority())
+		{
+			AddLobbyMenu();
+		}
 	}
 
+}
+
+void ALobbyPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (IsLocalController())
+	{
+		AddLobbyMenu();
+	}
+}
+
+void ALobbyPlayerController::AddLobbyMenu()
+{
+	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), LobbyWidgetClass);
+	if (IsValid(Widget))
+	{
+		Widget->AddToViewport();
+	}
+
+	SetShowMouseCursor(true);
+	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this);
 }
 
 void ALobbyPlayerController::Server_SetPlayerName_Implementation(const FString& PlayerName)
