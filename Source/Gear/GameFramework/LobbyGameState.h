@@ -19,17 +19,26 @@ class GEAR_API ALobbyGameState : public AGameState
 	GENERATED_BODY()
 	
 
+protected:
+
+	UPROPERTY()
+	TArray<class ALobbyPlayerPlatform*> PlayerPlatforms;
+
 public:
+
+	ALobbyGameState();
+	virtual void BeginPlay() override;
 
 	void RequestColorChangeForPlayer(ALobbyPlayerController* PC, EPlayerColorCode Color);
 
 protected:
 
 	void AddPlayerState(APlayerState* PlayerState) override;
-
 	void RemovePlayerState(APlayerState* PlayerState) override;
 
-private:
 	void GetInUseColors(TArray<EPlayerColorCode>& InUseColors);
 	void AssignNewColorToPlayer(APlayerState* Player);
+
+	void ConstructPlayerPlatform(class ALobbyPlayerState* PlayerState);
+	void DestructPlayerPlatform(class ALobbyPlayerState* PlayerState);
 };

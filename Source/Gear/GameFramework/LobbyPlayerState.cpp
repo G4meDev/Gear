@@ -13,12 +13,15 @@ void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ALobbyPlayerState, ColorCode);
+	DOREPLIFETIME(ALobbyPlayerState, PlayerJoinTime);
 }
 
 ALobbyPlayerState::ALobbyPlayerState()
 {
 	ColorCode = EPlayerColorCode::Black;
 	OnRep_ColorCode();
+
+	PlayerJoinTime = 0.0f;
 }
 
 void ALobbyPlayerState::BeginPlay()
@@ -47,6 +50,11 @@ void ALobbyPlayerState::OnRep_ColorCode()
 	PlayerColor = UDataHelperBFL::ResolveColorCode(ColorCode);
 	
 
+}
+
+float ALobbyPlayerState::GetPlayerJoinTime()
+{
+	return PlayerJoinTime;
 }
 
 void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)

@@ -4,6 +4,37 @@
 #include "GameFramework/LobbyGameState.h"
 #include "GameFramework/LobbyPlayerController.h"
 #include "GameFramework/LobbyPlayerState.h"
+#include "GameSystems/LobbyPlayerPlatform.h"
+#include "Kismet/GameplayStatics.h"
+
+ALobbyGameState::ALobbyGameState()
+{
+
+}
+
+void ALobbyGameState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TArray<AActor*> PlatformActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALobbyPlayerPlatform::StaticClass(), PlatformActors);
+
+	PlayerPlatforms.Reserve(4);
+	for (AActor* PlatformActor : PlatformActors)
+	{
+		ALobbyPlayerPlatform* PlayerPlatform = Cast<ALobbyPlayerPlatform>(PlatformActor);
+		if (IsValid(PlayerPlatform))
+		{
+			PlayerPlatforms.Add(PlayerPlatform);
+		}
+	}
+
+	for (APlayerState* PlayerState : PlayerArray)
+	{
+		ALobbyPlayerState* LobbyPlayerState = Cast<ALobbyPlayerState>(PlayerState);
+		ConstructPlayerPlatform(LobbyPlayerState);
+	}
+}
 
 void ALobbyGameState::GetInUseColors(TArray<EPlayerColorCode>& InUseColors)
 {
@@ -67,6 +98,13 @@ void ALobbyGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
 
+	ALobbyPlayerState* LobbyPlayerState = Cast<ALobbyPlayerState>(PlayerState);
+	if (IsValid(LobbyPlayerState))
+	{
+		LobbyPlayerState->PlayerJoinTime = GetServerWorldTimeSeconds();
+		ConstructPlayerPlatform(LobbyPlayerState);
+	}
+
 	if (HasAuthority())
 	{
 		AssignNewColorToPlayer(PlayerState);
@@ -92,6 +130,13 @@ void ALobbyGameState::RemovePlayerState(APlayerState* PlayerState)
 {
 	Super::RemovePlayerState(PlayerState);
 
+	ALobbyPlayerState* LobbyPlayerState = Cast<ALobbyPlayerState>(PlayerState);
+	if (IsValid(LobbyPlayerState))
+	{
+		LobbyPlayerState->PlayerJoinTime = GetServerWorldTimeSeconds();
+		DestructPlayerPlatform(LobbyPlayerState);
+	}
+
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		APlayerController* const PlayerController = Iterator->Get();
@@ -107,3 +152,26 @@ void ALobbyGameState::RemovePlayerState(APlayerState* PlayerState)
 	}
 }
 
+void ALobbyGameState::ConstructPlayerPlatform(class ALobbyPlayerState* PlayerState)
+{
+	for (ALobbyPlayerPlatform* PlayerPlatform : PlayerPlatforms)
+	{
+		if (!IsValid(PlayerPlatform->GetOwningPlayer()))
+		{
+			PlayerPlatform->SetOwningPlayer(PlayerState);
+			return;
+		}
+	}
+}
+
+void ALobbyGameState::DestructPlayerPlatform(class ALobbyPlayerState* PlayerState)
+{
+	for (ALobbyPlayerPlatform* PlayerPlatform : PlayerPlatforms)
+	{
+		if (IsValid(PlayerPlatform->GetOwningPlayer()) && PlayerPlatform->GetOwningPlayer() == PlayerState)
+		{
+			PlayerPlatform->SetOwningPlayer(nullptr);
+			return;
+		}
+	}
+}

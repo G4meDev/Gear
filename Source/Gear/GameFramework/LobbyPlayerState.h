@@ -18,14 +18,16 @@ class GEAR_API ALobbyPlayerState : public APlayerState
 protected:
 	
 	ALobbyPlayerState();
-
 	void BeginPlay();
-
 	void Destroyed() override;
 
 	void OnRep_PlayerName() override;
-
 	void CopyProperties(APlayerState* PlayerState) override;
+
+	UPROPERTY(Replicated)
+	float PlayerJoinTime;
+
+	friend class ALobbyGameState;
 
 public:
 
@@ -39,4 +41,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
 
+
+	UFUNCTION(BlueprintPure)
+	float GetPlayerJoinTime();
+
+protected:
 };
