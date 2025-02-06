@@ -220,7 +220,8 @@ public:
 UENUM(BlueprintType)
 enum class EDriverHead: uint8
 {
-	Box
+	Box,
+	Max
 };
 
 USTRUCT(BlueprintType)
@@ -265,6 +266,8 @@ public:
 		HandColor.ResolveColorCode();
 		ShoeColor.ResolveColorCode();
 	}
+
+	static FPlayerCustomization GetRandomCustomization();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FCustomizationHead HeadType;

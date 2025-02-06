@@ -29,7 +29,12 @@ void ALobbyPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	if (HasAuthority())
+	{
+		FPlayerCustomization OldCustomization = PlayerCusstomization;
+		PlayerCusstomization = FPlayerCustomization::GetRandomCustomization();
+		OnRep_PlayerCustomization(PlayerCusstomization);
+	}
 }
 
 void ALobbyPlayerState::Destroyed()

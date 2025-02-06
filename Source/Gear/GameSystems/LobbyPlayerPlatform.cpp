@@ -90,7 +90,9 @@ void ALobbyPlayerPlatform::SetOwningPlayer(class ALobbyPlayerState* InOwningPlay
 		if (IsValid(Driver))
 		{
 			Driver->AttachToComponent(DriverSocket, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			Driver->ChangeDriverHead(OwningPlayer->GetPlayerCustomization().HeadType.Class);
+
+			PlayerCustomizationColorChanged();
+			PlayerCustomizationHeadChanged();
 		}
 	}
 }
