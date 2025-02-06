@@ -29,6 +29,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UInputAction* PinchAction;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UInputAction* TouchEndAction;
+
 	virtual void PostNetInit() override;
 	void BeginPlay() override;
 

@@ -92,6 +92,7 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 	{
 		FVector2D ScreenDragValue = FVector2D::ZeroVector;
 		float PinchValue = 0.0f;
+		bool bTouchRelease;
 
 #if PLATFORM_WINDOWS
 
@@ -100,6 +101,8 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 
 		ScreenDragValue = LeftMouseInputHandler.GetVelocity();
 		PinchValue = RightMouseInputHandler.GetVelocity().X;
+
+		bTouchRelease = LeftMouseInputHandler.Released();
 
 #elif PLATFORM_ANDROID
 
@@ -126,6 +129,8 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 			ScreenDragValue = Touch1_InputHandler.IsHoldingTouch() ? Touch1_InputHandler.GetVelocity() : Touch2_InputHandler.GetVelocity();
 		}
 
+		bTouchRelease = Touch1_InputHandler.Released();
+
 #endif
 
 		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
@@ -141,6 +146,11 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 			if (IsValid(PinchAction))
 			{
 				InputSystem->InjectInputForAction(PinchAction, FInputActionValue(FInputActionValue::Axis1D(PinchValue)), Modifiers, Triggers);
+			}
+
+			if (IsValid(TouchEndAction))
+			{
+				InputSystem->InjectInputForAction(TouchEndAction, FInputActionValue(FInputActionValue::Axis1D(bTouchRelease)), Modifiers, Triggers);
 			}
 		}
 	}

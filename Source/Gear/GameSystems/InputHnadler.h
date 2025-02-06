@@ -13,6 +13,9 @@ protected:
 	FVector2D Value;
 	bool bHoldingKey;
 
+	bool bPressed;
+	bool bReleased;
+
 public:
 	FMouseInputHandler();
 
@@ -24,6 +27,9 @@ public:
 	const FVector2D& GetValue() const;
 
 	bool IsHoldingKey() const;
+
+	bool Pressed();
+	bool Released();
 };
 
 
@@ -36,6 +42,9 @@ protected:
 	FVector2D Value;
 	bool bHoldingTouch;
 
+	bool bPressed;
+	bool bReleased;
+
 public:
 	FTouchInputHandler();
 
@@ -47,4 +56,7 @@ public:
 	const FVector2D& GetValue() const;
 
 	bool IsHoldingTouch() const;
+
+	bool Pressed();
+	bool Released();
 };

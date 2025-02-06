@@ -22,6 +22,9 @@ void FMouseInputHandler::Tick(APlayerController* PC)
 	{
 		bool bKeyDown = PC->IsInputKeyDown(Key);
 
+		bPressed = bKeyDown && !bHoldingKey;
+		bReleased = !bKeyDown && bHoldingKey;
+
 		FVector2D KeyPosition = FVector2D(0.0f);
 		PC->GetMousePosition(KeyPosition.X, KeyPosition.Y);
 
@@ -62,6 +65,16 @@ bool FMouseInputHandler::IsHoldingKey() const
 	return bHoldingKey;
 }
 
+bool FMouseInputHandler::Pressed()
+{
+	return bPressed;
+}
+
+bool FMouseInputHandler::Released()
+{
+	return bReleased;
+}
+
 // ----------------------------------------------------------------------
 
 FTouchInputHandler::FTouchInputHandler()
@@ -84,6 +97,9 @@ void FTouchInputHandler::Tick(APlayerController* PC)
 		bool bTouchDown;
 		FVector2D KeyPosition = FVector2D(0.0f);
 		PC->GetInputTouchState(TouchIndex, KeyPosition.X, KeyPosition.Y, bTouchDown);
+
+		bPressed = bTouchDown && !bHoldingTouch;
+		bReleased = !bTouchDown && bHoldingTouch;
 
 		if (!bTouchDown)
 		{
@@ -120,4 +136,14 @@ const FVector2D& FTouchInputHandler::GetValue() const
 bool FTouchInputHandler::IsHoldingTouch() const
 {
 	return bHoldingTouch;
+}
+
+bool FTouchInputHandler::Pressed()
+{
+	return bPressed;
+}
+
+bool FTouchInputHandler::Released()
+{
+	return bReleased;
 }
