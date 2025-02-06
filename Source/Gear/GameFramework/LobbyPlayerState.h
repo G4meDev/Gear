@@ -21,13 +21,17 @@ class GEAR_API ALobbyPlayerState : public APlayerState
 protected:
 	
 	ALobbyPlayerState();
+	virtual void PostNetInit() override;
 	void BeginPlay();
 	void Destroyed() override;
 
 	void OnRep_PlayerName() override;
 	void CopyProperties(APlayerState* PlayerState) override;
 
-	UPROPERTY(Replicated)
+	UFUNCTION()
+	void OnRep_PlayerJoinTime();
+
+	UPROPERTY(ReplicatedUsing=OnRep_PlayerJoinTime)
 	float PlayerJoinTime;
 
 	UFUNCTION()
@@ -50,8 +54,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FColor PlayerColor;
 
-	UFUNCTION(BlueprintPure)
-	float GetPlayerJoinTime();
+	float GetPlayerJoinTime() const;
+
+	static bool SortJoinTimePredicate(const ALobbyPlayerState& P1, const ALobbyPlayerState& P2);
+
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerCustomizationColorChanged OnPlayerCustomizationColorChanged;

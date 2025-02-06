@@ -32,6 +32,9 @@ protected:
 	TSubclassOf<class AGearDriver> DriverClass;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 PlatformIndex;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float RotationSpeed;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -77,6 +80,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void StopRotation();
+
+	int32 GetPlatformIndex() const;
 
 protected:
 

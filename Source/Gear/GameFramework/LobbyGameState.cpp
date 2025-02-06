@@ -29,11 +29,12 @@ void ALobbyGameState::BeginPlay()
 		}
 	}
 
-	for (APlayerState* PlayerState : PlayerArray)
-	{
-		ALobbyPlayerState* LobbyPlayerState = Cast<ALobbyPlayerState>(PlayerState);
-		ConstructPlayerPlatform(LobbyPlayerState);
-	}
+	PlayerPlatforms.StableSort([](const ALobbyPlayerPlatform& P1, const ALobbyPlayerPlatform& P2)
+		{
+			return P1.GetPlatformIndex() < P2.GetPlatformIndex();
+		});
+
+	ReconstructPlayersPlatform();
 }
 
 void ALobbyGameState::GetInUseColors(TArray<EPlayerColorCode>& InUseColors)
@@ -94,16 +95,34 @@ void ALobbyGameState::RequestColorChangeForPlayer(ALobbyPlayerController* PC, EP
 	}
 }
 
+TArray<ALobbyPlayerState*> ALobbyGameState::GetLobbyPlayers()
+{
+	TArray<ALobbyPlayerState*> LobbyPlayerStates;
+	for (APlayerState* PlayerState : PlayerArray)
+	{
+		ALobbyPlayerState* LobbyPlayerState = Cast<ALobbyPlayerState>(PlayerState);
+		if (IsValid(LobbyPlayerState))
+		{
+			LobbyPlayerStates.Add(LobbyPlayerState);
+		}
+	}
+
+	return LobbyPlayerStates;
+}
+
+TArray<ALobbyPlayerState*> ALobbyGameState::GetJoinTimeSortedLobbyPlayers()
+{
+	TArray<ALobbyPlayerState*> LobbyPlayerStates = GetLobbyPlayers();
+	LobbyPlayerStates.StableSort(ALobbyPlayerState::SortJoinTimePredicate);
+	
+	return LobbyPlayerStates;
+}
+
 void ALobbyGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
 
-	ALobbyPlayerState* LobbyPlayerState = Cast<ALobbyPlayerState>(PlayerState);
-	if (IsValid(LobbyPlayerState))
-	{
-		LobbyPlayerState->PlayerJoinTime = GetServerWorldTimeSeconds();
-		ConstructPlayerPlatform(LobbyPlayerState);
-	}
+	ReconstructPlayersPlatform();
 
 	if (HasAuthority())
 	{
@@ -134,8 +153,9 @@ void ALobbyGameState::RemovePlayerState(APlayerState* PlayerState)
 	if (IsValid(LobbyPlayerState))
 	{
 		LobbyPlayerState->PlayerJoinTime = GetServerWorldTimeSeconds();
-		DestructPlayerPlatform(LobbyPlayerState);
 	}
+
+	ReconstructPlayersPlatform();
 
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -152,26 +172,22 @@ void ALobbyGameState::RemovePlayerState(APlayerState* PlayerState)
 	}
 }
 
-void ALobbyGameState::ConstructPlayerPlatform(class ALobbyPlayerState* PlayerState)
+void ALobbyGameState::ReconstructPlayersPlatform()
 {
-	for (ALobbyPlayerPlatform* PlayerPlatform : PlayerPlatforms)
-	{
-		if (!IsValid(PlayerPlatform->GetOwningPlayer()))
-		{
-			PlayerPlatform->SetOwningPlayer(PlayerState);
-			return;
-		}
-	}
-}
+	TArray<ALobbyPlayerState*> LobbyPlayers = GetJoinTimeSortedLobbyPlayers();
 
-void ALobbyGameState::DestructPlayerPlatform(class ALobbyPlayerState* PlayerState)
-{
-	for (ALobbyPlayerPlatform* PlayerPlatform : PlayerPlatforms)
+	for (int i = 0; i < LobbyPlayers.Num(); i++)
 	{
-		if (IsValid(PlayerPlatform->GetOwningPlayer()) && PlayerPlatform->GetOwningPlayer() == PlayerState)
+		UE_LOG(LogTemp, Warning, TEXT("%f"), LobbyPlayers[i]->GetPlayerJoinTime());
+	}
+
+	for (int i = 0; i < PlayerPlatforms.Num(); i++)
+	{
+		ALobbyPlayerPlatform* PlayerPlatform = PlayerPlatforms[i];
+		if (IsValid(PlayerPlatform))
 		{
-			PlayerPlatform->SetOwningPlayer(nullptr);
-			return;
+			ALobbyPlayerState* PlayerState = i < LobbyPlayers.Num() ? LobbyPlayers[i] : nullptr;
+			PlayerPlatform->SetOwningPlayer(PlayerState);
 		}
 	}
 }

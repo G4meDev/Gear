@@ -39,6 +39,8 @@ ALobbyPlayerPlatform::ALobbyPlayerPlatform()
 	RotationDrag = 4.0f;
 	RotationDamping = 3.0f;
 	RotationStopBias = 0.2f;
+
+	PlatformIndex = 0;
 }
 
 void ALobbyPlayerPlatform::PostInitializeComponents()
@@ -119,6 +121,11 @@ void ALobbyPlayerPlatform::StopRotation()
 	RotationVelocity = 0.0f;
 }
 
+int32 ALobbyPlayerPlatform::GetPlatformIndex() const
+{
+	return PlatformIndex;
+}
+
 void ALobbyPlayerPlatform::OnHitboxClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
 {
 	StopRotation();
@@ -143,6 +150,11 @@ void ALobbyPlayerPlatform::OnHitboxTouchEnd(ETouchIndex::Type FingerIndex, UPrim
 
 void ALobbyPlayerPlatform::SetOwningPlayer(class ALobbyPlayerState* InOwningPlayer)
 {
+	if (IsValid(OwningPlayer) && OwningPlayer == InOwningPlayer)
+	{
+		return;
+	}
+
 	if (IsValid(OwningPlayer))
 	{
 		OwningPlayer->OnPlayerCustomizationColorChanged.RemoveDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationColorChanged);

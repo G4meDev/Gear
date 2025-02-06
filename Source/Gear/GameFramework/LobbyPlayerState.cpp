@@ -25,12 +25,20 @@ ALobbyPlayerState::ALobbyPlayerState()
 	PlayerJoinTime = 0.0f;
 }
 
+void ALobbyPlayerState::PostNetInit()
+{
+	Super::PostNetInit();
+
+}
+
 void ALobbyPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (HasAuthority())
 	{
+		PlayerJoinTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+
 		FPlayerCustomization OldCustomization = PlayerCusstomization;
 		PlayerCusstomization = FPlayerCustomization::GetRandomCustomization();
 		OnRep_PlayerCustomization(PlayerCusstomization);
@@ -56,6 +64,15 @@ void ALobbyPlayerState::OnRep_ColorCode()
 	PlayerColor = UDataHelperBFL::ResolveColorCode(ColorCode);
 	
 
+}
+
+void ALobbyPlayerState::OnRep_PlayerJoinTime()
+{
+	ALobbyGameState* GameState = GetWorld()->GetGameState<ALobbyGameState>();
+	if (IsValid(GameState))
+	{
+		GameState->ReconstructPlayersPlatform();
+	}
 }
 
 FPlayerCustomization ALobbyPlayerState::GetPlayerCustomization()
@@ -112,9 +129,14 @@ void ALobbyPlayerState::SetPlayerShoeColor_Server_Implementation(EPlayerColorCod
 	OnRep_PlayerCustomization(OldCustomization);
 }
 
-float ALobbyPlayerState::GetPlayerJoinTime()
+float ALobbyPlayerState::GetPlayerJoinTime() const
 {
 	return PlayerJoinTime;
+}
+
+bool ALobbyPlayerState::SortJoinTimePredicate(const ALobbyPlayerState& P1, const ALobbyPlayerState& P2)
+{
+	return P1.GetPlayerJoinTime() < P2.GetPlayerJoinTime();
 }
 
 void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)

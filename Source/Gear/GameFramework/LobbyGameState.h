@@ -31,6 +31,14 @@ public:
 
 	void RequestColorChangeForPlayer(ALobbyPlayerController* PC, EPlayerColorCode Color);
 
+	UFUNCTION(BlueprintPure)
+	TArray<ALobbyPlayerState*> GetLobbyPlayers();
+
+	UFUNCTION(BlueprintPure)
+	TArray<ALobbyPlayerState*> GetJoinTimeSortedLobbyPlayers();
+
+	void ReconstructPlayersPlatform();
+
 protected:
 
 	void AddPlayerState(APlayerState* PlayerState) override;
@@ -39,6 +47,4 @@ protected:
 	void GetInUseColors(TArray<EPlayerColorCode>& InUseColors);
 	void AssignNewColorToPlayer(APlayerState* Player);
 
-	void ConstructPlayerPlatform(class ALobbyPlayerState* PlayerState);
-	void DestructPlayerPlatform(class ALobbyPlayerState* PlayerState);
 };
