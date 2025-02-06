@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/GearTypes.h"
+#include "GameSystems/InputHnadler.h"
 #include "LobbyPlayerController.generated.h"
 
 class ALobbyPlayerState;
@@ -18,6 +19,15 @@ class GEAR_API ALobbyPlayerController : public APlayerController
 	GENERATED_BODY()
 
 protected:
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UInputMappingContext* InputMappingContext;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UInputAction* MoveScreenAction;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UInputAction* PinchAction;
 
 	virtual void PostNetInit() override;
 	void BeginPlay() override;
@@ -38,7 +48,21 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
 
+#if PLATFORM_WINDOWS
+
+	FMouseInputHandler RightMouseInputHandler;
+	FMouseInputHandler LeftMouseInputHandler;
+
+#elif PLATFORM_ANDROID
+
+	FTouchInputHandler Touch1_InputHandler;
+	FTouchInputHandler Touch2_InputHandler;
+
+#endif
+
 public:
+
+	virtual void Tick( float DeltaSeconds ) override;
 
 	void NotifyNewPlayer(APlayerState* InPlayer);
 	void NotifyRemovePlayer(APlayerState* InPlayer);

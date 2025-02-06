@@ -17,13 +17,31 @@ protected:
 	USceneComponent* Root;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* RotationSocket;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* DriverSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USkeletalMeshComponent* Vehicle; 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UBoxComponent* Hitbox;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<class AGearDriver> DriverClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float RotationSpeed;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float RotationDrag;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float RotationDamping;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float RotationStopBias;
 
 	UPROPERTY()
 	class AGearDriver* Driver;
@@ -33,6 +51,10 @@ protected:
 
 	UPROPERTY()
 	UMaterialInstanceDynamic* VehicleMID;
+
+	bool bGrabbed;
+
+	float RotationVelocity;
 
 	friend class ALobbyGameState;
 
@@ -47,7 +69,28 @@ public:
 
 	class ALobbyPlayerState* GetOwningPlayer();
 
+	UFUNCTION(BlueprintCallable)
+	void Rotate(float Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void ClearGrabbed();
+
+	UFUNCTION(BlueprintCallable)
+	void StopRotation();
+
 protected:
+
+	UFUNCTION()
+	void OnHitboxClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
+
+	UFUNCTION()
+	void OnHitboxReleased(UPrimitiveComponent* TouchedComponent, FKey ButtonReleased);
+
+	UFUNCTION()
+	void OnHitboxTouchBegin(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void OnHitboxTouchEnd(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent);
 
 	void SetOwningPlayer(class ALobbyPlayerState* InOwningPlayer);
 

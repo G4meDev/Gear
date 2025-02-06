@@ -9,6 +9,10 @@
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
+
 void ALobbyPlayerController::PostNetInit()
 {
 	Super::PostNetInit();
@@ -22,6 +26,26 @@ void ALobbyPlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (IsValid(InputMappingContext))
+			{
+				InputSystem->AddMappingContext(InputMappingContext, 0);
+			}
+		}
+
+#if PLATFORM_WINDOWS
+
+		LeftMouseInputHandler.Init(EKeys::LeftMouseButton);
+		RightMouseInputHandler.Init(EKeys::RightMouseButton);
+
+#elif PLATFORM_ANDROID
+
+		Touch1_InputHandler.Init(ETouchIndex::Touch1);
+		Touch2_InputHandler.Init(ETouchIndex::Touch2);
+
+#endif
+
 		UGearGameInstance* GearGameIntance = Cast<UGearGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 		Server_SetPlayerName(GearGameIntance->GetPlayerName());
 
@@ -52,12 +76,74 @@ void ALobbyPlayerController::AddLobbyMenu()
 	}
 
 	SetShowMouseCursor(true);
-	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this);
+	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, nullptr, EMouseLockMode::DoNotLock, false);
 }
 
 void ALobbyPlayerController::Server_SetPlayerName_Implementation(const FString& PlayerName)
 {
 	PlayerState->SetPlayerName(PlayerName);
+}
+
+void ALobbyPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (IsLocalController())
+	{
+		FVector2D ScreenDragValue = FVector2D::ZeroVector;
+		float PinchValue = 0.0f;
+
+#if PLATFORM_WINDOWS
+
+		LeftMouseInputHandler.Tick(this);
+		RightMouseInputHandler.Tick(this);
+
+		ScreenDragValue = LeftMouseInputHandler.GetVelocity();
+		PinchValue = RightMouseInputHandler.GetVelocity().X;
+
+#elif PLATFORM_ANDROID
+
+		Touch1_InputHandler.Tick(this);
+		Touch2_InputHandler.Tick(this);
+
+		if (Touch1_InputHandler.IsHoldingTouch() && Touch2_InputHandler.IsHoldingTouch())
+		{
+			FVector2D Center = (Touch1_InputHandler.GetValue() + Touch2_InputHandler.GetValue()) / 2;
+
+			auto CalculateVelocityAlongCentroid = [&](const FTouchInputHandler& InputHandler)
+				{
+					FVector2D CentroidDir = Center - InputHandler.GetValue();
+					CentroidDir.Normalize();
+					return FVector2D::DotProduct(CentroidDir, InputHandler.GetVelocity());
+				};
+
+			PinchValue = CalculateVelocityAlongCentroid(Touch1_InputHandler) + CalculateVelocityAlongCentroid(Touch2_InputHandler);
+			PinchValue = -PinchValue;
+		}
+
+		else
+		{
+			ScreenDragValue = Touch1_InputHandler.IsHoldingTouch() ? Touch1_InputHandler.GetVelocity() : Touch2_InputHandler.GetVelocity();
+		}
+
+#endif
+
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			TArray<UInputModifier*> Modifiers;
+			TArray<UInputTrigger*> Triggers;
+
+			if (IsValid(MoveScreenAction))
+			{
+				InputSystem->InjectInputForAction(MoveScreenAction, FInputActionValue(FInputActionValue::Axis2D(ScreenDragValue)), Modifiers, Triggers);
+			}
+
+			if (IsValid(PinchAction))
+			{
+				InputSystem->InjectInputForAction(PinchAction, FInputActionValue(FInputActionValue::Axis1D(PinchValue)), Modifiers, Triggers);
+			}
+		}
+	}
 }
 
 void ALobbyPlayerController::NotifyNewPlayer(APlayerState* InPlayer)

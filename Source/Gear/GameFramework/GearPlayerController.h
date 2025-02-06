@@ -113,16 +113,16 @@ public:
 	void NotifyAllPlayerJoined();
 
 // -------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(EditDefaultsOnly)
-	float NetworkClockUpdateFrequency = 1.0f;
-
-	TArray<float> RTTCircularBuffer;
-
-	void RequestWorldTime_Internal();
-
-	UFUNCTION(Server, Unreliable)
-	void ServerRequestWorldTime(float ClientTimestamp);
-
-	UFUNCTION(Client, Unreliable)
-	void ClientUpdateWorldTime(float ClientTimestamp, float ServerTimestamp);
+// 	UPROPERTY(EditDefaultsOnly)
+// 	float NetworkClockUpdateFrequency = 1.0f;
+// 
+// 	TArray<float> RTTCircularBuffer;
+// 
+// 	void RequestWorldTime_Internal();
+// 
+// 	UFUNCTION(Server, Unreliable)
+// 	void ServerRequestWorldTime(float ClientTimestamp);
+// 
+// 	UFUNCTION(Client, Unreliable)
+// 	void ClientUpdateWorldTime(float ClientTimestamp, float ServerTimestamp);
 };
