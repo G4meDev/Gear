@@ -52,7 +52,10 @@ public:
 	EAbilityType GetAbilityType();
 
 	UFUNCTION(BlueprintCallable)
-	void ChangePlayerCustomization(const FPlayerCustomization& PlayerCustomization);
+	void ChangePlayerCustomizationColor(const FPlayerCustomization& PlayerCustomization);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangePlayerCustomizationHead(const FPlayerCustomization& PlayerCustomization);
 
 protected:
 	void DestroyDriverHead();

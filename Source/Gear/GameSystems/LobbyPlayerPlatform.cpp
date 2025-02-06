@@ -73,7 +73,8 @@ void ALobbyPlayerPlatform::SetOwningPlayer(class ALobbyPlayerState* InOwningPlay
 {
 	if (IsValid(OwningPlayer))
 	{
-		OwningPlayer->OnPlayerCustomizationChanged.RemoveDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationChanged);
+		OwningPlayer->OnPlayerCustomizationColorChanged.RemoveDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationColorChanged);
+		OwningPlayer->OnPlayerCustomizationHeadChanged.RemoveDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationHeadChanged);
 	}
 
 	ClearPlatform();
@@ -82,24 +83,41 @@ void ALobbyPlayerPlatform::SetOwningPlayer(class ALobbyPlayerState* InOwningPlay
 	if (IsValid(OwningPlayer))
 	{
 		Vehicle->SetHiddenInGame(false);
-		OwningPlayer->OnPlayerCustomizationChanged.AddDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationChanged);
+		OwningPlayer->OnPlayerCustomizationColorChanged.AddDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationColorChanged);
+		OwningPlayer->OnPlayerCustomizationHeadChanged.AddDynamic(this, &ALobbyPlayerPlatform::PlayerCustomizationHeadChanged);
 
-		Driver = GetWorld()->SpawnActor<AGearDriver>(DriverClass);
+		Driver = GetWorld()->SpawnActor<AGearDriver>(DriverClass, DriverSocket->GetComponentTransform());
 		if (IsValid(Driver))
 		{
 			Driver->AttachToComponent(DriverSocket, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			Driver->ChangeDriverHead(UDataHelperBFL::GetHeadClassFromType(OwningPlayer->GetPlayerCustomization().HeadType));
+			Driver->ChangeDriverHead(OwningPlayer->GetPlayerCustomization().HeadType.Class);
 		}
 	}
 }
 
-void ALobbyPlayerPlatform::PlayerCustomizationChanged()
+void ALobbyPlayerPlatform::PlayerCustomizationHeadChanged()
+{
+	if (IsValid(OwningPlayer))
+	{
+		if (IsValid(Driver))
+		{
+			Driver->ChangePlayerCustomizationHead(OwningPlayer->GetPlayerCustomization());
+		}
+	}
+}
+
+void ALobbyPlayerPlatform::PlayerCustomizationColorChanged()
 {
 	if (IsValid(OwningPlayer))
 	{
 		if (IsValid(VehicleMID))
 		{
-			VehicleMID->SetVectorParameterValue(TEXT("Color"), UDataHelperBFL::ResolveColorCode(OwningPlayer->GetPlayerCustomization().TricycleColor).ReinterpretAsLinear());
+			VehicleMID->SetVectorParameterValue(TEXT("Color"), OwningPlayer->GetPlayerCustomization().TricycleColor.LinearColor);
+		}
+
+		if (IsValid(Driver))
+		{
+			Driver->ChangePlayerCustomizationColor(OwningPlayer->GetPlayerCustomization());
 		}
 	}
 }

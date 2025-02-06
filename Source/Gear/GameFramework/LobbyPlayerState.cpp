@@ -60,44 +60,51 @@ FPlayerCustomization ALobbyPlayerState::GetPlayerCustomization()
 
 void ALobbyPlayerState::SetPlayerCustomization_Server_Implementation(const FPlayerCustomization& InPlayerCustomization)
 {
+	FPlayerCustomization OldCustomization = PlayerCusstomization;
 	PlayerCusstomization = InPlayerCustomization;
-	OnRep_PlayerCustomization();
+	OnRep_PlayerCustomization(OldCustomization);
 }
 
 void ALobbyPlayerState::SetPlayerHeadType_Server_Implementation(EDriverHead HeadType)
 {
-	PlayerCusstomization.HeadType = HeadType;
-	OnRep_PlayerCustomization();
+	FPlayerCustomization OldCustomization = PlayerCusstomization;
+	PlayerCusstomization.HeadType.Type = HeadType;
+	OnRep_PlayerCustomization(OldCustomization);
 }
 
 void ALobbyPlayerState::SetPlayerTricycleColor_Server_Implementation(EPlayerColorCode Color)
 {
-	PlayerCusstomization.TricycleColor = Color;
-	OnRep_PlayerCustomization();
+	FPlayerCustomization OldCustomization = PlayerCusstomization;
+	PlayerCusstomization.TricycleColor.ColorCode = Color;
+	OnRep_PlayerCustomization(OldCustomization);
 }
 
 void ALobbyPlayerState::SetPlayerClothColor_Server_Implementation(EPlayerColorCode Color)
 {
-	PlayerCusstomization.ClothColor = Color;
-	OnRep_PlayerCustomization();
+	FPlayerCustomization OldCustomization = PlayerCusstomization;
+	PlayerCusstomization.ClothColor.ColorCode = Color;
+	OnRep_PlayerCustomization(OldCustomization);
 }
 
 void ALobbyPlayerState::SetPlayerPantColor_Server_Implementation(EPlayerColorCode Color)
 {
-	PlayerCusstomization.PantColor = Color;
-	OnRep_PlayerCustomization();
+	FPlayerCustomization OldCustomization = PlayerCusstomization;
+	PlayerCusstomization.PantColor.ColorCode = Color;
+	OnRep_PlayerCustomization(OldCustomization);
 }
 
 void ALobbyPlayerState::SetPlayerHandColor_Server_Implementation(EPlayerColorCode Color)
 {
-	PlayerCusstomization.HandColor = Color;
-	OnRep_PlayerCustomization();
+	FPlayerCustomization OldCustomization = PlayerCusstomization;
+	PlayerCusstomization.HandColor.ColorCode = Color;
+	OnRep_PlayerCustomization(OldCustomization);
 }
 
 void ALobbyPlayerState::SetPlayerShoeColor_Server_Implementation(EPlayerColorCode Color)
 {
-	PlayerCusstomization.ShoeColor = Color;
-	OnRep_PlayerCustomization();
+	FPlayerCustomization OldCustomization = PlayerCusstomization;
+	PlayerCusstomization.ShoeColor.ColorCode = Color;
+	OnRep_PlayerCustomization(OldCustomization);
 }
 
 float ALobbyPlayerState::GetPlayerJoinTime()
@@ -117,7 +124,14 @@ void ALobbyPlayerState::CopyProperties(APlayerState* PlayerState)
 	}
 }
 
-void ALobbyPlayerState::OnRep_PlayerCustomization()
+void ALobbyPlayerState::OnRep_PlayerCustomization(FPlayerCustomization OldCustomization)
 {
-	OnPlayerCustomizationChanged.Broadcast();
+	PlayerCusstomization.ResolveData();
+
+	if (OldCustomization.HeadType.Type != PlayerCusstomization.HeadType.Type)
+	{
+		OnPlayerCustomizationHeadChanged.Broadcast();
+	}
+
+	OnPlayerCustomizationColorChanged.Broadcast();
 }

@@ -7,7 +7,8 @@
 #include "GameFramework/GearTypes.h"
 #include "LobbyPlayerState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerCustomizationChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerCustomizationColorChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerCustomizationHeadChanged);
 
 /**
  * 
@@ -30,7 +31,7 @@ protected:
 	float PlayerJoinTime;
 
 	UFUNCTION()
-	void OnRep_PlayerCustomization();
+	void OnRep_PlayerCustomization(FPlayerCustomization OldCustomization);
 
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerCustomization)
 	FPlayerCustomization PlayerCusstomization;
@@ -53,7 +54,10 @@ public:
 	float GetPlayerJoinTime();
 
 	UPROPERTY(BlueprintAssignable)
-	FOnPlayerCustomizationChanged OnPlayerCustomizationChanged;
+	FOnPlayerCustomizationColorChanged OnPlayerCustomizationColorChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerCustomizationHeadChanged OnPlayerCustomizationHeadChanged;
 
 	UFUNCTION(BlueprintPure)
 	FPlayerCustomization GetPlayerCustomization();

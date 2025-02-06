@@ -192,10 +192,56 @@ enum class EWidgetOrder : uint8
 	PauseMenu = 1
 };
 
+USTRUCT(BlueprintType)
+struct FCustomizationColor
+{
+	GENERATED_BODY()
+
+public:
+	
+	FCustomizationColor()
+	{
+		ColorCode = EPlayerColorCode::Black;
+		ResolveColorCode();
+	};
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EPlayerColorCode ColorCode;
+
+	UPROPERTY(BlueprintReadOnly, NotReplicated)
+	FColor Color;
+
+	UPROPERTY(BlueprintReadOnly, NotReplicated)
+	FLinearColor LinearColor;
+
+	void ResolveColorCode();
+};
+
 UENUM(BlueprintType)
 enum class EDriverHead: uint8
 {
 	Box
+};
+
+USTRUCT(BlueprintType)
+struct FCustomizationHead
+{
+	GENERATED_BODY()
+
+public:
+	FCustomizationHead()
+	{
+		Type = EDriverHead::Box;
+		ResolveClass();
+	};
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EDriverHead Type;
+
+	UPROPERTY(BlueprintReadOnly, NotReplicated)
+	UClass* Class;
+
+	void ResolveClass();
 };
 
 USTRUCT(BlueprintType)
@@ -209,21 +255,32 @@ public:
 
 	};
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EDriverHead HeadType;
+	void ResolveData()
+	{
+		HeadType.ResolveClass();
+
+		TricycleColor.ResolveColorCode();
+		ClothColor.ResolveColorCode();
+		PantColor.ResolveColorCode();
+		HandColor.ResolveColorCode();
+		ShoeColor.ResolveColorCode();
+	}
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPlayerColorCode TricycleColor;
+	FCustomizationHead HeadType;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPlayerColorCode ClothColor;
+	FCustomizationColor TricycleColor;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPlayerColorCode PantColor;
+	FCustomizationColor ClothColor;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPlayerColorCode HandColor;
+	FCustomizationColor PantColor;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPlayerColorCode ShoeColor;
+	FCustomizationColor HandColor;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FCustomizationColor ShoeColor;
 };

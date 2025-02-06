@@ -27,7 +27,13 @@ AGearDriver::AGearDriver()
 
 void AGearDriver::PostInitializeComponents()
 {
-	BodyMID = BodyMesh->CreateDynamicMaterialInstance(0);
+	Super::PostInitializeComponents();
+
+	if (IsValid(BodyMesh))
+	{
+		BodyMID = BodyMesh->CreateDynamicMaterialInstance(0);
+
+	}
 
 
 }
@@ -85,14 +91,19 @@ EAbilityType AGearDriver::GetAbilityType()
 	return IsValid(OwningVehicle) && IsValid(OwningVehicle->GetAbility()) ? OwningVehicle->GetAbility()->GetAbilityType() : EAbilityType::None;
 }
 
-void AGearDriver::ChangePlayerCustomization(const FPlayerCustomization& PlayerCustomization)
+void AGearDriver::ChangePlayerCustomizationHead(const FPlayerCustomization& PlayerCustomization)
+{
+	ChangeDriverHead(PlayerCustomization.HeadType.Class);
+}
+
+void AGearDriver::ChangePlayerCustomizationColor(const FPlayerCustomization& PlayerCustomization)
 {
 	if (IsValid(BodyMID))
 	{
-// 		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR,  PlayerCustomization.ClothColor);
-// 		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR, PlayerCustomization.ClothColor);
-// 		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR, PlayerCustomization.ClothColor);
-// 		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR, PlayerCustomization.ClothColor);
+		BodyMID->SetVectorParameterValue(MAT_NAME_CLOTH_COLOR, PlayerCustomization.ClothColor.LinearColor);
+		BodyMID->SetVectorParameterValue(MAT_NAME_PANT_COLOR, PlayerCustomization.PantColor.LinearColor);
+		BodyMID->SetVectorParameterValue(MAT_NAME_HAND_COLOR, PlayerCustomization.HandColor.LinearColor);
+		BodyMID->SetVectorParameterValue(MAT_NAME_SHOE_COLOR, PlayerCustomization.ShoeColor.LinearColor);
 	}
 }
 

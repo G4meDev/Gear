@@ -52,5 +52,8 @@ protected:
 	void SetOwningPlayer(class ALobbyPlayerState* InOwningPlayer);
 
 	UFUNCTION()
-	void PlayerCustomizationChanged();
+	void PlayerCustomizationColorChanged();
+
+	UFUNCTION()
+	void PlayerCustomizationHeadChanged();
 };
