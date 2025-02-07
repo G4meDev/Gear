@@ -307,6 +307,3 @@ void UGearGameInstance::ChangePerformanceSettings(bool bEnabingLoadingScreen)
 		FGameThreadHitchHeartBeat::Get().ResumeHeartBeat();
 	}
 }
-
-#undef SAVE_SLOT_NAME
-#undef SAVE_USER_INDEX
