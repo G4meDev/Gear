@@ -176,11 +176,6 @@ void ALobbyGameState::ReconstructPlayersPlatform()
 {
 	TArray<ALobbyPlayerState*> LobbyPlayers = GetJoinTimeSortedLobbyPlayers();
 
-	for (int i = 0; i < LobbyPlayers.Num(); i++)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%f"), LobbyPlayers[i]->GetPlayerJoinTime());
-	}
-
 	for (int i = 0; i < PlayerPlatforms.Num(); i++)
 	{
 		ALobbyPlayerPlatform* PlayerPlatform = PlayerPlatforms[i];
