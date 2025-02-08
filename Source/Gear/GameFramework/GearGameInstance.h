@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "GameFramework/GearTypes.h"
 #include "GearGameInstance.generated.h" 
 
 class UGearSaveGame;
@@ -58,7 +59,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	int32 GetQualityLevel();
 
+	void SetDisconnectionReason(EPlayerDisconnectionReason InDisconnectionReason);
+
+	UFUNCTION(BlueprintPure)
+	EPlayerDisconnectionReason GetDisconnectionReason();
+
 protected:
+	virtual void ReturnToMainMenu() override;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> LoadingScreenWidgetClass;
 
@@ -73,6 +81,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	class USoundMix* BaseSoundMix;
+
+	EPlayerDisconnectionReason DisconnectionReason;
 
 private:
 	UPROPERTY()

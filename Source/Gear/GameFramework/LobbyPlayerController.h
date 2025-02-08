@@ -10,15 +10,6 @@
 
 class ALobbyPlayerState;
 
-UENUM()
-enum class EDestructionReason
-{
-	ConnectionFailure,
-	Kicked,
-	ServerTravel,
-	Quit
-};
-
 /**
  * 
  */
@@ -69,7 +60,7 @@ protected:
 
 #endif
 
-	EDestructionReason DestructionReason;
+	EPlayerDisconnectionReason DisconnectionReason;
 
 public:
 

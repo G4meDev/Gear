@@ -287,3 +287,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FCustomizationColor ShoeColor;
 };
+
+UENUM(BlueprintType)
+enum class EPlayerDisconnectionReason : uint8
+{
+	ConnectionFailure,
+	Kicked,
+	ServerTravel,
+	Quit
+};

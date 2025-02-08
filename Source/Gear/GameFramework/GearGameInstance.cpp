@@ -22,6 +22,8 @@ void UGearGameInstance::Init()
 {
 	Super::Init();
 
+	DisconnectionReason = EPlayerDisconnectionReason::Quit;
+
 #if WITH_EDITORONLY_DATA
 
 	auto* SplineCurvesStruct = FSplineCurves::StaticStruct();
@@ -44,6 +46,12 @@ void UGearGameInstance::Shutdown()
 	LoadingScreenWidget.Reset();
 
 	Super::Shutdown();
+}
+
+void UGearGameInstance::ReturnToMainMenu()
+{
+	Super::ReturnToMainMenu();
+
 }
 
 void UGearGameInstance::InitPersistantData()
@@ -267,6 +275,16 @@ int32 UGearGameInstance::GetQualityLevel()
 	}
 
 	return 2;
+}
+
+void UGearGameInstance::SetDisconnectionReason(EPlayerDisconnectionReason InDisconnectionReason)
+{
+	DisconnectionReason = InDisconnectionReason;
+}
+
+EPlayerDisconnectionReason UGearGameInstance::GetDisconnectionReason()
+{
+	return DisconnectionReason;
 }
 
 void UGearGameInstance::ChangePerformanceSettings(bool bEnabingLoadingScreen)

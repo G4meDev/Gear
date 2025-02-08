@@ -17,7 +17,7 @@ ALobbyPlayerController::ALobbyPlayerController()
 {
 
 	
-	DestructionReason = EDestructionReason::ConnectionFailure;
+	DisconnectionReason = EPlayerDisconnectionReason::ConnectionFailure;
 }
 
 void ALobbyPlayerController::PostNetInit()
@@ -39,6 +39,12 @@ void ALobbyPlayerController::BeginPlay()
 			{
 				InputSystem->AddMappingContext(InputMappingContext, 0);
 			}
+		}
+
+		UGearGameInstance* GearGameInstance = GetGameInstance<UGearGameInstance>();
+		if (IsValid(GearGameInstance))
+		{
+			GearGameInstance->SetDisconnectionReason(DisconnectionReason);
 		}
 
 #if PLATFORM_WINDOWS
@@ -66,9 +72,10 @@ void ALobbyPlayerController::BeginPlay()
 
 void ALobbyPlayerController::Destroyed()
 {
-	if (IsLocalController())
+	UGearGameInstance* GearGameInstance = GetGameInstance<UGearGameInstance>();
+	if (IsValid(GearGameInstance))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), DestructionReason == EDestructionReason::Kicked ? TEXT("KICKED!") : TEXT("QUIT!"));
+		GearGameInstance->SetDisconnectionReason(DisconnectionReason);
 	}
 
 	Super::Destroyed();
@@ -103,12 +110,12 @@ void ALobbyPlayerController::Server_SetPlayerName_Implementation(const FString& 
 
 void ALobbyPlayerController::NotifyKicked_Client_Implementation()
 {
-	DestructionReason = EDestructionReason::Kicked;
+	DisconnectionReason = EPlayerDisconnectionReason::Kicked;
 }
 
 void ALobbyPlayerController::QuitLobby()
 {
-	DestructionReason = EDestructionReason::Quit;
+	DisconnectionReason = EPlayerDisconnectionReason::Quit;
 	ConsoleCommand("disconnect");
 }
 
