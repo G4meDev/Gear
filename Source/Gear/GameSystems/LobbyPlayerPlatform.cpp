@@ -7,6 +7,7 @@
 #include "Vehicle/GearDriver.h"
 #include "Utils/DataHelperBFL.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 
 
 
@@ -31,6 +32,9 @@ ALobbyPlayerPlatform::ALobbyPlayerPlatform()
 	Hitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("Hitbox"));
 	Hitbox->SetupAttachment(Root);
 	Hitbox->SetCollisionProfileName(TEXT("Selectable"));
+
+	PlayerbarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PlayerbarWidget"));
+	PlayerbarWidget->SetupAttachment(Root);
 
 	bGrabbed = false;
 
@@ -179,6 +183,8 @@ void ALobbyPlayerPlatform::SetOwningPlayer(class ALobbyPlayerState* InOwningPlay
 			PlayerCustomizationHeadChanged();
 		}
 	}
+
+	OnOwningPlayerChanged();
 }
 
 void ALobbyPlayerPlatform::PlayerCustomizationHeadChanged()

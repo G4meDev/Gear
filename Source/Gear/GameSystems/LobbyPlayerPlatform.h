@@ -29,6 +29,9 @@ protected:
 	class UBoxComponent* Hitbox;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UWidgetComponent* PlayerbarWidget;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<class AGearDriver> DriverClass;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -70,6 +73,7 @@ public:
 
 	void ClearPlatform();
 
+	UFUNCTION(BlueprintPure)
 	class ALobbyPlayerState* GetOwningPlayer();
 
 	UFUNCTION(BlueprintCallable)
@@ -104,4 +108,7 @@ protected:
 
 	UFUNCTION()
 	void PlayerCustomizationHeadChanged();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnOwningPlayerChanged();
 };
