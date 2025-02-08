@@ -296,3 +296,11 @@ enum class EPlayerDisconnectionReason : uint8
 	ServerTravel,
 	Quit
 };
+
+UENUM(BlueprintType)
+enum class ELanguageOption : uint8
+{
+	Farsi = 0,
+	English,
+	Max
+};

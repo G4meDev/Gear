@@ -2,6 +2,7 @@
 
 #include "GameFramework/GearGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
 #include "GameFramework/GearSaveGame.h"
 #include "GameFramework/GearTypes.h"
 #include "Blueprint/UserWidget.h"
@@ -138,6 +139,8 @@ void UGearGameInstance::ApplyUserSettings()
 		UGameplayStatics::SetBaseSoundMix(GetWorld(), BaseSoundMix);
 		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), BaseSoundMix, BaseSoundClass, GearSave->SoundAmplitude);
 		UGameplayStatics::SetSoundMixClassOverride(GetWorld(), BaseSoundMix, MusicSoundClass, GearSave->MusicAmplitude);
+
+		UKismetInternationalizationLibrary::SetCurrentCulture(UDataHelperBFL::LanguageOptionToCulture(GearSave->Language));
 	}
 }
 
@@ -247,6 +250,16 @@ void UGearGameInstance::SetQualityLevel(int32 Level)
 	}
 }
 
+void UGearGameInstance::SetLanguage(ELanguageOption Language)
+{
+	if (IsValid(GearSave))
+	{
+		GearSave->Language = Language;
+		ApplyUserSettings();
+		MarkUserSettingsDirty();
+	}
+}
+
 float UGearGameInstance::GetSoundAmplitude()
 {
 	if (IsValid(GearSave))
@@ -275,6 +288,16 @@ int32 UGearGameInstance::GetQualityLevel()
 	}
 
 	return 2;
+}
+
+ELanguageOption UGearGameInstance::GetLanguage()
+{
+	if (IsValid(GearSave))
+	{
+		return GearSave->Language;
+	}
+
+	return ELanguageOption::Farsi;
 }
 
 void UGearGameInstance::SetDisconnectionReason(EPlayerDisconnectionReason InDisconnectionReason)

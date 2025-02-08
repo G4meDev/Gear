@@ -106,3 +106,31 @@ float UDataHelperBFL::SmoothStep(float Value, float Min, float Max)
 {
 	return FMath::SmoothStep(Min, Max, Value);
 }
+
+FString UDataHelperBFL::LanguageOptionToCulture(ELanguageOption LanguageOption)
+{
+	switch (LanguageOption)
+	{
+	case ELanguageOption::Farsi:
+		return FString("fa");
+	case ELanguageOption::English:
+		return FString("en");
+	default:
+		return FString("fa");
+	}
+}
+
+ELanguageOption UDataHelperBFL::CultureToLanguageOption(const FString& Culture)
+{
+	if (Culture == "fa")
+	{
+		return ELanguageOption::Farsi;
+	}
+
+	if (Culture == "en")
+	{
+		return ELanguageOption::English;
+	}
+
+	return ELanguageOption::Farsi;
+}

@@ -21,6 +21,7 @@ public:
 		, SoundAmplitude(0.5f)
 		, MusicAmplitude(0.5f)
 		, QualityLevel(2)
+		, Language(ELanguageOption::Farsi)
 	{
 
 	}
@@ -36,4 +37,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	int32 QualityLevel;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	ELanguageOption Language;
 };

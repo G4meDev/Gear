@@ -35,4 +35,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static float SmoothStep(float Value, float Min, float Max);
+
+	UFUNCTION(BlueprintPure)
+	static FString LanguageOptionToCulture(ELanguageOption LanguageOption);
+
+	UFUNCTION(BlueprintPure)
+	static ELanguageOption CultureToLanguageOption(const FString& Culture);
 };

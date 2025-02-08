@@ -50,6 +50,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetQualityLevel(int32 Level);
 
+	UFUNCTION(BlueprintCallable)
+	void SetLanguage(ELanguageOption Language);
+
 	UFUNCTION(BlueprintPure)
 	float GetSoundAmplitude();
 
@@ -58,6 +61,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	int32 GetQualityLevel();
+
+	UFUNCTION(BlueprintPure)
+	ELanguageOption GetLanguage ();
 
 	void SetDisconnectionReason(EPlayerDisconnectionReason InDisconnectionReason);
 
