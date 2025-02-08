@@ -16,4 +16,7 @@ class GEAR_API ALobbyGameMode : public AGameMode
 	
 public:
 	ALobbyGameMode();
+
+	UFUNCTION(BlueprintCallable)
+	void KickPlayer(class APlayerController* Player);
 };
