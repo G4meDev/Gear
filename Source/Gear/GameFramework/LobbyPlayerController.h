@@ -10,6 +10,15 @@
 
 class ALobbyPlayerState;
 
+UENUM()
+enum class EDestructionReason
+{
+	ConnectionFailure,
+	Kicked,
+	ServerTravel,
+	Quit
+};
+
 /**
  * 
  */
@@ -31,9 +40,6 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UInputAction* TouchEndAction;
-
-	virtual void PostNetInit() override;
-	void BeginPlay() override;
 
 	void OnRep_PlayerState() override;
 
@@ -63,8 +69,15 @@ protected:
 
 #endif
 
+	EDestructionReason DestructionReason;
+
 public:
 
+	ALobbyPlayerController();
+
+	virtual void PostNetInit() override;
+	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
 	virtual void Tick( float DeltaSeconds ) override;
 
 	void NotifyNewPlayer(APlayerState* InPlayer);
@@ -79,5 +92,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TryChangeColor(EPlayerColorCode Color);
 
+	UFUNCTION(Client, Reliable)
+	void NotifyKicked_Client();
+
+	UFUNCTION(BlueprintCallable)
+	void QuitLobby();
+	
 	ALobbyPlayerState* GetLobbyPlayerState();
 };

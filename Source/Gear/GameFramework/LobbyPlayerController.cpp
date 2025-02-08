@@ -13,6 +13,13 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 
+ALobbyPlayerController::ALobbyPlayerController()
+{
+
+	
+	DestructionReason = EDestructionReason::ConnectionFailure;
+}
+
 void ALobbyPlayerController::PostNetInit()
 {
 	Super::PostNetInit();
@@ -57,6 +64,16 @@ void ALobbyPlayerController::BeginPlay()
 
 }
 
+void ALobbyPlayerController::Destroyed()
+{
+	if (IsLocalController())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), DestructionReason == EDestructionReason::Kicked ? TEXT("KICKED!") : TEXT("QUIT!"));
+	}
+
+	Super::Destroyed();
+}
+
 void ALobbyPlayerController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
@@ -82,6 +99,17 @@ void ALobbyPlayerController::AddLobbyMenu()
 void ALobbyPlayerController::Server_SetPlayerName_Implementation(const FString& PlayerName)
 {
 	PlayerState->SetPlayerName(PlayerName);
+}
+
+void ALobbyPlayerController::NotifyKicked_Client_Implementation()
+{
+	DestructionReason = EDestructionReason::Kicked;
+}
+
+void ALobbyPlayerController::QuitLobby()
+{
+	DestructionReason = EDestructionReason::Quit;
+	ConsoleCommand("disconnect");
 }
 
 void ALobbyPlayerController::Tick(float DeltaSeconds)

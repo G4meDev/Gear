@@ -18,5 +18,5 @@ public:
 	ALobbyGameMode();
 
 	UFUNCTION(BlueprintCallable)
-	void KickPlayer(class APlayerController* Player);
+	void KickPlayer(class ALobbyPlayerController* Player);
 };

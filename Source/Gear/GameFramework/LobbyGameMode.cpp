@@ -14,10 +14,11 @@ ALobbyGameMode::ALobbyGameMode()
 	bUseSeamlessTravel = true;
 }
 
-void ALobbyGameMode::KickPlayer(class APlayerController* Player)
+void ALobbyGameMode::KickPlayer(class ALobbyPlayerController* Player)
 {
 	if (IsValid(Player))
 	{
+		Player->NotifyKicked_Client();
 		Player->Destroy();
 	}
 }
