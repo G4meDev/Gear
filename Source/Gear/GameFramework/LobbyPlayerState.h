@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerCustomization)
 	FPlayerCustomization PlayerCusstomization;
 
+	UPROPERTY(Replicated)
+	bool bReady;
+
 	friend class ALobbyGameState;
 
 public:
@@ -88,6 +91,13 @@ public:
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SetPlayerShoeColor_Server(EPlayerColorCode Color);
+
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetReady_Server(bool InbReady);
+
+	UFUNCTION(BlueprintPure)
+	bool IsReady();
 
 protected:
 };

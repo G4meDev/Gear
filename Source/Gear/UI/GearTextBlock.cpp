@@ -14,9 +14,14 @@
 UGearTextBlock::UGearTextBlock(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	UpdateCultureVerticalOffset(FInternationalization::Get().GetCurrentCulture()->GetName());
-
 	CultureChangeDelegateHandle = FInternationalization::Get().OnCultureChanged().AddUObject(this, &UGearTextBlock::OnCultureChanged);
+}
+
+void UGearTextBlock::SynchronizeProperties()
+{
+	Super::SynchronizeProperties();
+
+	OnCultureChanged();
 }
 
 void UGearTextBlock::ReleaseSlateResources(bool bReleaseChildren)

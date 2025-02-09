@@ -15,6 +15,7 @@ void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ALobbyPlayerState, ColorCode);
 	DOREPLIFETIME(ALobbyPlayerState, PlayerJoinTime);
 	DOREPLIFETIME(ALobbyPlayerState, PlayerCusstomization);
+	DOREPLIFETIME(ALobbyPlayerState, bReady);
 }
 
 ALobbyPlayerState::ALobbyPlayerState()
@@ -127,6 +128,16 @@ void ALobbyPlayerState::SetPlayerShoeColor_Server_Implementation(EPlayerColorCod
 	FPlayerCustomization OldCustomization = PlayerCusstomization;
 	PlayerCusstomization.ShoeColor.ColorCode = Color;
 	OnRep_PlayerCustomization(OldCustomization);
+}
+
+void ALobbyPlayerState::SetReady_Server_Implementation(bool InbReady)
+{
+	bReady = InbReady;
+}
+
+bool ALobbyPlayerState::IsReady()
+{
+	return bReady;
 }
 
 float ALobbyPlayerState::GetPlayerJoinTime() const

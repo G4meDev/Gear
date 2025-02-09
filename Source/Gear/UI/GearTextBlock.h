@@ -12,13 +12,13 @@
 UCLASS()
 class GEAR_API UGearTextBlock : public UTextBlock
 {
-	//GENERATED_BODY()
 	GENERATED_UCLASS_BODY()
 	
 public:
 	
 protected:
 
+	virtual void SynchronizeProperties() override;
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 
 	void UpdateCultureVerticalOffset(const FString& Culture);
