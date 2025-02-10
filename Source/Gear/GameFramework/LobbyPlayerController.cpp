@@ -15,7 +15,9 @@
 
 ALobbyPlayerController::ALobbyPlayerController()
 {
-
+	LastDummyPacketTime = FLT_MAX;
+	DummyPacketInterval = 1.0f;
+	TimeoutLimit = 5.0f;
 	
 	DisconnectionReason = EPlayerDisconnectionReason::ConnectionFailure;
 }
@@ -33,6 +35,11 @@ void ALobbyPlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
+		if (!HasAuthority() && GetWorld())
+		{
+			GetWorld()->GetTimerManager().SetTimer(DummtPacketTimerHandle, FTimerDelegate::CreateUObject(this, &ThisClass::SendDummyPacket_Server), DummyPacketInterval, true);
+		}
+
 		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 		{
 			if (IsValid(InputMappingContext))
@@ -113,6 +120,11 @@ void ALobbyPlayerController::Server_SetPlayerName_Implementation(const FString& 
 	PlayerState->SetPlayerName(PlayerName);
 }
 
+void ALobbyPlayerController::SendDummyPacket_Server_Implementation()
+{
+	LastDummyPacketTime = GetWorld()->GetTimeSeconds();
+}
+
 void ALobbyPlayerController::NotifyKicked_Client_Implementation()
 {
 	DisconnectionReason = EPlayerDisconnectionReason::Kicked;
@@ -127,6 +139,15 @@ void ALobbyPlayerController::QuitLobby()
 void ALobbyPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (HasAuthority() && !IsLocalController())
+	{
+		if (LastDummyPacketTime < GetWorld()->GetTimeSeconds() - TimeoutLimit)
+		{
+			DisconnectionReason = EPlayerDisconnectionReason::ConnectionFailure;
+			Destroy();
+		}
+	}
 
 	if (IsLocalController())
 	{

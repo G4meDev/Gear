@@ -51,6 +51,14 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UUserWidget* LobbyWidget;
 
+	UFUNCTION(Server, Reliable)
+	void SendDummyPacket_Server();
+
+	float LastDummyPacketTime;
+	float DummyPacketInterval;
+	float TimeoutLimit;
+	FTimerHandle DummtPacketTimerHandle;
+
 #if PLATFORM_WINDOWS
 
 	FMouseInputHandler RightMouseInputHandler;
