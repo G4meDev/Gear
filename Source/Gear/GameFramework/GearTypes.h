@@ -304,3 +304,10 @@ enum class ELanguageOption : uint8
 	English,
 	Max
 };
+
+UENUM(BlueprintType)
+enum class ELobbyGameState : uint8
+{
+	WaitingForPlayers,
+	StartingGame
+};

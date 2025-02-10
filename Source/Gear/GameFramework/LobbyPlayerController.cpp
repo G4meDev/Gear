@@ -93,10 +93,15 @@ void ALobbyPlayerController::OnRep_PlayerState()
 
 void ALobbyPlayerController::AddLobbyMenu()
 {
-	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), LobbyWidgetClass);
-	if (IsValid(Widget))
+	if (IsValid(LobbyWidget))
 	{
-		Widget->AddToViewport();
+		return;
+	}
+
+	LobbyWidget = CreateWidget<UUserWidget>(GetWorld(), LobbyWidgetClass);
+	if (IsValid(LobbyWidget))
+	{
+		LobbyWidget->AddToViewport();
 	}
 
 	SetShowMouseCursor(true);
@@ -168,7 +173,7 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 
 #endif
 
-		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer() ? GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>() : nullptr)
 		{
 			TArray<UInputModifier*> Modifiers;
 			TArray<UInputTrigger*> Triggers;

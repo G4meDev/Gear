@@ -4,12 +4,14 @@
 #include "GameFramework/LobbyGameState.h"
 #include "GameFramework/LobbyPlayerController.h"
 #include "GameFramework/LobbyPlayerState.h"
+#include "GameFramework/LobbyGameMode.h"
 #include "GameSystems/LobbyPlayerPlatform.h"
 #include "Kismet/GameplayStatics.h"
 
 ALobbyGameState::ALobbyGameState()
 {
 
+	LobbyGameState = ELobbyGameState::WaitingForPlayers;
 }
 
 void ALobbyGameState::BeginPlay()
@@ -35,6 +37,34 @@ void ALobbyGameState::BeginPlay()
 		});
 
 	ReconstructPlayersPlatform();
+}
+
+void ALobbyGameState::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (HasAuthority() && LobbyGameState == ELobbyGameState::WaitingForPlayers && CanStartGame())
+	{
+		if (GetWorld())
+		{
+			LobbyGameState = ELobbyGameState::StartingGame;
+			GetWorld()->GetTimerManager().SetTimer(StartGameTimerHandle, FTimerDelegate::CreateUObject(this, &ThisClass::StartGame), 3.0f, false);
+			
+			StartGame_Multi(GetServerWorldTimeSeconds());
+		}
+	}
+
+	else if(HasAuthority() && LobbyGameState == ELobbyGameState::StartingGame && !CanStartGame())
+	{
+		if (GetWorld())
+		{
+			LobbyGameState = ELobbyGameState::WaitingForPlayers;
+			GetWorld()->GetTimerManager().ClearTimer(StartGameTimerHandle);
+			StartGameTimerHandle.Invalidate();
+
+			StartGameCancel_Multi();
+		}
+	}
 }
 
 void ALobbyGameState::GetInUseColors(TArray<EPlayerColorCode>& InUseColors)
@@ -69,6 +99,53 @@ void ALobbyGameState::AssignNewColorToPlayer(APlayerState* Player)
 				return;
 			}
 		}
+	}
+}
+
+bool ALobbyGameState::CanStartGame()
+{
+	ALobbyGameMode* LobbyGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ALobbyGameMode>() : nullptr;
+	if (IsValid(LobbyGameMode) && LobbyGameMode->GetNumPlayers() > 1 && LobbyGameMode->NumTravellingPlayers == 0)
+	{
+
+		TArray<ALobbyPlayerState*> LobbyPlayers = GetLobbyPlayers();
+		bool bEveryPlayerIsReady = true;
+
+		for (ALobbyPlayerState* LobbyPlayer : LobbyPlayers)
+		{
+			if (IsValid(LobbyPlayer) && !LobbyPlayer->IsReady())
+			{
+				bEveryPlayerIsReady = false;
+				break;
+			}
+		}
+
+		return bEveryPlayerIsReady;
+	}
+
+	return false;
+}
+
+void ALobbyGameState::StartGame()
+{
+	GetWorld()->ServerTravel("TestMap", true);
+}
+
+void ALobbyGameState::StartGame_Multi_Implementation(float StartTime)
+{
+	ALobbyPlayerController* LobbyPlayerController = Cast<ALobbyPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (IsValid(LobbyPlayerController))
+	{
+		LobbyPlayerController->OnStartGame(StartTime);
+	}
+}
+
+void ALobbyGameState::StartGameCancel_Multi_Implementation()
+{
+	ALobbyPlayerController* LobbyPlayerController = Cast<ALobbyPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (IsValid(LobbyPlayerController))
+	{
+		LobbyPlayerController->OnStartGameCancel();
 	}
 }
 
@@ -185,4 +262,9 @@ void ALobbyGameState::ReconstructPlayersPlatform()
 			PlayerPlatform->SetOwningPlayer(PlayerState);
 		}
 	}
+}
+
+bool ALobbyGameState::IsWaitingForPlayers()
+{
+	return LobbyGameState == ELobbyGameState::WaitingForPlayers;
 }

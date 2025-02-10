@@ -48,6 +48,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UUserWidget* LobbyWidget;
+
 #if PLATFORM_WINDOWS
 
 	FMouseInputHandler RightMouseInputHandler;
@@ -88,6 +91,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void QuitLobby();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartGame(float StartTime);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartGameCancel();
 	
 	ALobbyPlayerState* GetLobbyPlayerState();
 };

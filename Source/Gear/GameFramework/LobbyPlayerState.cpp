@@ -132,7 +132,11 @@ void ALobbyPlayerState::SetPlayerShoeColor_Server_Implementation(EPlayerColorCod
 
 void ALobbyPlayerState::SetReady_Server_Implementation(bool InbReady)
 {
+// 	ALobbyGameState* GameState = GetWorld() ? GetWorld()->GetGameState<ALobbyGameState>() : nullptr;
+// 	if (IsValid(GameState) && GameState->IsWaitingForPlayers())
+// 	{
 	bReady = InbReady;
+//	}
 }
 
 bool ALobbyPlayerState::IsReady()

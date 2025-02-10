@@ -127,7 +127,7 @@ void AGearPlayerController::UpdateAndInjectInputs()
 
 #endif
 
-	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+	if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer() ? GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>() : nullptr)
 	{
 		TArray<UInputModifier*> Modifiers;
 		TArray<UInputTrigger*> Triggers;

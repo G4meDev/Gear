@@ -28,6 +28,7 @@ public:
 
 	ALobbyGameState();
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	void RequestColorChangeForPlayer(ALobbyPlayerController* PC, EPlayerColorCode Color);
 
@@ -39,6 +40,9 @@ public:
 
 	void ReconstructPlayersPlatform();
 
+	UFUNCTION(BlueprintPure)
+	bool IsWaitingForPlayers();
+
 protected:
 
 	void AddPlayerState(APlayerState* PlayerState) override;
@@ -47,4 +51,16 @@ protected:
 	void GetInUseColors(TArray<EPlayerColorCode>& InUseColors);
 	void AssignNewColorToPlayer(APlayerState* Player);
 
+	bool CanStartGame();
+
+	void StartGame();
+	FTimerHandle StartGameTimerHandle;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void StartGame_Multi(float StartTime);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void StartGameCancel_Multi();
+
+	ELobbyGameState LobbyGameState;
 };
