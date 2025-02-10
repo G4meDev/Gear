@@ -17,7 +17,7 @@ ALobbyPlayerController::ALobbyPlayerController()
 {
 	LastDummyPacketTime = FLT_MAX;
 	DummyPacketInterval = 1.0f;
-	TimeoutLimit = 5.0f;
+	TimeoutLimit = 15.0f;
 	
 	DisconnectionReason = EPlayerDisconnectionReason::ConnectionFailure;
 }
