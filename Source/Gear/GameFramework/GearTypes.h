@@ -294,7 +294,21 @@ enum class EPlayerDisconnectionReason : uint8
 	ConnectionFailure,
 	Kicked,
 	ServerTravel,
-	Quit
+	Quit,
+	FullLobby,
+	WrongPassword,
+	TryingToStartGame
+};
+
+USTRUCT()
+struct FPlayerDisconnectionStrings
+{
+	GENERATED_BODY()
+
+public:
+	static FString FullLobbyString;
+	static FString WrongPasswordString;
+	static FString TryingToStartGame;
 };
 
 UENUM(BlueprintType)

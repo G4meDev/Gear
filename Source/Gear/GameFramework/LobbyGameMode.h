@@ -19,4 +19,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void KickPlayer(class ALobbyPlayerController* Player);
+
+protected:
+	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+
+	UFUNCTION(BlueprintPure)
+	bool HasEmptySlot();
+
+	UFUNCTION(BlueprintPure)
+	bool IsGameStarting();
 };

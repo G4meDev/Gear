@@ -42,3 +42,7 @@ FPlayerCustomization FPlayerCustomization::GetRandomCustomization()
 
 	return RandomCustomization;
 }
+
+FString FPlayerDisconnectionStrings::FullLobbyString = FString("Full Server");
+FString FPlayerDisconnectionStrings::WrongPasswordString = FString("Wrong Password");
+FString FPlayerDisconnectionStrings::TryingToStartGame = FString("Trying To Start Game");

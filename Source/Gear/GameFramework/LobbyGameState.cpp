@@ -7,11 +7,20 @@
 #include "GameFramework/LobbyGameMode.h"
 #include "GameSystems/LobbyPlayerPlatform.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 ALobbyGameState::ALobbyGameState()
 {
 
 	LobbyGameState = ELobbyGameState::WaitingForPlayers;
+	NumAllowedPlayers = 2;
+}
+
+void ALobbyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ALobbyGameState, NumAllowedPlayers);
 }
 
 void ALobbyGameState::BeginPlay()

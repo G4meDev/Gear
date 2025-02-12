@@ -90,6 +90,9 @@ protected:
 
 	EPlayerDisconnectionReason DisconnectionReason;
 
+	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
+	
+
 private:
 	UPROPERTY()
 	UGearSaveGame* GearSave;

@@ -23,6 +23,8 @@ void UGearGameInstance::Init()
 {
 	Super::Init();
 
+	GEngine->OnNetworkFailure().AddUObject(this, &ThisClass::HandleNetworkFailure);
+
 	DisconnectionReason = EPlayerDisconnectionReason::Quit;
 
 #if WITH_EDITORONLY_DATA
@@ -53,6 +55,28 @@ void UGearGameInstance::ReturnToMainMenu()
 {
 	Super::ReturnToMainMenu();
 
+}
+
+void UGearGameInstance::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString)
+{
+	UNetDriver* LocalDriver = GetWorld() ? GetWorld()->GetNetDriver() : nullptr;
+	if (!IsValid(LocalDriver))
+	{
+		if (ErrorString == FPlayerDisconnectionStrings::FullLobbyString)
+		{
+			DisconnectionReason = EPlayerDisconnectionReason::FullLobby;
+		}
+
+		else if (ErrorString == FPlayerDisconnectionStrings::WrongPasswordString)
+		{
+			DisconnectionReason = EPlayerDisconnectionReason::WrongPassword;
+		}
+
+		else if (ErrorString == FPlayerDisconnectionStrings::TryingToStartGame)
+		{
+			DisconnectionReason = EPlayerDisconnectionReason::TryingToStartGame;
+		}
+	}
 }
 
 void UGearGameInstance::InitPersistantData()
@@ -128,7 +152,7 @@ void UGearGameInstance::ApplyUserSettings()
 {
 	if (IsValid(GearSave))
 	{
-		FString ScalabilityStr = "Scalability " + FString::FromInt(GearSave->QualityLevel - 1);
+		FString ScalabilityStr = "Scalability " + FString::FromInt(GearSave->QualityLevel);
 		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), ScalabilityStr);
 	
 		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), TEXT("r.Mobile.FSR.enabled 1"));
@@ -244,7 +268,7 @@ void UGearGameInstance::SetQualityLevel(int32 Level)
 {
 	if (IsValid(GearSave))
 	{
-		GearSave->QualityLevel = FMath::Clamp(Level, 1, 4);
+		GearSave->QualityLevel = FMath::Clamp(Level, 0, 3);
 		ApplyUserSettings();
 		MarkUserSettingsDirty();
 	}

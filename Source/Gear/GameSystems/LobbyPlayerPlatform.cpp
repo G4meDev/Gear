@@ -9,8 +9,6 @@
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 
-
-
 ALobbyPlayerPlatform::ALobbyPlayerPlatform()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -38,7 +36,7 @@ ALobbyPlayerPlatform::ALobbyPlayerPlatform()
 
 	bGrabbed = false;
 
-	RotationVelocity;
+	RotationVelocity = 0.0f;
 	RotationSpeed = 80.0f;
 	RotationDrag = 4.0f;
 	RotationDamping = 3.0f;

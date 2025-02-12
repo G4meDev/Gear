@@ -23,6 +23,11 @@ protected:
 
 	UPROPERTY()
 	TArray<class ALobbyPlayerPlatform*> PlayerPlatforms;
+	
+	UPROPERTY(Replicated, BlueprintReadOnly, EditAnywhere)
+	int32 NumAllowedPlayers;
+
+	friend class ALobbyGameMode;
 
 public:
 
