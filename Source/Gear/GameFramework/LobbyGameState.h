@@ -10,6 +10,8 @@
 class ALobbyPlayerState;
 class ALobbyPlayerController;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNumAllowedPlayerChanged, int32, NumAllowedPlayers);
+
 /**
  * 
  */
@@ -24,7 +26,7 @@ protected:
 	UPROPERTY()
 	TArray<class ALobbyPlayerPlatform*> PlayerPlatforms;
 	
-	UPROPERTY(Replicated, BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(ReplicatedUsing=OnRep_NumAllowedPlayers, BlueprintReadOnly, EditAnywhere)
 	int32 NumAllowedPlayers;
 
 	friend class ALobbyGameMode;
@@ -48,6 +50,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsWaitingForPlayers();
 
+	UPROPERTY(BlueprintAssignable)
+	FOnNumAllowedPlayerChanged OnNumberOfAllowedPlayerChanged;
+
+	UFUNCTION(BlueprintCallable)
+	void SetNumAllowedPlayers(int32 InAllowedNumberOfPlayers);
+
 protected:
 
 	void AddPlayerState(APlayerState* PlayerState) override;
@@ -68,4 +76,7 @@ protected:
 	void StartGameCancel_Multi();
 
 	ELobbyGameState LobbyGameState;
+
+	UFUNCTION()
+	void OnRep_NumAllowedPlayers();
 };

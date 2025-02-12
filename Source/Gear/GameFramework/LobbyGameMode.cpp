@@ -19,8 +19,13 @@ ALobbyGameMode::ALobbyGameMode()
 
 void ALobbyGameMode::KickPlayer(class ALobbyPlayerController* Player)
 {
-	if (IsValid(Player))
+	if (IsValid(Player) && IsValid(Cast<UNetConnection>(Player->Player)))
 	{
+		if (IsValid(Player->GetPawn()))
+		{
+			Player->GetPawn()->Destroy();
+		}
+
 		Player->NotifyKicked_Client();
 		Player->Destroy();
 	}

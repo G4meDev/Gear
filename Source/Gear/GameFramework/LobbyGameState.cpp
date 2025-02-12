@@ -13,7 +13,7 @@ ALobbyGameState::ALobbyGameState()
 {
 
 	LobbyGameState = ELobbyGameState::WaitingForPlayers;
-	NumAllowedPlayers = 2;
+	NumAllowedPlayers = 4;
 }
 
 void ALobbyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -158,6 +158,11 @@ void ALobbyGameState::StartGameCancel_Multi_Implementation()
 	}
 }
 
+void ALobbyGameState::OnRep_NumAllowedPlayers()
+{
+	OnNumberOfAllowedPlayerChanged.Broadcast(NumAllowedPlayers);
+}
+
 void ALobbyGameState::RequestColorChangeForPlayer(ALobbyPlayerController* PC, EPlayerColorCode Color)
 {
 	ALobbyPlayerState* Player = Cast<ALobbyPlayerState>(PC->PlayerState);
@@ -276,4 +281,21 @@ void ALobbyGameState::ReconstructPlayersPlatform()
 bool ALobbyGameState::IsWaitingForPlayers()
 {
 	return LobbyGameState == ELobbyGameState::WaitingForPlayers;
+}
+
+void ALobbyGameState::SetNumAllowedPlayers(int32 InAllowedNumberOfPlayers)
+{
+	if (HasAuthority())
+	{
+		ALobbyGameMode* LobbyGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ALobbyGameMode>() : nullptr;
+		if (IsValid(LobbyGameMode))
+		{
+			if (InAllowedNumberOfPlayers >= LobbyGameMode->GetNumPlayers() && InAllowedNumberOfPlayers <= 4)
+			{
+				NumAllowedPlayers = InAllowedNumberOfPlayers;
+			}
+		}
+
+		OnRep_NumAllowedPlayers();
+	}
 }
