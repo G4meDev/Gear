@@ -11,6 +11,7 @@ class ALobbyPlayerState;
 class ALobbyPlayerController;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNumAllowedPlayerChanged, int32, NumAllowedPlayers);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWinningRequiredScoreChanged, int32, WinningRequiredScore);
 
 /**
  * 
@@ -28,6 +29,9 @@ protected:
 	
 	UPROPERTY(ReplicatedUsing=OnRep_NumAllowedPlayers, BlueprintReadOnly, EditAnywhere)
 	int32 NumAllowedPlayers;
+
+	UPROPERTY(ReplicatedUsing=OnRep_WinningRequiredScore, BlueprintReadOnly, EditAnywhere)
+	int32 WinningRequiredScore;
 
 	friend class ALobbyGameMode;
 
@@ -56,6 +60,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetNumAllowedPlayers(int32 InAllowedNumberOfPlayers);
 
+	UPROPERTY(BlueprintAssignable)
+	FOnWinningRequiredScoreChanged OnWinningRequiredScoreChanged;
+
+	UFUNCTION(BlueprintCallable)
+	void SetWinningRequiredScore(int32 InWinningRequiredScore);
+
 protected:
 
 	void AddPlayerState(APlayerState* PlayerState) override;
@@ -79,4 +89,7 @@ protected:
 
 	UFUNCTION()
 	void OnRep_NumAllowedPlayers();
+	
+	UFUNCTION()
+	void OnRep_WinningRequiredScore();
 };

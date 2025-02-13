@@ -13,7 +13,9 @@ ALobbyGameState::ALobbyGameState()
 {
 
 	LobbyGameState = ELobbyGameState::WaitingForPlayers;
+	
 	NumAllowedPlayers = 4;
+	WinningRequiredScore = 10;
 }
 
 void ALobbyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -21,6 +23,7 @@ void ALobbyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ALobbyGameState, NumAllowedPlayers);
+	DOREPLIFETIME(ALobbyGameState, WinningRequiredScore);
 }
 
 void ALobbyGameState::BeginPlay()
@@ -163,6 +166,11 @@ void ALobbyGameState::OnRep_NumAllowedPlayers()
 	OnNumberOfAllowedPlayerChanged.Broadcast(NumAllowedPlayers);
 }
 
+void ALobbyGameState::OnRep_WinningRequiredScore()
+{
+	OnWinningRequiredScoreChanged.Broadcast(WinningRequiredScore);
+}
+
 void ALobbyGameState::RequestColorChangeForPlayer(ALobbyPlayerController* PC, EPlayerColorCode Color)
 {
 	ALobbyPlayerState* Player = Cast<ALobbyPlayerState>(PC->PlayerState);
@@ -285,7 +293,7 @@ bool ALobbyGameState::IsWaitingForPlayers()
 
 void ALobbyGameState::SetNumAllowedPlayers(int32 InAllowedNumberOfPlayers)
 {
-	if (HasAuthority())
+	if (HasAuthority() && IsWaitingForPlayers())
 	{
 		ALobbyGameMode* LobbyGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ALobbyGameMode>() : nullptr;
 		if (IsValid(LobbyGameMode))
@@ -297,5 +305,19 @@ void ALobbyGameState::SetNumAllowedPlayers(int32 InAllowedNumberOfPlayers)
 		}
 
 		OnRep_NumAllowedPlayers();
+	}
+}
+
+void ALobbyGameState::SetWinningRequiredScore(int32 InWinningRequiredScore)
+{
+	if (HasAuthority() && IsWaitingForPlayers())
+	{
+		ALobbyGameMode* LobbyGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ALobbyGameMode>() : nullptr;
+		if (IsValid(LobbyGameMode))
+		{			
+			WinningRequiredScore = InWinningRequiredScore;
+		}
+
+		OnRep_WinningRequiredScore();
 	}
 }
