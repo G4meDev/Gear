@@ -24,6 +24,7 @@ void ALobbyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME(ALobbyGameState, NumAllowedPlayers);
 	DOREPLIFETIME(ALobbyGameState, WinningRequiredScore);
+	DOREPLIFETIME(ALobbyGameState, Password);
 }
 
 void ALobbyGameState::BeginPlay()
@@ -171,6 +172,11 @@ void ALobbyGameState::OnRep_WinningRequiredScore()
 	OnWinningRequiredScoreChanged.Broadcast(WinningRequiredScore);
 }
 
+void ALobbyGameState::OnRep_Password()
+{
+	OnPasswordChanged.Broadcast(Password);
+}
+
 void ALobbyGameState::RequestColorChangeForPlayer(ALobbyPlayerController* PC, EPlayerColorCode Color)
 {
 	ALobbyPlayerState* Player = Cast<ALobbyPlayerState>(PC->PlayerState);
@@ -303,9 +309,9 @@ void ALobbyGameState::SetNumAllowedPlayers(int32 InAllowedNumberOfPlayers)
 				NumAllowedPlayers = InAllowedNumberOfPlayers;
 			}
 		}
-
-		OnRep_NumAllowedPlayers();
 	}
+
+	OnRep_NumAllowedPlayers();
 }
 
 void ALobbyGameState::SetWinningRequiredScore(int32 InWinningRequiredScore)
@@ -317,7 +323,33 @@ void ALobbyGameState::SetWinningRequiredScore(int32 InWinningRequiredScore)
 		{			
 			WinningRequiredScore = InWinningRequiredScore;
 		}
-
-		OnRep_WinningRequiredScore();
 	}
+
+	OnRep_WinningRequiredScore();
+}
+
+void ALobbyGameState::SetPassword(const FString& InPassword)
+{
+	if (HasAuthority() && IsWaitingForPlayers())
+	{
+		ALobbyGameMode* LobbyGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ALobbyGameMode>() : nullptr;
+		if (IsValid(LobbyGameMode))
+		{
+			Password = ValidatePassword(InPassword);
+		}
+	}
+	
+	OnRep_Password();
+}
+
+FString ALobbyGameState::ValidatePassword(const FString& InPassword)
+{
+	FString Result = InPassword;
+	Result = Result.Replace(TEXT("\n"), TEXT(""));
+	Result = Result.Replace(TEXT("\t"), TEXT(""));
+	Result = Result.Replace(TEXT(" "), TEXT(""));
+
+	Result = Result.Left(8);
+	
+	return Result;
 }
