@@ -10,6 +10,7 @@
 #include "NetworkDiscoveryActor.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFoundHostDelegate, const FGearHostInfo&, HostInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDiscoveryTimeout);
 
 UCLASS()
 class GEAR_API ANetworkDiscoveryActor : public AActor
@@ -40,4 +41,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnFoundHostDelegate OnFoundHostDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnDiscoveryTimeout OnDiscoveryTimeout;
 };

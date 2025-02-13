@@ -96,6 +96,5 @@ void ANetworkDiscoveryActor::OnSearchTimeout()
 	UE_LOG(LogTemp, Log, TEXT("discovery search time out"));
 
 	StopDiscovery();
+	OnDiscoveryTimeout.Broadcast();
 }
-
-#undef LAN_DISCOVERY_NONCE
