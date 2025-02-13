@@ -14,6 +14,16 @@ class GEAR_API UGearTextBlock : public UTextBlock
 {
 	GENERATED_UCLASS_BODY()
 	
+protected:
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
+	bool bUseCustomHeightOffset = false;
+
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, meta=(EditCondition = bUseCustomHeightOffset))
+	float HeightOffset_En = 0.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, meta=(EditCondition = bUseCustomHeightOffset))
+	float HeightOffset_Fa = 0.0f;
+
 public:
 	
 protected:

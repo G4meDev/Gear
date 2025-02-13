@@ -36,14 +36,35 @@ void UGearTextBlock::ReleaseSlateResources(bool bReleaseChildren)
 
 void UGearTextBlock::UpdateCultureVerticalOffset(const FString& Culture)
 {
-	FVector2D RenderTranslation = FVector2D::ZeroVector;
+	float HeightOffset = 0.0f;
 
 	if (Culture == CULTURE_FA)
 	{
-		RenderTranslation = FVector2D(0, CULTURE_FA_VERTICAL_OFFSET_PER_FONT_SIZE * (GetFont().HasValidFont() ? GetFont().Size : 10.0f));
+		if (bUseCustomHeightOffset)
+		{
+			HeightOffset = HeightOffset_Fa;
+		}
+
+		else
+		{
+			HeightOffset = CULTURE_FA_VERTICAL_OFFSET_PER_FONT_SIZE * (GetFont().HasValidFont() ? GetFont().Size : 10.0f);
+		}
 	}
 
-	SetRenderTranslation(RenderTranslation);
+	else if (Culture == CULTURE_EN)
+	{
+		if (bUseCustomHeightOffset)
+		{
+			HeightOffset = HeightOffset_En;
+		}
+
+		else
+		{
+			HeightOffset = 0.0f;
+		}
+	}
+
+	SetRenderTranslation(FVector2D(0, HeightOffset));
 }
 
 void UGearTextBlock::OnCultureChanged()
