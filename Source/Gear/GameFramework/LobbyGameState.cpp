@@ -6,6 +6,7 @@
 #include "GameFramework/LobbyPlayerState.h"
 #include "GameFramework/LobbyGameMode.h"
 #include "GameSystems/LobbyPlayerPlatform.h"
+#include "Utils/DataHelperBFL.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -345,26 +346,19 @@ void ALobbyGameState::SetPassword(const FString& InPassword)
 		ALobbyGameMode* LobbyGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ALobbyGameMode>() : nullptr;
 		if (IsValid(LobbyGameMode))
 		{
-			Password = ValidatePassword(InPassword);
+			Password = UDataHelperBFL::ValidatePassword(InPassword);
 		}
 	}
 	
 	OnRep_Password();
 }
 
-FString ALobbyGameState::ValidatePassword(const FString& InPassword)
-{
-	FString Result = InPassword;
-	Result = Result.Replace(TEXT("\n"), TEXT(""));
-	Result = Result.Replace(TEXT("\t"), TEXT(""));
-	Result = Result.Replace(TEXT(" "), TEXT(""));
-
-	Result = Result.Left(8);
-	
-	return Result;
-}
-
 bool ALobbyGameState::HasPassword()
 {
 	return !Password.IsEmpty();
+}
+
+bool ALobbyGameState::CheckPassword(const FString& InPassword)
+{
+	return Password.Equals(InPassword);
 }

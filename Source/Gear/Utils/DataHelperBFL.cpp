@@ -134,3 +134,15 @@ ELanguageOption UDataHelperBFL::CultureToLanguageOption(const FString& Culture)
 
 	return ELanguageOption::Farsi;
 }
+
+FString UDataHelperBFL::ValidatePassword(const FString& Password)
+{
+	FString Result = Password;
+	Result = Result.Replace(TEXT("\n"), TEXT(""));
+	Result = Result.Replace(TEXT("\t"), TEXT(""));
+	Result = Result.Replace(TEXT(" "), TEXT(""));
+
+	Result = Result.Left(8);
+
+	return Result;
+}

@@ -81,11 +81,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetPassword(const FString& InPassword);
-
-	FString ValidatePassword(const FString& InPassword);
 	
 	UFUNCTION(BlueprintPure)
 	bool HasPassword();
+
+	UFUNCTION(BlueprintPure)
+	bool CheckPassword(const FString& InPassword);
 
 protected:
 

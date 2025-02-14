@@ -5,6 +5,7 @@
 #include "GameFramework/LobbyGameState.h"
 #include "GameFramework/LobbyPlayerState.h"
 #include "GameFramework/GameSession.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/OnlineEngineInterface.h"
 
 ALobbyGameMode::ALobbyGameMode()
@@ -33,6 +34,11 @@ void ALobbyGameMode::KickPlayer(class ALobbyPlayerController* Player)
 
 void ALobbyGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
+	FString Password = UGameplayStatics::ParseOption(Options, "Password");
+	ALobbyGameState* LobbyGameState = GetWorld() ? GetWorld()->GetGameState<ALobbyGameState>() : nullptr;
+
+	UE_LOG(LogTemp, Warning, TEXT("OPPPPPP : %s"), *Password);
+
 	const bool bUniqueIdCheckOk = (!UniqueId.IsValid() || UOnlineEngineInterface::Get()->IsCompatibleUniqueNetId(UniqueId));
 	if (!bUniqueIdCheckOk)
 	{
@@ -47,6 +53,11 @@ void ALobbyGameMode::PreLogin(const FString& Options, const FString& Address, co
 	else if (IsGameStarting())
 	{
 		ErrorMessage = FPlayerDisconnectionStrings::TryingToStartGame;
+	}
+
+	else if (IsValid(LobbyGameState) && !LobbyGameState->CheckPassword(Password))
+	{
+		ErrorMessage = FPlayerDisconnectionStrings::WrongPasswordString;
 	}
 
 	else

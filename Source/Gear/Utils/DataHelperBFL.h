@@ -41,4 +41,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static ELanguageOption CultureToLanguageOption(const FString& Culture);
+	
+	UFUNCTION(BlueprintPure)
+	static FString ValidatePassword(const FString& Password);
 };
