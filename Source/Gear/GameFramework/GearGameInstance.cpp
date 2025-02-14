@@ -76,6 +76,16 @@ void UGearGameInstance::HandleNetworkFailure(UWorld* World, UNetDriver* NetDrive
 		{
 			DisconnectionReason = EPlayerDisconnectionReason::TryingToStartGame;
 		}
+
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AWERRRRRRRRRRRRRRRRRRRRRRRRRRRR"));
+		}
+
+// 		else if ()
+// 		{
+// 			
+// 		}
 	}
 }
 

@@ -63,12 +63,18 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetNumAllowedPlayers(int32 InAllowedNumberOfPlayers);
+	
+	UFUNCTION(BlueprintPure)
+	int32 GetNumAllowedPlayers();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnWinningRequiredScoreChanged OnWinningRequiredScoreChanged;
 
 	UFUNCTION(BlueprintCallable)
 	void SetWinningRequiredScore(int32 InWinningRequiredScore);
+	
+	UFUNCTION(BlueprintPure)
+	int32 GetWinningRequiredScore();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPasswordChanged OnPasswordChanged;
@@ -77,6 +83,9 @@ public:
 	void SetPassword(const FString& InPassword);
 
 	FString ValidatePassword(const FString& InPassword);
+	
+	UFUNCTION(BlueprintPure)
+	bool HasPassword();
 
 protected:
 

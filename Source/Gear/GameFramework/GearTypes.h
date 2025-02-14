@@ -48,14 +48,18 @@ struct GEAR_API FGearHostInfo
 	GENERATED_BODY()
 
 public:
-	FGearHostInfo(const FString& InName, const FString& InIP)
+	FGearHostInfo(const FString& InName, const FString& InIP, bool InHasPassword, int32 InNumPlayers, int32 InNumAllowedPlayers, int32 InWinningRequiredScore)
 		: Name(InName)
 		, IP(InIP)
+		, bHasPassword(InHasPassword)
+		, NumPlayers(InNumPlayers)
+		, NumAllowedPlayers(InNumAllowedPlayers)
+		, WinningRequiredScore(InWinningRequiredScore)
 	{
 
 	}
 
-	FGearHostInfo() : FGearHostInfo("Host", "IP")
+	FGearHostInfo() : FGearHostInfo("Host", "IP", false, 2, 4, 10)
 	{
 
 	}
@@ -65,6 +69,18 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	FString IP;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bHasPassword;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 NumPlayers;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 NumAllowedPlayers;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 WinningRequiredScore;
 };
 
 UENUM(BlueprintType)

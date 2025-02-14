@@ -6,6 +6,8 @@
 #include "SocketSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GearGameInstance.h"
+#include "GameFramework/LobbyGameState.h"
+#include "GameFramework/LobbyGameMode.h"
 
 #define LAN_DISCOVERY_NONCE 1
 
@@ -27,6 +29,8 @@ void ANetworkDiscoveryActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	LanSession.Tick(DeltaTime);
+
+	
 }
 
 void ANetworkDiscoveryActor::StartDiscovery(bool bHost)
@@ -68,26 +72,43 @@ void ANetworkDiscoveryActor::OnValidQueryPacket(uint8* Bytes, int32 Length, uint
 	TSharedPtr<class FInternetAddr> Addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, bCanBindAll);
 	FString IP = Addr->ToString(false);
 
-	Packet << HostName;
-	Packet << IP;
+	ALobbyGameState* LobbyGameState = GetWorld() ? GetWorld()->GetGameState<ALobbyGameState>() : nullptr;
+	ALobbyGameMode* LobbyGameMode = GetWorld() ? GetWorld()->GetAuthGameMode<ALobbyGameMode>() : nullptr;
+	if (IsValid(LobbyGameState) && IsValid(LobbyGameMode))
+	{
+		Packet << HostName;
+		Packet << IP;
+		Packet << LobbyGameState->HasPassword();
+		Packet << LobbyGameMode->GetNumPlayers();
+		Packet << LobbyGameState->GetNumAllowedPlayers();
+		Packet << LobbyGameState->GetWinningRequiredScore();
 
- 	LanSession.BroadcastPacket(Packet, Packet.GetByteCount());
+		LanSession.BroadcastPacket(Packet, Packet.GetByteCount());
 
-	UE_LOG(LogTemp, Log, TEXT("send response with hostname: %s and ip: %s"), *HostName, *IP);
+		UE_LOG(LogTemp, Log, TEXT("send response with hostname: %s and ip: %s"), *HostName, *IP);
+	}
 }
 
 void ANetworkDiscoveryActor::OnValidResponsePacket(uint8* Bytes, int32 Length)
 {
 	FString HostName;
 	FString IP;
+	bool bHasPassword;
+	int32 NumPlayers;
+	int32 NumAllowedPlayers;
+	int32 WinningRequiredScore;
 
 	FNboSerializeFromBuffer PacketReader(Bytes, Length);
 	PacketReader >> HostName;
 	PacketReader >> IP;
+	PacketReader >> bHasPassword;
+	PacketReader >> NumPlayers;
+	PacketReader >> NumAllowedPlayers;
+	PacketReader >> WinningRequiredScore;
 
 	UE_LOG(LogTemp, Log, TEXT("recived response from hostname: %s and ip: %s"), *HostName, *IP);
 
-	FGearHostInfo HostInfo = FGearHostInfo(HostName, IP);
+	FGearHostInfo HostInfo = FGearHostInfo(HostName, IP, bHasPassword, NumPlayers, NumAllowedPlayers, WinningRequiredScore);
 	OnFoundHostDelegate.Broadcast(HostInfo);
 }
 

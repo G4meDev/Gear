@@ -314,6 +314,11 @@ void ALobbyGameState::SetNumAllowedPlayers(int32 InAllowedNumberOfPlayers)
 	OnRep_NumAllowedPlayers();
 }
 
+int32 ALobbyGameState::GetNumAllowedPlayers()
+{
+	return NumAllowedPlayers;
+}
+
 void ALobbyGameState::SetWinningRequiredScore(int32 InWinningRequiredScore)
 {
 	if (HasAuthority() && IsWaitingForPlayers())
@@ -326,6 +331,11 @@ void ALobbyGameState::SetWinningRequiredScore(int32 InWinningRequiredScore)
 	}
 
 	OnRep_WinningRequiredScore();
+}
+
+int32 ALobbyGameState::GetWinningRequiredScore()
+{
+	return WinningRequiredScore;
 }
 
 void ALobbyGameState::SetPassword(const FString& InPassword)
@@ -352,4 +362,9 @@ FString ALobbyGameState::ValidatePassword(const FString& InPassword)
 	Result = Result.Left(8);
 	
 	return Result;
+}
+
+bool ALobbyGameState::HasPassword()
+{
+	return !Password.IsEmpty();
 }
