@@ -37,8 +37,6 @@ void ALobbyGameMode::PreLogin(const FString& Options, const FString& Address, co
 	FString Password = UGameplayStatics::ParseOption(Options, "Password");
 	ALobbyGameState* LobbyGameState = GetWorld() ? GetWorld()->GetGameState<ALobbyGameState>() : nullptr;
 
-	UE_LOG(LogTemp, Warning, TEXT("OPPPPPP : %s"), *Password);
-
 	const bool bUniqueIdCheckOk = (!UniqueId.IsValid() || UOnlineEngineInterface::Get()->IsCompatibleUniqueNetId(UniqueId));
 	if (!bUniqueIdCheckOk)
 	{

@@ -7,7 +7,6 @@
 
 #define DEFAULT_PLAYER_NAME "NewPlayer"
 
-
 class AGearPlaceable;
 class AGearPlayerState;
 
@@ -313,7 +312,8 @@ enum class EPlayerDisconnectionReason : uint8
 	Quit,
 	FullLobby,
 	WrongPassword,
-	TryingToStartGame
+	TryingToStartGame,
+	Timedout
 };
 
 USTRUCT()

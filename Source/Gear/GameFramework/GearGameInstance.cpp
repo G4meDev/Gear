@@ -77,15 +77,10 @@ void UGearGameInstance::HandleNetworkFailure(UWorld* World, UNetDriver* NetDrive
 			DisconnectionReason = EPlayerDisconnectionReason::TryingToStartGame;
 		}
 
-		else
+		else if (ErrorString.Contains("TIMED OUT"))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("AWERRRRRRRRRRRRRRRRRRRRRRRRRRRR"));
+			DisconnectionReason = EPlayerDisconnectionReason::Timedout;
 		}
-
-// 		else if ()
-// 		{
-// 			
-// 		}
 	}
 }
 

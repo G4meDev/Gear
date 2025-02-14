@@ -1,9 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#pragma once
-
 #include "GearTypes.h"
 #include "Utils/DataHelperBFL.h"
+
+FString FPlayerDisconnectionStrings::FullLobbyString = FString("Full Server");
+FString FPlayerDisconnectionStrings::WrongPasswordString = FString("Wrong Password");
+FString FPlayerDisconnectionStrings::TryingToStartGame = FString("Trying To Start Game");
 
 void FCustomizationColor::ResolveColorCode()
 {
@@ -42,7 +44,3 @@ FPlayerCustomization FPlayerCustomization::GetRandomCustomization()
 
 	return RandomCustomization;
 }
-
-FString FPlayerDisconnectionStrings::FullLobbyString = FString("Full Server");
-FString FPlayerDisconnectionStrings::WrongPasswordString = FString("Wrong Password");
-FString FPlayerDisconnectionStrings::TryingToStartGame = FString("Trying To Start Game");

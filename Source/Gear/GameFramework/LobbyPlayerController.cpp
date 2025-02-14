@@ -15,9 +15,9 @@
 
 ALobbyPlayerController::ALobbyPlayerController()
 {
-	LastDummyPacketTime = FLT_MAX;
-	DummyPacketInterval = 1.0f;
-	TimeoutLimit = 15.0f;
+// 	LastDummyPacketTime = FLT_MAX;
+// 	DummyPacketInterval = 1.0f;
+// 	TimeoutLimit = 15.0f;
 	
 	DisconnectionReason = EPlayerDisconnectionReason::ConnectionFailure;
 }
@@ -35,10 +35,10 @@ void ALobbyPlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
-		if (!HasAuthority() && GetWorld())
-		{
-			GetWorld()->GetTimerManager().SetTimer(DummtPacketTimerHandle, FTimerDelegate::CreateUObject(this, &ThisClass::SendDummyPacket_Server), DummyPacketInterval, true);
-		}
+// 		if (!HasAuthority() && GetWorld())
+// 		{
+// 			GetWorld()->GetTimerManager().SetTimer(DummtPacketTimerHandle, FTimerDelegate::CreateUObject(this, &ThisClass::SendDummyPacket_Server), DummyPacketInterval, true);
+// 		}
 
 		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 		{
@@ -120,10 +120,10 @@ void ALobbyPlayerController::Server_SetPlayerName_Implementation(const FString& 
 	PlayerState->SetPlayerName(PlayerName);
 }
 
-void ALobbyPlayerController::SendDummyPacket_Server_Implementation()
-{
-	LastDummyPacketTime = GetWorld()->GetTimeSeconds();
-}
+// void ALobbyPlayerController::SendDummyPacket_Server_Implementation()
+// {
+// 	LastDummyPacketTime = GetWorld()->GetTimeSeconds();
+// }
 
 void ALobbyPlayerController::NotifyKicked_Client_Implementation()
 {
@@ -140,14 +140,14 @@ void ALobbyPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (HasAuthority() && !IsLocalController())
-	{
-		if (LastDummyPacketTime < GetWorld()->GetTimeSeconds() - TimeoutLimit)
-		{
-			DisconnectionReason = EPlayerDisconnectionReason::ConnectionFailure;
-			Destroy();
-		}
-	}
+// 	if (HasAuthority() && !IsLocalController())
+// 	{
+// 		if (LastDummyPacketTime < GetWorld()->GetTimeSeconds() - TimeoutLimit)
+// 		{
+// 			DisconnectionReason = EPlayerDisconnectionReason::ConnectionFailure;
+// 			Destroy();
+// 		}
+// 	}
 
 	if (IsLocalController())
 	{
