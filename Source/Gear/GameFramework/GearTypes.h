@@ -171,14 +171,6 @@ public:
 };
 
 UENUM()
-enum class ERoadModuleTraceResult : uint8
-{
-	NotColliding,
-	BodyColliding,
-	ExtentColliding
-};
-
-UENUM()
 enum class EHazardSocketType : uint8
 {
 	SmallHazard,

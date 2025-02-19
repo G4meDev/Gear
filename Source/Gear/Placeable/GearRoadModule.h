@@ -30,7 +30,7 @@ public:
 
 	void MoveToSocketTransform(const FTransform& TargetSocket);
 
-	void OnTraceStateChanged(ERoadModuleTraceResult Result);
+	void OnTraceStateChanged();
 
 	void InitializePrebuildMaterials();
 
@@ -73,12 +73,14 @@ public:
 	float RoadLength;
 
 	UPROPERTY(BlueprintReadOnly)
-	ERoadModuleTraceResult TraceReult;
+	bool bPlacingModuleInCollision;
 
 	UPROPERTY()
  	TArray<UMaterialInstanceDynamic*> PrebuildMaterials;
 
 	void SetPrebuildState(EPrebuildState State);
+
+	bool bActivePlacingModule;
 
 #if WITH_EDITORONLY_DATA
 	void UpdateSplineParameters();

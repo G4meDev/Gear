@@ -310,10 +310,6 @@ void AGearBuilderPawn::SpawnPlacingRoadModules()
 	PlacingRoadModule_MirroredY				= SpawnRoadModuleLocally(PlacingRoadModule->RoadModuleClass_MirrorY->GetAuthoritativeClass());
 	PlacingRoadModule_MirroredX_MirroredY	= SpawnRoadModuleLocally(PlacingRoadModule->RoadModuleClass_MirrorX_MirrorY->GetAuthoritativeClass());
 
-	PlacingRoadModule->OnTraceStateChanged(ERoadModuleTraceResult::NotColliding);
-	PlacingRoadModule_MirroredX->OnTraceStateChanged(ERoadModuleTraceResult::NotColliding);
-	PlacingRoadModule_MirroredY->OnTraceStateChanged(ERoadModuleTraceResult::NotColliding);
-	PlacingRoadModule_MirroredX_MirroredY->OnTraceStateChanged(ERoadModuleTraceResult::NotColliding);
 }
 
 AGearRoadModule* AGearBuilderPawn::GetActiveRoadModule()
@@ -347,10 +343,12 @@ void AGearBuilderPawn::UpdatePlacingRoadModule(bool bMirroredX, bool bMirroredY)
 			{
 				const FTransform& RoadModuleSocket = GearGameState->RoadModuleSocketTransform;
 				RoadModule->MoveToSocketTransform(RoadModuleSocket);
+				RoadModule->bActivePlacingModule = true;
 			}
 			else
 			{
 				RoadModule->SetActorLocationAndRotation(FVector::Zero(), FRotator::ZeroRotator);
+				RoadModule->bActivePlacingModule = false;
 			}
 
 			RoadModule->SetActorHiddenInGame(RoadModule == ActiveRoadModule ? false : true);

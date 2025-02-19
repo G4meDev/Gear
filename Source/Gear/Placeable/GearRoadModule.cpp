@@ -42,7 +42,8 @@ AGearRoadModule::AGearRoadModule()
 
 	PreviewScale = 0.3f;
 
-	TraceReult = ERoadModuleTraceResult::NotColliding;
+	bPlacingModuleInCollision = false;
+	bActivePlacingModule = false;
 }
 
 // void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
@@ -73,6 +74,8 @@ void AGearRoadModule::BeginPlay()
 			}
 		}
 	}
+
+	OnTraceStateChanged();
 }
 
 #if WITH_EDITOR
@@ -217,13 +220,13 @@ void AGearRoadModule::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (PlaceableState == EPlaceableState::Placing)
+	if (bActivePlacingModule)
 	{
-		ERoadModuleTraceResult NewResult = UGearStatics::TraceRoadModule(this, GetClass(), GetActorTransform());
-		if (NewResult != TraceReult)
+		bool NewResult = UGearStatics::TracePlacingRoadModuleForCollision(this, GetClass(), GetActorTransform());
+		if (NewResult != bPlacingModuleInCollision)
 		{
-			TraceReult = NewResult;
-			OnTraceStateChanged(TraceReult);
+			bPlacingModuleInCollision = NewResult;
+			OnTraceStateChanged();
 		}
 	}
 }
@@ -261,9 +264,11 @@ void AGearRoadModule::SetPrebuildState(EPrebuildState State)
 	}
 }
 
-void AGearRoadModule::OnTraceStateChanged(ERoadModuleTraceResult Result)
+void AGearRoadModule::OnTraceStateChanged()
 {
-	SetPrebuildState(Result == ERoadModuleTraceResult::NotColliding ? EPrebuildState::Placable : EPrebuildState::NotPlaceable);
+	SetPrebuildState(bPlacingModuleInCollision ? EPrebuildState::NotPlaceable : EPrebuildState::Placable);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), bPlacingModuleInCollision ? TEXT("True") : TEXT("FALSE"));
 }
 
 void AGearRoadModule::InitializePrebuildMaterials()

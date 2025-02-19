@@ -291,7 +291,7 @@ void AGearGameMode::RequestPlaceRoadModuleForPlayer(AGearPlayerController* PC, T
 		AGearBuilderPawn* BuilderPawn = PC->GetPawn<AGearBuilderPawn>();
 
 		if (IsValid(BuilderPawn) && IsValid(BuilderPawn->SelectedPlaceableClass) && BuilderPawn->SelectedPlaceableClass->IsChildOf<AGearRoadModule>()
-			&& UGearStatics::TraceRoadModule(this, RoadModule, GearGameState->RoadModuleSocketTransform) == ERoadModuleTraceResult::NotColliding)
+			&& !UGearStatics::TracePlacingRoadModuleForCollision(this, RoadModule, GearGameState->RoadModuleSocketTransform))
 		{
 			if (IsValid(AddRoadModule(RoadModule)))
 			{

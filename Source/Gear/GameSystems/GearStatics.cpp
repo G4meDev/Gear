@@ -8,7 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Engine/OverlapResult.h"
 
-ERoadModuleTraceResult UGearStatics::TraceRoadModule(UObject* WorldContextObject, TSubclassOf<class AGearRoadModule> RoadModuleClass, const FTransform& SocketTransform)
+bool UGearStatics::TracePlacingRoadModuleForCollision(UObject* WorldContextObject, TSubclassOf<class AGearRoadModule> RoadModuleClass, const FTransform& SocketTransform)
 {
 	AGearRoadModule* RoadModule = RoadModuleClass.GetDefaultObject();
 
@@ -28,23 +28,23 @@ ERoadModuleTraceResult UGearStatics::TraceRoadModule(UObject* WorldContextObject
 	bool bHitMainBody = TraceForCollider(RoadModule->MainCollider);
 
 #if !UE_BUILD_SHIPPING
-	//DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitMainBody ? FColor::Red : FColor::Blue, false, 0.1f);
+	DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitMainBody ? FColor::Red : FColor::Blue, false, 0.1f);
 #endif
 
 	if (bHitMainBody)
-		return ERoadModuleTraceResult::BodyColliding;
+		return true;
 
 
 	bool bHitExtent = TraceForCollider(RoadModule->ExtentCollider);
 
 #if !UE_BUILD_SHIPPING
-	//DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitExtent ? FColor::Red : FColor::Yellow, false, 0.1f);
+	DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitExtent ? FColor::Red : FColor::Yellow, false, 0.1f);
 #endif
 
 	if (bHitExtent)
-		return ERoadModuleTraceResult::ExtentColliding;
+		return true;
 
-	return ERoadModuleTraceResult::NotColliding;
+	return false;
 }
 
 void UGearStatics::SphereOverlapForVehicles(UObject* WorldContextObject, TArray<class AGearVehicle*>& Vehicles, const FVector& Center, float Radius, TArray<AActor*> IgnoreActors, bool bIncludeInvincible)
