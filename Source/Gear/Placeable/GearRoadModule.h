@@ -85,8 +85,19 @@ public:
 
 	void UpdateColliders();
 
+	void UpdateSplineFromParent(bool InMirrorX, bool InMirrorY);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bDirty = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bSplineDirty = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bMirrorX = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bMirrorY = false;
 
 	float RotationPivotHeightOffset = -200.0f;
 	 

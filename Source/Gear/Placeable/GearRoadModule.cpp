@@ -90,6 +90,12 @@ void AGearRoadModule::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 		UpdateSplineParameters();
 		UpdateColliders();
 	}
+
+	else if (ProperyName == GET_MEMBER_NAME_CHECKED(AGearRoadModule, bSplineDirty))
+	{
+		bSplineDirty = false;
+		UpdateSplineFromParent(bMirrorX, bMirrorY);
+	}
 }
 
 void AGearRoadModule::UpdateSplineParameters()
@@ -136,6 +142,67 @@ void AGearRoadModule::UpdateColliders()
 		ExtentCollider->SetBoxExtent(BoundExtent);
 	}
 
+}
+
+void AGearRoadModule::UpdateSplineFromParent(bool InMirrorX, bool InMirrorY)
+{
+	AGearRoadModule* RoadModuleCDO = IsValid(RoadModuleClass) ? RoadModuleClass->GetDefaultObject<AGearRoadModule>() : nullptr;
+	if (IsValid(RoadModuleCDO) && IsValid(RoadModuleCDO->RoadSpline) && IsValid(RoadSpline))
+	{
+		FTransform EndSocketTransform = RoadEndSocketComponent->GetRelativeTransform();
+
+		FSplinePoint SplinePoint;
+		auto AddSplinePoint = [&](int SplinePointIndex)
+			{
+				SplinePoint = RoadModuleCDO->RoadSpline->GetSplinePointAt(SplinePointIndex, ESplineCoordinateSpace::World);
+
+				SplinePoint.Type = RoadModuleCDO->RoadSpline->GetSplinePointType(SplinePointIndex);
+				SplinePoint.Position = RoadModuleCDO->RoadSpline->GetLocationAtSplineInputKey(SplinePointIndex, ESplineCoordinateSpace::World);
+				SplinePoint.ArriveTangent = RoadModuleCDO->RoadSpline->GetArriveTangentAtSplinePoint(SplinePointIndex, ESplineCoordinateSpace::World);
+				SplinePoint.LeaveTangent = RoadModuleCDO->RoadSpline->GetLeaveTangentAtSplinePoint(SplinePointIndex, ESplineCoordinateSpace::World);
+				SplinePoint.Rotation = RoadModuleCDO->RoadSpline->GetRotationAtSplineInputKey(SplinePointIndex, ESplineCoordinateSpace::World);
+				SplinePoint.InputKey = RoadSpline->GetNumberOfSplinePoints();
+
+				if (bMirrorY)
+				{
+					SplinePoint.Position = SplinePoint.Position * FVector(1, -1, 1);
+					SplinePoint.ArriveTangent = SplinePoint.ArriveTangent * FVector(1, -1, 1);
+					SplinePoint.LeaveTangent = SplinePoint.LeaveTangent * FVector(1, -1, 1);
+				}
+
+				if (bMirrorX)
+				{
+					FTransform Transform = EndSocketTransform;
+					Transform.SetRotation(FQuat(FVector::UpVector, PI) * Transform.GetRotation());
+
+					SplinePoint.Position = Transform.TransformPosition(SplinePoint.Position);
+					SplinePoint.ArriveTangent = -SplinePoint.ArriveTangent;
+					SplinePoint.LeaveTangent = -SplinePoint.LeaveTangent;
+				}
+
+				RoadSpline->AddPoint(SplinePoint, false);
+			};
+
+		RoadSpline->ClearSplinePoints(false);
+
+		if (InMirrorX)
+		{
+			for (int i = RoadModuleCDO->RoadSpline->GetNumberOfSplinePoints(); i >= 0; i--)
+			{
+				AddSplinePoint(i);
+			}
+		}
+
+		else
+		{
+			for (int i = 0; i < RoadModuleCDO->RoadSpline->GetNumberOfSplinePoints(); i++)
+			{
+				AddSplinePoint(i);
+			}
+		}
+
+		RoadSpline->UpdateSpline();
+	}
 }
 
 #endif
