@@ -12,6 +12,33 @@ bool UGearStatics::TracePlacingRoadModuleForCollision(UObject* WorldContextObjec
 {
 	AGearRoadModule* RoadModule = RoadModuleClass.GetDefaultObject();
 
+	auto TraceBox = [&](const FCollisionBox& Box)
+		{
+			FVector ColliderPos;
+			FQuat ColliderRot;
+			FCollisionShape TraceShape;
+
+			ColliderPos = SocketTransform.TransformPosition(Box.Location);
+			ColliderRot = SocketTransform.TransformRotation(Box.Rotation.Quaternion());
+			TraceShape = FCollisionShape::MakeBox(Box.Extent);
+
+			bool bHit = WorldContextObject->GetWorld()->OverlapAnyTestByProfile(ColliderPos, ColliderRot, TEXT("RoadBoundCollider"), TraceShape);
+
+#if !UE_BUILD_SHIPPING
+			DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHit ? FColor::Red : FColor::Blue, false, 0.1f);
+#endif
+	
+			return bHit;
+		};
+
+	if (IsValid(RoadModule))
+	{
+		for (const FCollisionBox& Box : RoadModule->PlacingColliderBoxs)
+		{
+			TraceBox(Box);
+		}
+	}
+
 	FVector ColliderPos;
 	FQuat ColliderRot;
 	FCollisionShape TraceShape;

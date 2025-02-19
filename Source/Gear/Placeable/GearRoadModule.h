@@ -52,6 +52,33 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UBoxComponent* MainCollider;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
+	UBoxComponent* Collider_1;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
+	UBoxComponent* Collider_2;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
+	UBoxComponent* Collider_3;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
+	UBoxComponent* Collider_4;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
+	UBoxComponent* Collider_5;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
+	UBoxComponent* Collider_6;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
+	UBoxComponent* Collider_7;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
+	UBoxComponent* Collider_8;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* MainColliders;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UBoxComponent* ExtentCollider;
 
@@ -82,6 +109,9 @@ public:
 
 	bool bActivePlacingModule;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<FCollisionBox> PlacingColliderBoxs;
+
 #if WITH_EDITORONLY_DATA
 	void UpdateSplineParameters();
 
@@ -90,7 +120,7 @@ public:
 	void UpdateSplineFromParent(bool InMirrorX, bool InMirrorY);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool bDirty = false;
+	bool bDirty = false; 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bSplineDirty = false;
@@ -100,6 +130,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bMirrorY = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FTransform CollidersRefreneTransform = FTransform::Identity;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FTransform ExtendCollidersRefreneTransform = FTransform::Identity;
 
 	float RotationPivotHeightOffset = -200.0f;
 	 

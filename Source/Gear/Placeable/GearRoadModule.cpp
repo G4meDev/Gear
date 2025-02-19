@@ -10,6 +10,11 @@
 #include "GameFramework/GearPlayerController.h"
 #include "Net/UnrealNetwork.h"
 
+#define DEFINE_COLLIDER( name )		name = CreateDefaultSubobject<UBoxComponent>(TEXT(#name));	\
+ 	name->SetupAttachment(MainColliders);														\
+ 	name->SetCollisionEnabled(ECollisionEnabled::NoCollision);									\
+ 	name->ShapeColor = FColor::Blue;
+
 AGearRoadModule::AGearRoadModule()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -35,6 +40,18 @@ AGearRoadModule::AGearRoadModule()
 	MainCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	MainCollider->ShapeColor = FColor::Blue;
 
+	MainColliders = CreateDefaultSubobject<USceneComponent>(TEXT("MainColliders"));
+	MainColliders->SetupAttachment(ModulesStack);
+
+	DEFINE_COLLIDER(Collider_1);
+	DEFINE_COLLIDER(Collider_2);
+	DEFINE_COLLIDER(Collider_3);
+	DEFINE_COLLIDER(Collider_4);
+	DEFINE_COLLIDER(Collider_5);
+	DEFINE_COLLIDER(Collider_6);
+	DEFINE_COLLIDER(Collider_7);
+	DEFINE_COLLIDER(Collider_8);
+
 	ExtentCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("ExtentCollider"));
 	ExtentCollider->SetupAttachment(Root);
 	ExtentCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -55,6 +72,7 @@ AGearRoadModule::AGearRoadModule()
 void AGearRoadModule::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
 
 }
 
@@ -82,8 +100,6 @@ void AGearRoadModule::BeginPlay()
 
 void AGearRoadModule::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
 	FName ProperyName = PropertyChangedEvent.Property == nullptr ? NAME_None : PropertyChangedEvent.Property->GetFName();
 
 	if (ProperyName == GET_MEMBER_NAME_CHECKED(AGearRoadModule, bDirty))
@@ -99,6 +115,8 @@ void AGearRoadModule::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 		bSplineDirty = false;
 		UpdateSplineFromParent(bMirrorX, bMirrorY);
 	}
+
+	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 
 void AGearRoadModule::UpdateSplineParameters()
@@ -130,9 +148,7 @@ void AGearRoadModule::UpdateColliders()
 		BoundOrigin = ModulesStack->GetRelativeTransform().TransformPosition(BoundOrigin);
 
 		FVector BoundExtent = (MaxBound - MinBound) / 2;
-
-		MainCollider->SetRelativeLocation(BoundOrigin);
-		MainCollider->SetBoxExtent(BoundExtent + MainColliderPadding);
+		CollidersRefreneTransform = FTransform(FRotator::ZeroRotator, BoundOrigin, BoundExtent + MainColliderPadding);
 
 		SelectionHitbox->SetRelativeLocation(BoundOrigin);
 		SelectionHitbox->SetBoxExtent(BoundExtent + SelectionBoxPadding);
@@ -140,9 +156,32 @@ void AGearRoadModule::UpdateColliders()
 		BoundOrigin = RoadEndSocketComponent->GetRelativeTransform().TransformPosition(FVector(ExtentColliderSize.X, 0, 0));
 		BoundExtent = ExtentColliderSize;
 
-		ExtentCollider->SetRelativeLocation(BoundOrigin);
-		ExtentCollider->SetRelativeRotation(RoadEndSocketComponent->GetRelativeRotation());
-		ExtentCollider->SetBoxExtent(BoundExtent);
+		ExtendCollidersRefreneTransform = FTransform(RoadEndSocketComponent->GetRelativeRotation(), BoundOrigin, BoundExtent);
+	
+// ------------------------------------------------------------------------------------------------------------------------------
+
+		auto AddBox = [&](UBoxComponent* Box)
+			{
+				if (IsValid(Box) && Box->bDynamicObstacle)
+				{
+					FVector Origin = Box->GetRelativeLocation();
+					FRotator Rotation = Box->GetRelativeRotation();
+					FVector Extent = Box->GetUnscaledBoxExtent();
+
+					PlacingColliderBoxs.Add(FCollisionBox(Origin, Rotation, Extent));
+				}
+			}; 
+
+		PlacingColliderBoxs.Empty();
+
+		AddBox(Collider_1);
+		AddBox(Collider_2);
+		AddBox(Collider_3);
+		AddBox(Collider_4);
+		AddBox(Collider_5);
+		AddBox(Collider_6);
+		AddBox(Collider_7);
+		AddBox(Collider_8);
 	}
 
 }
@@ -267,8 +306,6 @@ void AGearRoadModule::SetPrebuildState(EPrebuildState State)
 void AGearRoadModule::OnTraceStateChanged()
 {
 	SetPrebuildState(bPlacingModuleInCollision ? EPrebuildState::NotPlaceable : EPrebuildState::Placable);
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), bPlacingModuleInCollision ? TEXT("True") : TEXT("FALSE"));
 }
 
 void AGearRoadModule::InitializePrebuildMaterials()

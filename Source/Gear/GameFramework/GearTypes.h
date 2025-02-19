@@ -333,3 +333,32 @@ enum class ELobbyGameState : uint8
 	WaitingForPlayers,
 	StartingGame
 };
+
+USTRUCT(BlueprintType)
+struct FCollisionBox
+{
+	GENERATED_BODY()
+
+public:
+	FCollisionBox() : FCollisionBox(FVector::ZeroVector, FRotator::ZeroRotator, FVector(128))
+	{
+
+	}
+
+	FCollisionBox(const FVector& InLocation, const FRotator& InRotation, const FVector& InExtent)
+		: Location(InLocation)
+		, Rotation(InRotation)
+		, Extent(InExtent)
+	{
+
+	}
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector Location;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FRotator Rotation;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector Extent;
+};
