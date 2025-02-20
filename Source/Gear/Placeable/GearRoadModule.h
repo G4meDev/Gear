@@ -109,6 +109,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<FCollisionBox> PlacingColliderBoxs;
 
+	UPROPERTY(Replicated)
+	bool bShouldPlayBuildAnim;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayBuildAnim();
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bMirrorX = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bMirrorY = false;
+
 #if WITH_EDITORONLY_DATA
 	void UpdateSplineParameters();
 
@@ -121,12 +134,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bSplineDirty = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool bMirrorX = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool bMirrorY = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FTransform CollidersRefreneTransform = FTransform::Identity;

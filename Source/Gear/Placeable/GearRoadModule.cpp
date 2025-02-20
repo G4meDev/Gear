@@ -52,13 +52,16 @@ AGearRoadModule::AGearRoadModule()
 
 	bPlacingModuleInCollision = false;
 	bActivePlacingModule = false;
+
+	bShouldPlayBuildAnim = false;
 }
 
-// void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
-// {
-// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-// 
-// }
+void AGearRoadModule::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AGearRoadModule, bShouldPlayBuildAnim, COND_InitialOnly);
+}
 
 void AGearRoadModule::PostInitializeComponents()
 {
@@ -85,6 +88,11 @@ void AGearRoadModule::BeginPlay()
 	}
 
 	OnTraceStateChanged();
+
+	if (bShouldPlayBuildAnim)
+	{
+		PlayBuildAnim();
+	}
 }
 
 #if WITH_EDITOR

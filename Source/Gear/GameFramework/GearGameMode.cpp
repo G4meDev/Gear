@@ -349,6 +349,8 @@ AGearRoadModule* AGearGameMode::AddRoadModule(TSubclassOf<AGearRoadModule> RoadM
 	if (IsValid(SpawnRoadModule))
 	{
 		SetOwner(GetOwner());
+		SpawnRoadModule->bShouldPlayBuildAnim = true;
+
 		UGameplayStatics::FinishSpawningActor(SpawnRoadModule, SpawnTransform);
 
 		SpawnRoadModule->MoveToSocketTransform(GearGameState->RoadModuleSocketTransform);
