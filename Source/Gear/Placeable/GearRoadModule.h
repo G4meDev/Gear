@@ -47,10 +47,10 @@ public:
 	USceneComponent* SpawnableSockets;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USplineComponent* RoadSpline;
+	UBoxComponent* ExtentCollider;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UBoxComponent* MainCollider;
+	USplineComponent* RoadSpline;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)	
 	UBoxComponent* Collider_1;
@@ -78,8 +78,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* MainColliders;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> RoadModuleClass;

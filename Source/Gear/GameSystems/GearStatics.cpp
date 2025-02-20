@@ -25,7 +25,7 @@ bool UGearStatics::TracePlacingRoadModuleForCollision(UObject* WorldContextObjec
 			bool bHit = WorldContextObject->GetWorld()->OverlapAnyTestByProfile(ColliderPos, ColliderRot, TEXT("RoadBoundCollider"), TraceShape);
 
 #if !UE_BUILD_SHIPPING
-			DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHit ? FColor::Red : FColor::Blue, false, 0.1f);
+			DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, Box.Extent, ColliderRot, bHit ? FColor::Red : FColor::Blue, false, 0.1f);
 #endif
 	
 			return bHit;
@@ -35,41 +35,12 @@ bool UGearStatics::TracePlacingRoadModuleForCollision(UObject* WorldContextObjec
 	{
 		for (const FCollisionBox& Box : RoadModule->PlacingColliderBoxs)
 		{
-			TraceBox(Box);
+			if (TraceBox(Box))
+			{
+				return true;
+			}
 		}
 	}
-
-	FVector ColliderPos;
-	FQuat ColliderRot;
-	FCollisionShape TraceShape;
-
-	auto TraceForCollider = [&](UBoxComponent* Collider)
-	{
-		ColliderPos = SocketTransform.TransformPosition(Collider->GetRelativeLocation());
-		ColliderRot = SocketTransform.TransformRotation(Collider->GetRelativeRotation().Quaternion());
-		TraceShape = FCollisionShape::MakeBox(Collider->GetUnscaledBoxExtent());
-
-		return WorldContextObject->GetWorld()->OverlapAnyTestByProfile(ColliderPos, ColliderRot, TEXT("RoadBoundCollider"), TraceShape);
-	};
-
-	bool bHitMainBody = TraceForCollider(RoadModule->MainCollider);
-
-#if !UE_BUILD_SHIPPING
-	DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitMainBody ? FColor::Red : FColor::Blue, false, 0.1f);
-#endif
-
-	if (bHitMainBody)
-		return true;
-
-
-	bool bHitExtent = TraceForCollider(RoadModule->ExtentCollider);
-
-#if !UE_BUILD_SHIPPING
-	DrawDebugBox(WorldContextObject->GetWorld(), ColliderPos, RoadModule->MainCollider->GetUnscaledBoxExtent(), ColliderRot, bHitExtent ? FColor::Red : FColor::Yellow, false, 0.1f);
-#endif
-
-	if (bHitExtent)
-		return true;
 
 	return false;
 }

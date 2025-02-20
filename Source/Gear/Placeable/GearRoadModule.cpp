@@ -35,14 +35,10 @@ AGearRoadModule::AGearRoadModule()
 	RoadSpline = CreateDefaultSubobject<USplineComponent>(TEXT("RoadSpline"));
 	RoadSpline->SetupAttachment(Root);
 
-	MainCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("MainCollider"));
-	MainCollider->SetupAttachment(Root);
-	MainCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MainCollider->ShapeColor = FColor::Blue;
-
 	MainColliders = CreateDefaultSubobject<USceneComponent>(TEXT("MainColliders"));
-	MainColliders->SetupAttachment(ModulesStack);
+	MainColliders->SetupAttachment(Root);
 
+	DEFINE_COLLIDER(ExtentCollider);
 	DEFINE_COLLIDER(Collider_1);
 	DEFINE_COLLIDER(Collider_2);
 	DEFINE_COLLIDER(Collider_3);
@@ -51,11 +47,6 @@ AGearRoadModule::AGearRoadModule()
 	DEFINE_COLLIDER(Collider_6);
 	DEFINE_COLLIDER(Collider_7);
 	DEFINE_COLLIDER(Collider_8);
-
-	ExtentCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("ExtentCollider"));
-	ExtentCollider->SetupAttachment(Root);
-	ExtentCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	ExtentCollider->ShapeColor = FColor::Yellow;
 
 	PreviewScale = 0.3f;
 
@@ -138,7 +129,7 @@ void AGearRoadModule::UpdateSplineParameters()
 
 void AGearRoadModule::UpdateColliders()
 {
-	if (IsValid(RoadMesh) && IsValid(MainCollider) && IsValid(ExtentCollider))
+	if (IsValid(RoadMesh))
 	{
 		FVector MinBound;
 		FVector MaxBound;
@@ -174,6 +165,7 @@ void AGearRoadModule::UpdateColliders()
 
 		PlacingColliderBoxs.Empty();
 
+		AddBox(ExtentCollider);
 		AddBox(Collider_1);
 		AddBox(Collider_2);
 		AddBox(Collider_3);
@@ -333,14 +325,29 @@ void AGearRoadModule::InitializePrebuildMaterials()
 
 void AGearRoadModule::SetMainColliderEnabled(bool bEnabled)
 {
-	if (bEnabled)
-	{
-		MainCollider->SetCollisionProfileName(TEXT("RoadBoundCollider"));
-	}
-	else
-	{
-		MainCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
+	auto SetBoxColliderEnabled = [&](UBoxComponent* Box)
+		{
+			if (IsValid(Box) && Box->bDynamicObstacle)
+			{
+				if (bEnabled)
+				{
+					Box->SetCollisionProfileName(TEXT("RoadBoundCollider"));
+				}
+				else
+				{
+					Box->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				}
+			}
+		};
+
+	SetBoxColliderEnabled(Collider_1);
+	SetBoxColliderEnabled(Collider_2);
+	SetBoxColliderEnabled(Collider_3);
+	SetBoxColliderEnabled(Collider_4);
+	SetBoxColliderEnabled(Collider_5);
+	SetBoxColliderEnabled(Collider_6);
+	SetBoxColliderEnabled(Collider_7);
+	SetBoxColliderEnabled(Collider_8);
 }
 
 void AGearRoadModule::OnIdle_Start()
