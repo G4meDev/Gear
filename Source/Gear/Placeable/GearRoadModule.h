@@ -147,7 +147,7 @@ public:
 	FVector MainColliderPadding = FVector(-100.0f, 200.0f, 500.0f);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FVector ExtentColliderSize = FVector(3000.0f, 1000.0f, 500.0f);
+	FVector ExtentColliderSize = FVector(3000.0f, 600.0f, 500.0f);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float SelectionBoxPadding = 200.0f;
