@@ -80,7 +80,6 @@ public:
 	USceneComponent* MainColliders;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UBoxComponent* ExtentCollider;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AGearRoadModule> RoadModuleClass;
