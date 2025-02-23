@@ -20,6 +20,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -42,6 +43,8 @@ AGearVehicle::AGearVehicle()
 	BrakeValue				= 0.0f;
 	TargetCheckpoint		= 1;
 	bGrantedInvincibility	= false;
+
+	AirTorqueControl		= 700.0f;
 
 	bReplicates				= true;
 	bAlwaysRelevant			= true;
@@ -293,6 +296,8 @@ void AGearVehicle::Tick(float DeltaSeconds)
 		SteerAngle = GetWheelSteerAngle(0);
 	}
 
+	UpdateControl();
+
 #if WITH_EDITOR
 	if (bInTestMap)
 		return;
@@ -523,20 +528,27 @@ AGearDriver* AGearVehicle::GetDriver()
 	return Driver;
 }
 
-bool AGearVehicle::IsOnGround()
+int32 AGearVehicle::GetNumWheelsOnGround()
 {
+	int Result = 0;
+
 	if (IsValid(GetChaosMovementComponent()))
 	{
 		for (int i = 0; i < ChaosMovementComponent->GetNumWheels(); i++)
 		{
 			if (ChaosMovementComponent->GetWheelState(i).bInContact)
 			{
-				return true;
+				Result++;
 			}
 		}
 	}
 
-	return false;
+	return Result;
+}
+
+bool AGearVehicle::IsOnGround()
+{
+	return GetNumWheelsOnGround() == 0;
 }
 
 void AGearVehicle::ReduceVelocityBeRatio(float Ratio)
@@ -545,5 +557,22 @@ void AGearVehicle::ReduceVelocityBeRatio(float Ratio)
 	{
 		FVector Velocity = GetMesh()->GetComponentVelocity();		
 		GetMesh()->AddImpulse(FMath::Clamp(Ratio, 0, 1) * -Velocity, NAME_None, true);
+	}
+}
+
+void AGearVehicle::UpdateControl()
+{
+	const int32 NumWheelsOnGround = GetNumWheelsOnGround();
+	
+	InputDirection = FVector(ChaosMovementComponent->GetThrottleInput() - ChaosMovementComponent->GetBrakeInput()
+		, ChaosMovementComponent->GetSteeringInput(), 0.0f);
+
+	if (IsValid(GetChaosMovementComponent()))
+	{
+		if (NumWheelsOnGround == 0)
+		{
+			GetMesh()->AddTorqueInDegrees(GetActorUpVector() * InputDirection.Y * AirTorqueControl, NAME_None, true);
+		}
+
 	}
 }

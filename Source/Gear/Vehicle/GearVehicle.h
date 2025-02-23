@@ -100,10 +100,15 @@ public:
 	AGearDriver* GetDriver();
 
 	UFUNCTION(BlueprintPure)
+	int32 GetNumWheelsOnGround();
+
+	UFUNCTION(BlueprintPure)
 	bool IsOnGround();
 
 	UFUNCTION(BlueprintCallable)
 	void ReduceVelocityBeRatio(float Ratio);
+
+	void UpdateControl();
 
 protected:
 
@@ -188,10 +193,21 @@ protected:
 	TSubclassOf<AVehicleCamera> VehicleCameraClass;
 
 	bool bInTestMap = false; 
+
 #endif
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Control)
+	float AirTorqueControl;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Control)
+	bool bDrawDebugs = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Control)
+	FVector InputDirection;
 
 private:
 
 	UPROPERTY(Category = Vehicle, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UVehicleAudioComponent> VehicleAudioComponent;
+
 };
