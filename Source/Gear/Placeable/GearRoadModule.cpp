@@ -156,6 +156,57 @@ void AGearRoadModule::UpdateColliders()
 		BoundExtent = ExtentColliderSize;
 
 		ExtendCollidersRefreneTransform = FTransform(RoadEndSocketComponent->GetRelativeRotation(), BoundOrigin, BoundExtent);
+
+		AGearRoadModule* RoadModuleCDO = IsValid(RoadModuleClass) ? RoadModuleClass->GetDefaultObject<AGearRoadModule>() : nullptr;
+		if (IsValid(RoadModuleCDO))
+		{
+			FTransform EndSocketTransform = RoadEndSocketComponent->GetRelativeTransform();
+			auto UpdateBox = [&](UBoxComponent* Box, UBoxComponent* BoxCDO)
+				{
+					if (IsValid(Box) && IsValid(BoxCDO))
+					{
+						FVector BoxExtent = BoxCDO->GetUnscaledBoxExtent();
+						FVector BoxPosition = BoxCDO->GetRelativeLocation();
+						FRotator BoxRotation = BoxCDO->GetRelativeRotation();
+
+						if (bMirrorY)
+						{
+							BoxPosition *= FVector(1, -1, 1);
+							BoxRotation = FRotator(BoxRotation.Pitch, -BoxRotation.Yaw, BoxRotation.Roll);
+						}
+
+						if (bMirrorX)
+						{
+							FTransform Transform = EndSocketTransform;
+							Transform.SetRotation(FQuat(FVector::UpVector, PI) * Transform.GetRotation());
+
+							BoxPosition = Transform.TransformPosition(BoxPosition);
+							Transform.SetRotation(FRotator(0, -EndSocketTransform.Rotator().Yaw, 0).Quaternion());
+
+							BoxRotation = Transform.InverseTransformRotation(BoxRotation.Quaternion()).Rotator();
+						}
+						
+						Box->bDynamicObstacle = BoxCDO->bDynamicObstacle;
+						Box->SetBoxExtent(BoxExtent);
+						Box->SetRelativeLocationAndRotation(BoxPosition, BoxRotation);
+						Box->SetRelativeScale3D(FVector::OneVector);
+					}
+				};
+
+			ExtentCollider->SetBoxExtent(ExtendCollidersRefreneTransform.GetScale3D());
+			ExtentCollider->SetRelativeLocationAndRotation(ExtendCollidersRefreneTransform.GetLocation(), ExtendCollidersRefreneTransform.GetRotation());
+
+//			UpdateBox(ExtentCollider, RoadModuleCDO->ExtentCollider);
+			UpdateBox(Collider_1, RoadModuleCDO->Collider_1);
+			UpdateBox(Collider_2, RoadModuleCDO->Collider_2);
+			UpdateBox(Collider_3, RoadModuleCDO->Collider_3);
+			UpdateBox(Collider_4, RoadModuleCDO->Collider_4);
+			UpdateBox(Collider_5, RoadModuleCDO->Collider_5);
+			UpdateBox(Collider_6, RoadModuleCDO->Collider_6);
+			UpdateBox(Collider_7, RoadModuleCDO->Collider_7);
+			UpdateBox(Collider_8, RoadModuleCDO->Collider_8);
+			
+		}
 	
 // ------------------------------------------------------------------------------------------------------------------------------
 
