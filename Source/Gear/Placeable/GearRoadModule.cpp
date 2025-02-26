@@ -218,8 +218,11 @@ void AGearRoadModule::UpdateSplineFromParent(bool InMirrorX, bool InMirrorY)
 					Transform.SetRotation(FQuat(FVector::UpVector, PI) * Transform.GetRotation());
 
 					SplinePoint.Position = Transform.TransformPosition(SplinePoint.Position);
-					SplinePoint.ArriveTangent = -SplinePoint.ArriveTangent;
-					SplinePoint.LeaveTangent = -SplinePoint.LeaveTangent;
+
+					Transform.SetRotation(FRotator(0, -EndSocketTransform.Rotator().Yaw, 0).Quaternion());
+
+					SplinePoint.ArriveTangent = Transform.InverseTransformVectorNoScale(SplinePoint.ArriveTangent * FVector(1, 1, -1));
+					SplinePoint.LeaveTangent = Transform.InverseTransformVectorNoScale(SplinePoint.LeaveTangent * FVector(1, 1, -1));
 				}
 
 				RoadSpline->AddPoint(SplinePoint, false);
