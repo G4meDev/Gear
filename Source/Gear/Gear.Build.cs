@@ -9,7 +9,7 @@ public class Gear : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineBase", "Sockets", "UMG", "RenderCore", "Niagara", "Http" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineBase", "Sockets", "UMG", "RenderCore", "Niagara", "HTTP" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
