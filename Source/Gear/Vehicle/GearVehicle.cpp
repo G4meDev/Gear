@@ -473,6 +473,19 @@ bool AGearVehicle::IsWheelOnGround(int32 Index)
 	return IsValid(GetChaosMovementComponent()) ? GetChaosMovementComponent()->GetWheelState(Index).bInContact : false;
 }
 
+// const TUPhysicalMaterial* AGearVehicle::GetWheelContactPhysicMaterial(int32 Index)
+// {
+// 	if (IsValid(GetChaosMovementComponent()))
+// 	{
+// 		if (ChaosMovementComponent->GetWheelState(Index).bInContact)
+// 		{
+// 			return ChaosMovementComponent->GetWheelState(Index).PhysMaterial;
+// 		}
+// 	}
+// 	
+// 	return nullptr;
+// }
+
 bool AGearVehicle::IsWheelSkiding(int32 Index)
 {
 	return IsValid(GetChaosMovementComponent()) ? GetChaosMovementComponent()->GetWheelState(Index).bIsSkidding : false;

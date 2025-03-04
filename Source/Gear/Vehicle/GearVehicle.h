@@ -75,6 +75,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsWheelOnGround(int32 Index);
 
+// 	UFUNCTION(BlueprintPure)
+// 	UPhysicalMaterial* GetWheelContactPhysicMaterial(int32 Index);
+
 	UFUNCTION(BlueprintPure)
 	bool IsWheelSkiding(int32 Index);
 
