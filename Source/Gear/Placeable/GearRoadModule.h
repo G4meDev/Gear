@@ -37,6 +37,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* RoadMesh;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UStaticMeshComponent* RoadCollider_Default;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UStaticMeshComponent* RoadCollider_CementWet;
+
  	UPROPERTY(BlueprintReadWrite, EditAnywhere)
  	USceneComponent* RoadEndSocketComponent;
 

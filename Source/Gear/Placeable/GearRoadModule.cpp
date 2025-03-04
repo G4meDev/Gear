@@ -23,6 +23,16 @@ AGearRoadModule::AGearRoadModule()
 	RoadMesh->SetupAttachment(MainModules);
 	RoadMesh->SetCollisionProfileName(TEXT("BlockAll"));
 
+	RoadCollider_Default = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RoadCollider_Default"));
+	RoadCollider_Default->SetupAttachment(MainModules);
+	RoadCollider_Default->SetCollisionProfileName(TEXT("BlockAll"));
+	RoadCollider_Default->SetVisibility(false);
+
+	RoadCollider_CementWet = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RoadCollider_CementWet"));
+	RoadCollider_CementWet->SetupAttachment(MainModules);
+	RoadCollider_CementWet->SetCollisionProfileName(TEXT("BlockAll"));
+	RoadCollider_CementWet->SetVisibility(false);
+
 	RoadEndSocketComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RoadEndSocket"));
 	RoadEndSocketComponent->SetupAttachment(Root);
 
