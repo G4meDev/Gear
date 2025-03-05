@@ -11,7 +11,6 @@ UVehicleSkidmarkComponent::UVehicleSkidmarkComponent()
 
 	OwningVehicle = nullptr;
 	NiagaraComponent = nullptr;
-	ParticleEffect = nullptr;
 	WheelIndex = 0;
 }
 
@@ -31,19 +30,22 @@ void UVehicleSkidmarkComponent::TickComponent(float DeltaTime, enum ELevelTick T
 	bool bWheelOnGround = OwningVehicle->IsWheelOnGround(WheelIndex);
 	bool bWheelSkiding = OwningVehicle->IsWheelSkiding(WheelIndex);
 
-	bool bEffectActive = IsValid(NiagaraComponent);
+// 	const TWeakObjectPtr<UPhysicalMaterial> ContactMaterial = OwningVehicle->GetWheelContactPhysicMaterial(WheelIndex);
+// 	ContactMaterial->SurfaceType
 
-	if (bEffectActive && (!bWheelOnGround || !bWheelSkiding))
-	{
-		NiagaraComponent->Deactivate();
-		NiagaraComponent = nullptr;
-	}
-
-	if (!bEffectActive && bWheelOnGround && bWheelSkiding)
-	{
-		NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(ParticleEffect, this, NAME_None, FVector::Zero(), FRotator::ZeroRotator, FVector::OneVector, EAttachLocation::SnapToTarget, true, ENCPoolMethod::AutoRelease, true);
-		
-	}
+// 	bool bEffectActive = IsValid(NiagaraComponent);
+// 
+// 	if (bEffectActive && (!bWheelOnGround || !bWheelSkiding))
+// 	{
+// 		NiagaraComponent->Deactivate();
+// 		NiagaraComponent = nullptr;
+// 	}
+// 
+// 	if (!bEffectActive && bWheelOnGround && bWheelSkiding)
+// 	{
+// 		NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(ParticleEffect, this, NAME_None, FVector::Zero(), FRotator::ZeroRotator, FVector::OneVector, EAttachLocation::SnapToTarget, true, ENCPoolMethod::AutoRelease, true);
+// 		
+// 	}
 }
 
 void UVehicleSkidmarkComponent::OnComponentDestroyed(bool bDestroyingHierarchy)

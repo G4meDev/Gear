@@ -7,6 +7,9 @@
 
 #define DEFAULT_PLAYER_NAME "NewPlayer"
 
+#define SURFACE_Default		SurfaceType_Default
+#define SURFACE_CementWet	SurfaceType1
+
 class AGearPlaceable;
 class AGearPlayerState;
 

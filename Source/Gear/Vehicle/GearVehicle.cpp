@@ -8,6 +8,7 @@
 
 #include "GameFramework/GearPlayerController.h"
 #include "Vehicle/GearDriver.h"
+#include "Vehicle/WheelEffectType.h"
 #include "UI/VehicleInputWidget.h"
 #include "Ability/GearAbility.h"
 #include "GameFramework/GearPlayerState.h"
@@ -23,6 +24,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Net/UnrealNetwork.h"
 
@@ -45,6 +47,8 @@ AGearVehicle::AGearVehicle()
 	bGrantedInvincibility	= false;
 
 	AirTorqueControl		= 700.0f;
+
+	WheelEffectOffset		= 0.0f;
 
 	bReplicates				= true;
 	bAlwaysRelevant			= true;
@@ -285,6 +289,10 @@ void AGearVehicle::Input_Ability(const FInputActionInstance& Instance)
 void AGearVehicle::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	CurrentSpeed = GetVehicleMovement() ? FMath::Abs(GetVehicleMovement()->GetForwardSpeed()) : 0.0f;
+
+	UpdateWheelEffect(DeltaSeconds);
 	
 	if (IsLocallyControlled())
 	{
@@ -473,7 +481,7 @@ bool AGearVehicle::IsWheelOnGround(int32 Index)
 	return IsValid(GetChaosMovementComponent()) ? GetChaosMovementComponent()->GetWheelState(Index).bInContact : false;
 }
 
-// const TUPhysicalMaterial* AGearVehicle::GetWheelContactPhysicMaterial(int32 Index)
+// const TWeakObjectPtr<UPhysicalMaterial> AGearVehicle::GetWheelContactPhysicMaterial(int32 Index)
 // {
 // 	if (IsValid(GetChaosMovementComponent()))
 // 	{
@@ -588,4 +596,57 @@ void AGearVehicle::UpdateControl()
 		}
 
 	}
+}
+
+// ---------------------------------------------------------------------------------------------
+
+void AGearVehicle::UpdateWheelEffect(float DeltaTime)
+{
+	bool bTiresTouchingGround = false;
+
+	if (GetChaosMovementComponent() && IsValid(WheelEffect))
+	{
+		for (int32 i = 0; i < UE_ARRAY_COUNT(DustPSC); i++)
+		{
+			UPhysicalMaterial* ContactMat = ChaosMovementComponent->Wheels[i]->GetContactSurfaceMaterial();
+			if (ContactMat != nullptr)
+			{
+				bTiresTouchingGround = true;
+			}
+			UNiagaraSystem* WheelFX = WheelEffect->GetFX(ContactMat, CurrentSpeed);
+
+			const bool bIsActive = DustPSC[i] != nullptr && DustPSC[i]->IsActive() && !DustPSC[i]->IsComplete();
+			
+			UNiagaraSystem* CurrentFX = DustPSC[i] != nullptr ? Cast<UNiagaraSystem>(DustPSC[i]->GetFXSystemAsset()) : nullptr;
+			if (WheelFX != nullptr && (CurrentFX != WheelFX || !bIsActive))
+			{
+				if (DustPSC[i] == nullptr || DustPSC[i]->IsActive())
+				{
+					if (DustPSC[i] != nullptr)
+					{
+						DustPSC[i]->SetActive(false);
+						DustPSC[i]->SetAutoDestroy(true);
+					}
+					SpawnNewWheelEffect(i);
+				}
+				DustPSC[i]->SetAsset(WheelFX);
+				DustPSC[i]->ActivateSystem();
+			}
+			else if (WheelFX == nullptr && bIsActive)
+			{
+				DustPSC[i]->SetActive(false);
+			}
+		}
+	}
+}
+
+void AGearVehicle::SpawnNewWheelEffect(int WheelIndex)
+{
+	DustPSC[WheelIndex] = NewObject<UNiagaraComponent>(this);
+	DustPSC[WheelIndex]->bAutoActivate = true;
+	DustPSC[WheelIndex]->SetAutoDestroy(false);
+	DustPSC[WheelIndex]->RegisterComponentWithWorld(GetWorld());
+	DustPSC[WheelIndex]->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	FVector WheelLocalPosition = GetMesh()->GetBoneLocation(ChaosMovementComponent->WheelSetups[WheelIndex].BoneName, EBoneSpaces::ComponentSpace);
+	DustPSC[WheelIndex]->SetRelativeLocation(WheelLocalPosition + FVector::DownVector * (ChaosMovementComponent->Wheels[WheelIndex]->WheelRadius - WheelEffectOffset));
 }

@@ -76,7 +76,7 @@ public:
 	bool IsWheelOnGround(int32 Index);
 
 // 	UFUNCTION(BlueprintPure)
-// 	UPhysicalMaterial* GetWheelContactPhysicMaterial(int32 Index);
+// 	const TWeakObjectPtr<UPhysicalMaterial> GetWheelContactPhysicMaterial(int32 Index);
 
 	UFUNCTION(BlueprintPure)
 	bool IsWheelSkiding(int32 Index);
@@ -112,6 +112,8 @@ public:
 	void ReduceVelocityBeRatio(float Ratio);
 
 	void UpdateControl();
+
+	void UpdateWheelEffect(float DeltaTime);
 
 protected:
 
@@ -207,6 +209,22 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Control)
 	FVector InputDirection;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category=Control)
+	float CurrentSpeed;
+
+// ---------------------------------------------------------------------------------------------
+
+	void SpawnNewWheelEffect(int WheelIndex);
+
+	UPROPERTY(Transient)
+	class UNiagaraComponent* DustPSC[3];
+
+	UPROPERTY(EditDefaultsOnly, Category="Effect")
+	class UWheelEffectType* WheelEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effect")
+	float WheelEffectOffset;
 
 private:
 

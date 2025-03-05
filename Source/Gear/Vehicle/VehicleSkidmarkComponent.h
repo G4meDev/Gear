@@ -25,7 +25,10 @@ public:
 protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Effect")
-	class UNiagaraSystem* ParticleEffect;
+	class UNiagaraSystem* DefaultEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effect")
+	class UNiagaraSystem* CementEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	int32 WheelIndex;
