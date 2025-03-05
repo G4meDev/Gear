@@ -614,17 +614,17 @@ void AGearVehicle::UpdateWheelEffect(float DeltaTime)
 				bTiresTouchingGround = true;
 			}
 			UNiagaraSystem* WheelFX = WheelEffect->GetFX(ContactMat, CurrentSpeed);
-
-			const bool bIsActive = DustPSC[i] != nullptr && DustPSC[i]->IsActive() && !DustPSC[i]->IsComplete();
 			
+			const bool bIsActive = DustPSC[i] != nullptr && DustPSC[i]->IsActive() && !DustPSC[i]->IsComplete();
 			UNiagaraSystem* CurrentFX = DustPSC[i] != nullptr ? Cast<UNiagaraSystem>(DustPSC[i]->GetFXSystemAsset()) : nullptr;
+			
 			if (WheelFX != nullptr && (CurrentFX != WheelFX || !bIsActive))
 			{
 				if (DustPSC[i] == nullptr || DustPSC[i]->IsActive())
 				{
 					if (DustPSC[i] != nullptr)
 					{
-						DustPSC[i]->SetActive(false);
+						DustPSC[i]->Deactivate();
 						DustPSC[i]->SetAutoDestroy(true);
 					}
 					SpawnNewWheelEffect(i);
@@ -634,7 +634,9 @@ void AGearVehicle::UpdateWheelEffect(float DeltaTime)
 			}
 			else if (WheelFX == nullptr && bIsActive)
 			{
-				DustPSC[i]->SetActive(false);
+				DustPSC[i]->Deactivate();
+				DustPSC[i]->SetAutoDestroy(true);
+				DustPSC[i] = nullptr;
 			}
 		}
 	}
