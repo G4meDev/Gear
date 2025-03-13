@@ -183,7 +183,8 @@ void AGearHUD::Finishboard_End()
 void AGearHUD::Pause_Start(float StartTime)
 {
 	SetVisilityOfWidgetsInStack(false);
-	AddWidget(PauseWidgetClass, PauseWidget, StartTime);
+	//AddWidget(PauseWidgetClass, PauseWidget, StartTime);
+	OnPauseStart();
 	bPaused = true;
 }
 

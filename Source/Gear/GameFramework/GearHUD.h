@@ -35,7 +35,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category=Classes)
 	TSubclassOf<UGearBaseWidget> PauseWidgetClass;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UGearBaseWidget* PauseWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category=Classes)
@@ -150,6 +150,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void Pause_End();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPauseStart();
 
 	UFUNCTION(BlueprintPure)
 	bool IsPaused();
