@@ -17,4 +17,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void SphereOverlapForVehicles(UObject* WorldContextObject, TArray<class AGearVehicle*>& Vehicles, const FVector& Center, float Radius, TArray<AActor*> IgnoreActors, bool bIncludeInvincible = false);
+
+	UFUNCTION(BlueprintPure)
+	static FVector GetVectorZPlaneIntersection(const FVector& VectorPosition, const FVector& VectorDirection, float ZPlaneHeight);
+
+	UFUNCTION(BlueprintPure)
+	static bool GetPlayerViewZPlaneIntersection(class APlayerController* PC, float ZPlaneHeight, FVector& Result);
+
 };

@@ -68,3 +68,22 @@ void UGearStatics::SphereOverlapForVehicles(UObject* WorldContextObject, TArray<
 		}
 	}
 }
+
+FVector UGearStatics::GetVectorZPlaneIntersection(const FVector& VectorPosition, const FVector& VectorDirection, float ZPlaneHeight)
+{
+	float IntersectionDistance = (VectorPosition.Z - ZPlaneHeight) / -VectorDirection.Z;
+	return VectorPosition + IntersectionDistance * VectorDirection;
+}
+
+bool UGearStatics::GetPlayerViewZPlaneIntersection(class APlayerController* PC, float ZPlaneHeight, FVector& Result)
+{
+	APlayerCameraManager* CM = IsValid(PC) ? PC->PlayerCameraManager : nullptr;
+	if (IsValid(CM))
+	{
+		Result = GetVectorZPlaneIntersection(CM->GetCameraLocation(), CM->GetCameraRotation().Vector(), ZPlaneHeight);
+		return true;
+	}
+
+	Result = FVector::ZeroVector;
+	return false;
+}
